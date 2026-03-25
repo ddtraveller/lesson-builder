@@ -1,0 +1,139 @@
+{
+  "course_id": "CHANGE_ME",
+  "title": "CHANGE_ME",
+  "title_l1": "CHANGE_ME",
+  "description": "CHANGE_ME",
+  "level": "Pre-A1 → A1",
+  "schedule": "1 hour/week × 12 weeks",
+  "l1": "CHANGE_ME",
+  "l1_name": "CHANGE_ME",
+  "l1_name_native": "CHANGE_ME",
+  "l2": "en",
+  "l2_name": "English",
+  "output_dir": "HTML/courses/CHANGE_ME",
+  "file_prefix": "CHANGE_ME",
+  "syllabus_file": "syllabus_CHANGE_ME.html",
+  "theme": {
+    "primary": "#7c3aed",
+    "primary_dark": "#6d28d9",
+    "primary_light": "#c4b5fd",
+    "primary_pale": "#f5f3ff",
+    "accent": "#8b5cf6"
+  },
+  "page_types": {
+    "lesson": "every",
+    "activities": "every",
+    "exam": "every",
+    "flashcards": "random:3",
+    "conversation": "random:3",
+    "pronunciation": "random:2",
+    "worksheet": "random:3",
+    "syllabus": true
+  },
+  "page_structure": {
+    "lesson": {
+      "sections": [
+        "introduction",
+        "vocabulary",
+        "grammar",
+        "tutorial_steps",
+        "activity",
+        "reference_table",
+        "summary"
+      ],
+      "section_checks": true,
+      "section_check_questions": 3,
+      "homework": true,
+      "references": true,
+      "audio_buttons": true,
+      "hero_image": false
+    },
+    "exam": {
+      "categories": 4,
+      "difficulty_selector": true,
+      "gradebook": true
+    }
+  },
+  "vocab_per_unit": 12,
+  "research": {
+    "notebooklm": false,
+    "web_search": true,
+    "fact_check": false
+  },
+  "images": {
+    "enabled": false
+  },
+  "units": [
+    {
+      "week": 1,
+      "prefix": "CHANGE_ME_w1",
+      "emoji": "CHANGE_ME",
+      "topic_l2": "CHANGE_ME",
+      "topic_l1": "CHANGE_ME",
+      "grammar_l2": "CHANGE_ME",
+      "grammar_l1": "CHANGE_ME",
+      "vocab": [
+        [
+          "word1",
+          "CHANGE_ME",
+          "Definition"
+        ],
+        [
+          "word2",
+          "CHANGE_ME",
+          "Definition"
+        ],
+        [
+          "word3",
+          "CHANGE_ME",
+          "Definition"
+        ],
+        [
+          "word4",
+          "CHANGE_ME",
+          "Definition"
+        ],
+        [
+          "word5",
+          "CHANGE_ME",
+          "Definition"
+        ],
+        [
+          "word6",
+          "CHANGE_ME",
+          "Definition"
+        ],
+        [
+          "word7",
+          "CHANGE_ME",
+          "Definition"
+        ],
+        [
+          "word8",
+          "CHANGE_ME",
+          "Definition"
+        ],
+        [
+          "word9",
+          "CHANGE_ME",
+          "Definition"
+        ],
+        [
+          "word10",
+          "CHANGE_ME",
+          "Definition"
+        ],
+        [
+          "word11",
+          "CHANGE_ME",
+          "Definition"
+        ],
+        [
+          "word12",
+          "CHANGE_ME",
+          "Definition"
+        ]
+      ]
+    }
+  ]
+}

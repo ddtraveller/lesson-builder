@@ -1,0 +1,925 @@
+{
+  "course_id": "business_english",
+  "title": "Business English for the Workplace",
+  "title_l1": "ภาษาอังกฤษธุรกิจสำหรับที่ทำงาน",
+  "description": "A 12-week course for professionals who need English for meetings, emails, presentations, and office communication.",
+  "level": "A1 → A2",
+  "schedule": "1 hour/week × 12 weeks",
+  "l1": "th",
+  "l1_name": "Thai",
+  "l1_name_native": "ภาษาไทย",
+  "l2": "en",
+  "l2_name": "English",
+  "output_dir": "HTML/courses/business_english",
+  "file_prefix": "biz",
+  "syllabus_file": "syllabus_business_english.html",
+  "theme": {
+    "primary": "#1e40af",
+    "primary_dark": "#1e3a8a",
+    "primary_light": "#93c5fd",
+    "primary_pale": "#eff6ff",
+    "accent": "#0891b2"
+  },
+  "page_types": {
+    "lesson": "every",
+    "activities": "every",
+    "exam": "every",
+    "flashcards": "random:4",
+    "conversation": "every",
+    "pronunciation": "random:3",
+    "worksheet": "random:4",
+    "syllabus": true
+  },
+  "page_structure": {
+    "lesson": {
+      "sections": [
+        "introduction",
+        "vocabulary",
+        "grammar",
+        "tutorial_steps",
+        "activity",
+        "reference_table",
+        "summary"
+      ],
+      "section_checks": true,
+      "section_check_questions": 3,
+      "homework": true,
+      "references": true,
+      "audio_buttons": true,
+      "hero_image": false
+    },
+    "exam": {
+      "categories": 4,
+      "difficulty_selector": true,
+      "gradebook": true
+    },
+    "conversation": {
+      "dialogue_lines": 10,
+      "comprehension_questions": 3,
+      "role_play_prompts": 3
+    }
+  },
+  "vocab_per_unit": 12,
+  "research": {
+    "notebooklm": false,
+    "web_search": true,
+    "fact_check": false
+  },
+  "images": {
+    "enabled": false
+  },
+  "units": [
+    {
+      "week": 1,
+      "prefix": "biz_intro",
+      "emoji": "🤝",
+      "topic_l2": "Introductions & Small Talk",
+      "topic_l1": "การแนะนำตัวและการสนทนาทั่วไป",
+      "grammar_l2": "Present Simple + Polite Questions",
+      "grammar_l1": "Present Simple + คำถามสุภาพ",
+      "vocab": [
+        [
+          "introduce",
+          "แนะนำ",
+          "To tell someone your name"
+        ],
+        [
+          "position",
+          "ตำแหน่ง",
+          "Your job title"
+        ],
+        [
+          "department",
+          "แผนก",
+          "A section of a company"
+        ],
+        [
+          "colleague",
+          "เพื่อนร่วมงาน",
+          "A person you work with"
+        ],
+        [
+          "pleased",
+          "ยินดี",
+          "Happy about something"
+        ],
+        [
+          "responsible",
+          "รับผิดชอบ",
+          "In charge of something"
+        ],
+        [
+          "experience",
+          "ประสบการณ์",
+          "Knowledge from doing something"
+        ],
+        [
+          "currently",
+          "ปัจจุบัน",
+          "At this time"
+        ],
+        [
+          "based in",
+          "ประจำอยู่ที่",
+          "Located at"
+        ],
+        [
+          "look forward to",
+          "ตั้งตารอ",
+          "To be excited about a future event"
+        ],
+        [
+          "How do you do?",
+          "สวัสดีครับ/ค่ะ (ทางการ)",
+          "Formal greeting"
+        ],
+        [
+          "Nice to meet you",
+          "ยินดีที่ได้รู้จัก",
+          "Common greeting when introduced"
+        ]
+      ]
+    },
+    {
+      "week": 2,
+      "prefix": "biz_email",
+      "emoji": "📧",
+      "topic_l2": "Writing Professional Emails",
+      "topic_l1": "การเขียนอีเมลอย่างมืออาชีพ",
+      "grammar_l2": "Formal vs Informal Register",
+      "grammar_l1": "ภาษาทางการ vs ไม่เป็นทางการ",
+      "vocab": [
+        [
+          "Dear",
+          "เรียน",
+          "Formal email greeting"
+        ],
+        [
+          "regarding",
+          "เกี่ยวกับ",
+          "About a topic"
+        ],
+        [
+          "attached",
+          "แนบ",
+          "A file sent with an email"
+        ],
+        [
+          "deadline",
+          "กำหนดส่ง",
+          "The last day to finish"
+        ],
+        [
+          "confirm",
+          "ยืนยัน",
+          "To say something is correct"
+        ],
+        [
+          "request",
+          "ขอ / คำขอ",
+          "To ask formally"
+        ],
+        [
+          "apologize",
+          "ขออภัย",
+          "To say sorry formally"
+        ],
+        [
+          "update",
+          "อัปเดต",
+          "New information"
+        ],
+        [
+          "sincerely",
+          "ด้วยความนับถือ",
+          "Formal email closing"
+        ],
+        [
+          "inform",
+          "แจ้งให้ทราบ",
+          "To tell someone officially"
+        ],
+        [
+          "CC",
+          "สำเนาถึง",
+          "Send a copy to another person"
+        ],
+        [
+          "subject line",
+          "หัวข้ออีเมล",
+          "The title of an email"
+        ]
+      ]
+    },
+    {
+      "week": 3,
+      "prefix": "biz_phone",
+      "emoji": "📞",
+      "topic_l2": "Phone Calls & Voicemail",
+      "topic_l1": "การโทรศัพท์และข้อความเสียง",
+      "grammar_l2": "Could / Would (Polite Requests)",
+      "grammar_l1": "Could / Would (การขอร้องอย่างสุภาพ)",
+      "vocab": [
+        [
+          "calling",
+          "โทรหา",
+          "Making a phone call"
+        ],
+        [
+          "extension",
+          "เบอร์ต่อ",
+          "An internal phone number"
+        ],
+        [
+          "transfer",
+          "โอนสาย",
+          "To connect to another person"
+        ],
+        [
+          "hold",
+          "ถือสาย",
+          "To wait on the phone"
+        ],
+        [
+          "voicemail",
+          "ข้อความเสียง",
+          "A recorded phone message"
+        ],
+        [
+          "callback",
+          "โทรกลับ",
+          "To return a call"
+        ],
+        [
+          "available",
+          "ว่าง",
+          "Free to talk"
+        ],
+        [
+          "urgent",
+          "เร่งด่วน",
+          "Needs fast action"
+        ],
+        [
+          "message",
+          "ข้อความ",
+          "Information left for someone"
+        ],
+        [
+          "reach",
+          "ติดต่อ",
+          "To successfully contact someone"
+        ],
+        [
+          "speaking",
+          "กำลังพูดสายครับ/ค่ะ",
+          "Identifying yourself on the phone"
+        ],
+        [
+          "dial",
+          "กด (หมายเลข)",
+          "To press phone numbers"
+        ]
+      ]
+    },
+    {
+      "week": 4,
+      "prefix": "biz_meetings",
+      "emoji": "👥",
+      "topic_l2": "Meetings & Agendas",
+      "topic_l1": "การประชุมและวาระการประชุม",
+      "grammar_l2": "Let's + Shall we + Suggestions",
+      "grammar_l1": "Let's + Shall we + การเสนอแนะ",
+      "vocab": [
+        [
+          "agenda",
+          "วาระการประชุม",
+          "A list of things to discuss"
+        ],
+        [
+          "minutes",
+          "รายงานการประชุม",
+          "Written notes from a meeting"
+        ],
+        [
+          "chair",
+          "ประธาน",
+          "The person who leads a meeting"
+        ],
+        [
+          "agree",
+          "เห็นด้วย",
+          "To have the same opinion"
+        ],
+        [
+          "disagree",
+          "ไม่เห็นด้วย",
+          "To have a different opinion"
+        ],
+        [
+          "suggest",
+          "เสนอ",
+          "To offer an idea"
+        ],
+        [
+          "postpone",
+          "เลื่อน",
+          "To move to a later time"
+        ],
+        [
+          "discuss",
+          "หารือ",
+          "To talk in detail"
+        ],
+        [
+          "decision",
+          "การตัดสินใจ",
+          "A choice that is made"
+        ],
+        [
+          "action item",
+          "สิ่งที่ต้องทำ",
+          "A task assigned in a meeting"
+        ],
+        [
+          "attendee",
+          "ผู้เข้าร่วม",
+          "A person at a meeting"
+        ],
+        [
+          "wrap up",
+          "สรุป / จบ",
+          "To finish a meeting"
+        ]
+      ]
+    },
+    {
+      "week": 5,
+      "prefix": "biz_present",
+      "emoji": "📊",
+      "topic_l2": "Giving Presentations",
+      "topic_l1": "การนำเสนอ",
+      "grammar_l2": "Sequencing + Transitions",
+      "grammar_l1": "การเรียงลำดับ + คำเชื่อม",
+      "vocab": [
+        [
+          "presentation",
+          "การนำเสนอ",
+          "A talk given to an audience"
+        ],
+        [
+          "slide",
+          "สไลด์",
+          "One page of a presentation"
+        ],
+        [
+          "chart",
+          "แผนภูมิ",
+          "A visual display of data"
+        ],
+        [
+          "audience",
+          "ผู้ฟัง",
+          "People watching"
+        ],
+        [
+          "overview",
+          "ภาพรวม",
+          "A general summary"
+        ],
+        [
+          "highlight",
+          "จุดเด่น",
+          "The most important part"
+        ],
+        [
+          "conclusion",
+          "สรุป",
+          "The final point"
+        ],
+        [
+          "question",
+          "คำถาม",
+          "Something you ask"
+        ],
+        [
+          "clearly",
+          "อย่างชัดเจน",
+          "Easy to understand"
+        ],
+        [
+          "as you can see",
+          "อย่างที่เห็น",
+          "Drawing attention to data"
+        ],
+        [
+          "graph",
+          "กราฟ",
+          "A diagram showing trends"
+        ],
+        [
+          "in summary",
+          "โดยสรุป",
+          "To finish with main points"
+        ]
+      ]
+    },
+    {
+      "week": 6,
+      "prefix": "biz_negotiate",
+      "emoji": "💼",
+      "topic_l2": "Negotiation & Agreements",
+      "topic_l1": "การเจรจาต่อรองและข้อตกลง",
+      "grammar_l2": "Conditionals + Would like to",
+      "grammar_l1": "ประโยคเงื่อนไข + Would like to",
+      "vocab": [
+        [
+          "negotiate",
+          "เจรจาต่อรอง",
+          "To discuss terms"
+        ],
+        [
+          "offer",
+          "เสนอ",
+          "To present for acceptance"
+        ],
+        [
+          "accept",
+          "ยอมรับ",
+          "To agree"
+        ],
+        [
+          "reject",
+          "ปฏิเสธ",
+          "To say no"
+        ],
+        [
+          "compromise",
+          "ประนีประนอม",
+          "Both sides give up something"
+        ],
+        [
+          "terms",
+          "เงื่อนไข",
+          "Rules of an agreement"
+        ],
+        [
+          "contract",
+          "สัญญา",
+          "A written legal agreement"
+        ],
+        [
+          "budget",
+          "งบประมาณ",
+          "The amount of money available"
+        ],
+        [
+          "discount",
+          "ส่วนลด",
+          "A reduction in price"
+        ],
+        [
+          "proposal",
+          "ข้อเสนอ",
+          "A formal plan"
+        ],
+        [
+          "deal",
+          "ข้อตกลง",
+          "An agreement"
+        ],
+        [
+          "counter-offer",
+          "ข้อเสนอกลับ",
+          "A response offer"
+        ]
+      ]
+    },
+    {
+      "week": 7,
+      "prefix": "biz_customer",
+      "emoji": "🎧",
+      "topic_l2": "Customer Service & Complaints",
+      "topic_l1": "การบริการลูกค้าและการร้องเรียน",
+      "grammar_l2": "Present Perfect",
+      "grammar_l1": "Present Perfect (have/has + กริยาช่อง 3)",
+      "vocab": [
+        [
+          "customer",
+          "ลูกค้า",
+          "A person who buys something"
+        ],
+        [
+          "complaint",
+          "ข้อร้องเรียน",
+          "When a customer is unhappy"
+        ],
+        [
+          "resolve",
+          "แก้ไข",
+          "To find a solution"
+        ],
+        [
+          "refund",
+          "คืนเงิน",
+          "To give money back"
+        ],
+        [
+          "apologize",
+          "ขออภัย",
+          "To say sorry"
+        ],
+        [
+          "inconvenience",
+          "ความไม่สะดวก",
+          "A problem that causes trouble"
+        ],
+        [
+          "feedback",
+          "ข้อเสนอแนะ",
+          "Comments about a service"
+        ],
+        [
+          "satisfaction",
+          "ความพึงพอใจ",
+          "Being happy with something"
+        ],
+        [
+          "issue",
+          "ปัญหา",
+          "A problem"
+        ],
+        [
+          "assist",
+          "ช่วยเหลือ",
+          "To help"
+        ],
+        [
+          "warranty",
+          "การรับประกัน",
+          "A promise to fix or replace"
+        ],
+        [
+          "replacement",
+          "สินค้าทดแทน",
+          "A new item to replace a broken one"
+        ]
+      ]
+    },
+    {
+      "week": 8,
+      "prefix": "biz_report",
+      "emoji": "📝",
+      "topic_l2": "Reports & Data",
+      "topic_l1": "รายงานและข้อมูล",
+      "grammar_l2": "Comparatives & Superlatives",
+      "grammar_l1": "การเปรียบเทียบ",
+      "vocab": [
+        [
+          "report",
+          "รายงาน",
+          "A document with analysis"
+        ],
+        [
+          "data",
+          "ข้อมูล",
+          "Facts and numbers"
+        ],
+        [
+          "increase",
+          "เพิ่มขึ้น",
+          "To go up"
+        ],
+        [
+          "decrease",
+          "ลดลง",
+          "To go down"
+        ],
+        [
+          "total",
+          "ยอดรวม",
+          "The complete amount"
+        ],
+        [
+          "percentage",
+          "เปอร์เซ็นต์",
+          "A number out of 100"
+        ],
+        [
+          "compare",
+          "เปรียบเทียบ",
+          "To look at differences"
+        ],
+        [
+          "result",
+          "ผลลัพธ์",
+          "The outcome"
+        ],
+        [
+          "significant",
+          "สำคัญ",
+          "Important"
+        ],
+        [
+          "trend",
+          "แนวโน้ม",
+          "A general direction of change"
+        ],
+        [
+          "quarter",
+          "ไตรมาส",
+          "A 3-month period"
+        ],
+        [
+          "annually",
+          "รายปี",
+          "Once a year"
+        ]
+      ]
+    },
+    {
+      "week": 9,
+      "prefix": "biz_travel",
+      "emoji": "✈️",
+      "topic_l2": "Business Travel & Hotels",
+      "topic_l1": "การเดินทางธุรกิจและโรงแรม",
+      "grammar_l2": "Future with will and going to",
+      "grammar_l1": "อนาคตด้วย will และ going to",
+      "vocab": [
+        [
+          "flight",
+          "เที่ยวบิน",
+          "A trip by airplane"
+        ],
+        [
+          "reservation",
+          "การจอง",
+          "Booking in advance"
+        ],
+        [
+          "check in",
+          "เช็คอิน",
+          "To register at a hotel"
+        ],
+        [
+          "check out",
+          "เช็คเอาท์",
+          "To leave a hotel"
+        ],
+        [
+          "itinerary",
+          "กำหนดการเดินทาง",
+          "A plan for a trip"
+        ],
+        [
+          "boarding pass",
+          "บัตรขึ้นเครื่อง",
+          "A ticket to get on a plane"
+        ],
+        [
+          "luggage",
+          "กระเป๋าเดินทาง",
+          "Bags when traveling"
+        ],
+        [
+          "receipt",
+          "ใบเสร็จ",
+          "Proof of payment"
+        ],
+        [
+          "expense",
+          "ค่าใช้จ่าย",
+          "Money spent"
+        ],
+        [
+          "cancel",
+          "ยกเลิก",
+          "To stop a plan"
+        ],
+        [
+          "delay",
+          "ล่าช้า",
+          "Later than planned"
+        ],
+        [
+          "accommodation",
+          "ที่พัก",
+          "A place to stay"
+        ]
+      ]
+    },
+    {
+      "week": 10,
+      "prefix": "biz_interview",
+      "emoji": "🎯",
+      "topic_l2": "Job Interviews & CVs",
+      "topic_l1": "การสัมภาษณ์งานและเรซูเม่",
+      "grammar_l2": "Present Perfect vs Past Simple",
+      "grammar_l1": "Present Perfect vs Past Simple",
+      "vocab": [
+        [
+          "interview",
+          "สัมภาษณ์",
+          "A meeting to assess a candidate"
+        ],
+        [
+          "resume",
+          "เรซูเม่",
+          "A document listing work history"
+        ],
+        [
+          "qualifications",
+          "คุณสมบัติ",
+          "Skills and education"
+        ],
+        [
+          "strength",
+          "จุดแข็ง",
+          "Something you do well"
+        ],
+        [
+          "weakness",
+          "จุดอ่อน",
+          "Something to improve"
+        ],
+        [
+          "salary",
+          "เงินเดือน",
+          "Monthly pay"
+        ],
+        [
+          "benefits",
+          "สวัสดิการ",
+          "Extra things a company gives"
+        ],
+        [
+          "hire",
+          "จ้าง",
+          "To give someone a job"
+        ],
+        [
+          "apply",
+          "สมัคร",
+          "To ask for a job officially"
+        ],
+        [
+          "skill",
+          "ทักษะ",
+          "An ability"
+        ],
+        [
+          "teamwork",
+          "การทำงานเป็นทีม",
+          "Working well with others"
+        ],
+        [
+          "achievement",
+          "ผลงาน",
+          "Something important you have done"
+        ]
+      ]
+    },
+    {
+      "week": 11,
+      "prefix": "biz_project",
+      "emoji": "📋",
+      "topic_l2": "Project Management Basics",
+      "topic_l1": "พื้นฐานการบริหารโครงการ",
+      "grammar_l2": "Must / Have to / Should",
+      "grammar_l1": "Must / Have to / Should (ความจำเป็น)",
+      "vocab": [
+        [
+          "project",
+          "โครงการ",
+          "A planned piece of work"
+        ],
+        [
+          "task",
+          "งาน",
+          "A piece of work to be done"
+        ],
+        [
+          "deadline",
+          "กำหนดเวลา",
+          "The last day to finish"
+        ],
+        [
+          "milestone",
+          "เป้าหมายย่อย",
+          "An important project point"
+        ],
+        [
+          "priority",
+          "ลำดับความสำคัญ",
+          "What should be done first"
+        ],
+        [
+          "assign",
+          "มอบหมาย",
+          "To give someone a task"
+        ],
+        [
+          "progress",
+          "ความคืบหน้า",
+          "How much has been done"
+        ],
+        [
+          "resource",
+          "ทรัพยากร",
+          "People, money, or tools"
+        ],
+        [
+          "risk",
+          "ความเสี่ยง",
+          "Something that could go wrong"
+        ],
+        [
+          "stakeholder",
+          "ผู้มีส่วนได้ส่วนเสีย",
+          "A person affected by a project"
+        ],
+        [
+          "on track",
+          "ตามแผน",
+          "Going as planned"
+        ],
+        [
+          "behind schedule",
+          "ล่าช้ากว่าแผน",
+          "Later than planned"
+        ]
+      ]
+    },
+    {
+      "week": 12,
+      "prefix": "biz_review",
+      "emoji": "🏆",
+      "topic_l2": "Performance Reviews & Goals",
+      "topic_l1": "การประเมินผลงานและเป้าหมาย",
+      "grammar_l2": "Review: Past, Present, Future",
+      "grammar_l1": "ทบทวน: อดีต ปัจจุบัน อนาคต",
+      "vocab": [
+        [
+          "performance",
+          "ผลงาน",
+          "How well someone works"
+        ],
+        [
+          "goal",
+          "เป้าหมาย",
+          "Something to achieve"
+        ],
+        [
+          "feedback",
+          "ข้อเสนอแนะ",
+          "Comments about work"
+        ],
+        [
+          "improve",
+          "ปรับปรุง",
+          "To make better"
+        ],
+        [
+          "promote",
+          "เลื่อนตำแหน่ง",
+          "To move to a higher position"
+        ],
+        [
+          "evaluate",
+          "ประเมิน",
+          "To judge quality"
+        ],
+        [
+          "target",
+          "เป้า",
+          "A goal to reach"
+        ],
+        [
+          "exceed",
+          "เกินเป้า",
+          "To do more than expected"
+        ],
+        [
+          "develop",
+          "พัฒนา",
+          "To grow or improve"
+        ],
+        [
+          "training",
+          "การฝึกอบรม",
+          "Learning new skills"
+        ],
+        [
+          "accomplish",
+          "สำเร็จ",
+          "To finish successfully"
+        ],
+        [
+          "next steps",
+          "ขั้นตอนต่อไป",
+          "What to do after this"
+        ]
+      ]
+    }
+  ]
+}

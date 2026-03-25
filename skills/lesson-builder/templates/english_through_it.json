@@ -1,0 +1,920 @@
+{
+  "course_id": "english_through_it",
+  "title": "English through IT Skills",
+  "title_l1": "CHANGE_ME",
+  "description": "A 12-week course teaching English vocabulary through practical IT topics: hardware, software, networking, security, and help desk skills.",
+  "level": "Pre-A1 → A1",
+  "schedule": "1 hour/week × 12 weeks",
+  "l1": "CHANGE_ME",
+  "l1_name": "CHANGE_ME",
+  "l1_name_native": "CHANGE_ME",
+  "l2": "en",
+  "l2_name": "English",
+  "output_dir": "HTML/courses/english_through_it",
+  "file_prefix": "it",
+  "syllabus_file": "syllabus_english_through_it.html",
+  "theme": {
+    "primary": "#059669",
+    "primary_dark": "#047857",
+    "primary_light": "#6ee7b7",
+    "primary_pale": "#ecfdf5",
+    "accent": "#0d9488"
+  },
+  "page_types": {
+    "lesson": "every",
+    "activities": "every",
+    "exam": "every",
+    "flashcards": "random:4",
+    "conversation": "random:3",
+    "pronunciation": "random:3",
+    "worksheet": "random:4",
+    "syllabus": true
+  },
+  "page_structure": {
+    "lesson": {
+      "sections": [
+        "introduction",
+        "vocabulary",
+        "grammar",
+        "tutorial_steps",
+        "activity",
+        "reference_table",
+        "summary"
+      ],
+      "section_checks": true,
+      "section_check_questions": 3,
+      "homework": true,
+      "references": true,
+      "audio_buttons": true,
+      "hero_image": true
+    },
+    "exam": {
+      "categories": 5,
+      "difficulty_selector": true,
+      "gradebook": true
+    }
+  },
+  "vocab_per_unit": 12,
+  "research": {
+    "notebooklm": true,
+    "web_search": true,
+    "fact_check": true
+  },
+  "images": {
+    "enabled": false
+  },
+  "units": [
+    {
+      "week": 1,
+      "prefix": "it_basics",
+      "emoji": "💻",
+      "topic_l2": "What Is a Computer?",
+      "topic_l1": "CHANGE_ME",
+      "grammar_l2": "Singular/Plural Nouns + This/That/These/Those",
+      "grammar_l1": "CHANGE_ME",
+      "vocab": [
+        [
+          "computer",
+          "CHANGE_ME",
+          "An electronic device for processing data"
+        ],
+        [
+          "keyboard",
+          "CHANGE_ME",
+          "Used to type letters and numbers"
+        ],
+        [
+          "mouse",
+          "CHANGE_ME",
+          "Used to point and click on screen"
+        ],
+        [
+          "monitor",
+          "CHANGE_ME",
+          "The screen that displays information"
+        ],
+        [
+          "printer",
+          "CHANGE_ME",
+          "A device that puts text on paper"
+        ],
+        [
+          "hardware",
+          "CHANGE_ME",
+          "Physical parts of a computer"
+        ],
+        [
+          "software",
+          "CHANGE_ME",
+          "Programs that run on a computer"
+        ],
+        [
+          "click",
+          "CHANGE_ME",
+          "To press a mouse button"
+        ],
+        [
+          "type",
+          "CHANGE_ME",
+          "To enter text using a keyboard"
+        ],
+        [
+          "power",
+          "CHANGE_ME",
+          "To turn on; energy source"
+        ],
+        [
+          "screen",
+          "CHANGE_ME",
+          "The display area"
+        ],
+        [
+          "USB",
+          "CHANGE_ME",
+          "A common connector type"
+        ]
+      ]
+    },
+    {
+      "week": 2,
+      "prefix": "it_desktop",
+      "emoji": "🖥️",
+      "topic_l2": "The Desktop & Files",
+      "topic_l1": "CHANGE_ME",
+      "grammar_l2": "Prepositions of Place (in/on/at)",
+      "grammar_l1": "CHANGE_ME",
+      "vocab": [
+        [
+          "desktop",
+          "CHANGE_ME",
+          "The main screen of a computer"
+        ],
+        [
+          "file",
+          "CHANGE_ME",
+          "A document stored on a computer"
+        ],
+        [
+          "folder",
+          "CHANGE_ME",
+          "A container for files"
+        ],
+        [
+          "icon",
+          "CHANGE_ME",
+          "A small picture on screen"
+        ],
+        [
+          "save",
+          "CHANGE_ME",
+          "To store work on a computer"
+        ],
+        [
+          "open",
+          "CHANGE_ME",
+          "To start a file or program"
+        ],
+        [
+          "close",
+          "CHANGE_ME",
+          "To shut a window or program"
+        ],
+        [
+          "delete",
+          "CHANGE_ME",
+          "To remove something"
+        ],
+        [
+          "copy",
+          "CHANGE_ME",
+          "To make a duplicate"
+        ],
+        [
+          "paste",
+          "CHANGE_ME",
+          "To place copied content"
+        ],
+        [
+          "download",
+          "CHANGE_ME",
+          "To get a file from the internet"
+        ],
+        [
+          "upload",
+          "CHANGE_ME",
+          "To send a file to the internet"
+        ]
+      ]
+    },
+    {
+      "week": 3,
+      "prefix": "it_internet",
+      "emoji": "🌐",
+      "topic_l2": "The Internet & Browsing",
+      "topic_l1": "CHANGE_ME",
+      "grammar_l2": "Present Simple + Frequency Adverbs",
+      "grammar_l1": "CHANGE_ME",
+      "vocab": [
+        [
+          "internet",
+          "CHANGE_ME",
+          "A global network of computers"
+        ],
+        [
+          "browser",
+          "CHANGE_ME",
+          "A program for viewing websites"
+        ],
+        [
+          "website",
+          "CHANGE_ME",
+          "A page on the internet"
+        ],
+        [
+          "search",
+          "CHANGE_ME",
+          "To look for information"
+        ],
+        [
+          "link",
+          "CHANGE_ME",
+          "Text you click to go to another page"
+        ],
+        [
+          "URL",
+          "CHANGE_ME",
+          "The address of a website"
+        ],
+        [
+          "password",
+          "CHANGE_ME",
+          "A secret word for security"
+        ],
+        [
+          "login",
+          "CHANGE_ME",
+          "To enter your account"
+        ],
+        [
+          "logout",
+          "CHANGE_ME",
+          "To leave your account"
+        ],
+        [
+          "bookmark",
+          "CHANGE_ME",
+          "To save a website for later"
+        ],
+        [
+          "tab",
+          "CHANGE_ME",
+          "A separate page in a browser"
+        ],
+        [
+          "homepage",
+          "CHANGE_ME",
+          "The first page of a website"
+        ]
+      ]
+    },
+    {
+      "week": 4,
+      "prefix": "it_email_tic",
+      "emoji": "📧",
+      "topic_l2": "Email & Communication Tools",
+      "topic_l1": "CHANGE_ME",
+      "grammar_l2": "Imperatives + Please/Could you",
+      "grammar_l1": "CHANGE_ME",
+      "vocab": [
+        [
+          "email",
+          "CHANGE_ME",
+          "Electronic mail"
+        ],
+        [
+          "inbox",
+          "CHANGE_ME",
+          "Where new emails arrive"
+        ],
+        [
+          "send",
+          "CHANGE_ME",
+          "To transmit a message"
+        ],
+        [
+          "reply",
+          "CHANGE_ME",
+          "To respond to a message"
+        ],
+        [
+          "forward",
+          "CHANGE_ME",
+          "To send a received email to someone else"
+        ],
+        [
+          "attach",
+          "CHANGE_ME",
+          "To add a file to an email"
+        ],
+        [
+          "spam",
+          "CHANGE_ME",
+          "Unwanted junk email"
+        ],
+        [
+          "subject",
+          "CHANGE_ME",
+          "The topic line of an email"
+        ],
+        [
+          "draft",
+          "CHANGE_ME",
+          "An unsent email you are writing"
+        ],
+        [
+          "notification",
+          "CHANGE_ME",
+          "An alert or message"
+        ],
+        [
+          "chat",
+          "CHANGE_ME",
+          "Real-time text conversation"
+        ],
+        [
+          "video call",
+          "CHANGE_ME",
+          "A call with camera"
+        ]
+      ]
+    },
+    {
+      "week": 5,
+      "prefix": "it_docs",
+      "emoji": "📄",
+      "topic_l2": "Documents & Spreadsheets",
+      "topic_l1": "CHANGE_ME",
+      "grammar_l2": "Countable/Uncountable + How much/How many",
+      "grammar_l1": "CHANGE_ME",
+      "vocab": [
+        [
+          "document",
+          "CHANGE_ME",
+          "A text file"
+        ],
+        [
+          "spreadsheet",
+          "CHANGE_ME",
+          "A file with rows and columns"
+        ],
+        [
+          "cell",
+          "CHANGE_ME",
+          "One box in a spreadsheet"
+        ],
+        [
+          "row",
+          "CHANGE_ME",
+          "A horizontal line of data"
+        ],
+        [
+          "column",
+          "CHANGE_ME",
+          "A vertical line of data"
+        ],
+        [
+          "format",
+          "CHANGE_ME",
+          "The style or layout"
+        ],
+        [
+          "font",
+          "CHANGE_ME",
+          "The style of text"
+        ],
+        [
+          "bold",
+          "CHANGE_ME",
+          "Thick, dark text"
+        ],
+        [
+          "table",
+          "CHANGE_ME",
+          "Data arranged in rows and columns"
+        ],
+        [
+          "chart",
+          "CHANGE_ME",
+          "A visual display of data"
+        ],
+        [
+          "template",
+          "CHANGE_ME",
+          "A pre-made document layout"
+        ],
+        [
+          "print",
+          "CHANGE_ME",
+          "To put on paper"
+        ]
+      ]
+    },
+    {
+      "week": 6,
+      "prefix": "it_network",
+      "emoji": "📶",
+      "topic_l2": "Networks & Wi-Fi",
+      "topic_l1": "CHANGE_ME",
+      "grammar_l2": "There is/There are + Some/Any",
+      "grammar_l1": "CHANGE_ME",
+      "vocab": [
+        [
+          "network",
+          "CHANGE_ME",
+          "Connected computers sharing data"
+        ],
+        [
+          "Wi-Fi",
+          "CHANGE_ME",
+          "Wireless internet connection"
+        ],
+        [
+          "router",
+          "CHANGE_ME",
+          "A device that shares internet"
+        ],
+        [
+          "connect",
+          "CHANGE_ME",
+          "To join a network"
+        ],
+        [
+          "disconnect",
+          "CHANGE_ME",
+          "To leave a network"
+        ],
+        [
+          "signal",
+          "CHANGE_ME",
+          "The strength of a connection"
+        ],
+        [
+          "bandwidth",
+          "CHANGE_ME",
+          "How much data can transfer"
+        ],
+        [
+          "IP address",
+          "CHANGE_ME",
+          "A computer's network address"
+        ],
+        [
+          "LAN",
+          "CHANGE_ME",
+          "A local area network"
+        ],
+        [
+          "server",
+          "CHANGE_ME",
+          "A computer that provides services"
+        ],
+        [
+          "cable",
+          "CHANGE_ME",
+          "A wire for connecting devices"
+        ],
+        [
+          "hotspot",
+          "CHANGE_ME",
+          "A place with Wi-Fi access"
+        ]
+      ]
+    },
+    {
+      "week": 7,
+      "prefix": "it_security",
+      "emoji": "🔒",
+      "topic_l2": "Security & Passwords",
+      "topic_l1": "CHANGE_ME",
+      "grammar_l2": "Should/Shouldn't + Must/Mustn't",
+      "grammar_l1": "CHANGE_ME",
+      "vocab": [
+        [
+          "security",
+          "CHANGE_ME",
+          "Protection from threats"
+        ],
+        [
+          "password",
+          "CHANGE_ME",
+          "A secret word for access"
+        ],
+        [
+          "virus",
+          "CHANGE_ME",
+          "Harmful software"
+        ],
+        [
+          "malware",
+          "CHANGE_ME",
+          "Software designed to cause damage"
+        ],
+        [
+          "firewall",
+          "CHANGE_ME",
+          "Software that blocks threats"
+        ],
+        [
+          "phishing",
+          "CHANGE_ME",
+          "A fake email trying to steal info"
+        ],
+        [
+          "encrypt",
+          "CHANGE_ME",
+          "To scramble data for protection"
+        ],
+        [
+          "backup",
+          "CHANGE_ME",
+          "A copy of data for safety"
+        ],
+        [
+          "update",
+          "CHANGE_ME",
+          "To install the latest version"
+        ],
+        [
+          "antivirus",
+          "CHANGE_ME",
+          "Software that removes viruses"
+        ],
+        [
+          "two-factor",
+          "CHANGE_ME",
+          "Extra security step for login"
+        ],
+        [
+          "suspicious",
+          "CHANGE_ME",
+          "Something that looks dangerous"
+        ]
+      ]
+    },
+    {
+      "week": 8,
+      "prefix": "it_trouble",
+      "emoji": "🔧",
+      "topic_l2": "Troubleshooting Basics",
+      "topic_l1": "CHANGE_ME",
+      "grammar_l2": "Past Simple + Irregular Verbs",
+      "grammar_l1": "CHANGE_ME",
+      "vocab": [
+        [
+          "problem",
+          "CHANGE_ME",
+          "Something that is wrong"
+        ],
+        [
+          "restart",
+          "CHANGE_ME",
+          "To turn off and on again"
+        ],
+        [
+          "error",
+          "CHANGE_ME",
+          "A mistake or fault"
+        ],
+        [
+          "crash",
+          "CHANGE_ME",
+          "When a program stops working"
+        ],
+        [
+          "freeze",
+          "CHANGE_ME",
+          "When a computer stops responding"
+        ],
+        [
+          "slow",
+          "CHANGE_ME",
+          "Not fast"
+        ],
+        [
+          "fix",
+          "CHANGE_ME",
+          "To repair something"
+        ],
+        [
+          "solution",
+          "CHANGE_ME",
+          "The answer to a problem"
+        ],
+        [
+          "troubleshoot",
+          "CHANGE_ME",
+          "To find and fix problems"
+        ],
+        [
+          "reboot",
+          "CHANGE_ME",
+          "To restart a computer"
+        ],
+        [
+          "uninstall",
+          "CHANGE_ME",
+          "To remove a program"
+        ],
+        [
+          "settings",
+          "CHANGE_ME",
+          "Options you can change"
+        ]
+      ]
+    },
+    {
+      "week": 9,
+      "prefix": "it_cloud",
+      "emoji": "☁️",
+      "topic_l2": "Cloud & Storage",
+      "topic_l1": "CHANGE_ME",
+      "grammar_l2": "Present Continuous (am/is/are + -ing)",
+      "grammar_l1": "CHANGE_ME",
+      "vocab": [
+        [
+          "cloud",
+          "CHANGE_ME",
+          "Online storage and services"
+        ],
+        [
+          "storage",
+          "CHANGE_ME",
+          "Space to keep files"
+        ],
+        [
+          "sync",
+          "CHANGE_ME",
+          "To make files the same everywhere"
+        ],
+        [
+          "share",
+          "CHANGE_ME",
+          "To give access to others"
+        ],
+        [
+          "access",
+          "CHANGE_ME",
+          "To be able to use something"
+        ],
+        [
+          "account",
+          "CHANGE_ME",
+          "Your personal login"
+        ],
+        [
+          "subscription",
+          "CHANGE_ME",
+          "A paid plan for a service"
+        ],
+        [
+          "migrate",
+          "CHANGE_ME",
+          "To move data to a new place"
+        ],
+        [
+          "backup",
+          "CHANGE_ME",
+          "A safety copy of data"
+        ],
+        [
+          "permission",
+          "CHANGE_ME",
+          "The right to access something"
+        ],
+        [
+          "online",
+          "CHANGE_ME",
+          "Connected to the internet"
+        ],
+        [
+          "offline",
+          "CHANGE_ME",
+          "Not connected to the internet"
+        ]
+      ]
+    },
+    {
+      "week": 10,
+      "prefix": "it_helpdesk",
+      "emoji": "🎧",
+      "topic_l2": "Help Desk Communication",
+      "topic_l1": "CHANGE_ME",
+      "grammar_l2": "Can/Could for Requests + Reported Speech intro",
+      "grammar_l1": "CHANGE_ME",
+      "vocab": [
+        [
+          "ticket",
+          "CHANGE_ME",
+          "A support request"
+        ],
+        [
+          "issue",
+          "CHANGE_ME",
+          "A problem to solve"
+        ],
+        [
+          "priority",
+          "CHANGE_ME",
+          "How urgent something is"
+        ],
+        [
+          "escalate",
+          "CHANGE_ME",
+          "To send to a higher level"
+        ],
+        [
+          "resolve",
+          "CHANGE_ME",
+          "To fix a problem"
+        ],
+        [
+          "respond",
+          "CHANGE_ME",
+          "To answer"
+        ],
+        [
+          "remote",
+          "CHANGE_ME",
+          "From a different location"
+        ],
+        [
+          "screenshot",
+          "CHANGE_ME",
+          "A picture of your screen"
+        ],
+        [
+          "instructions",
+          "CHANGE_ME",
+          "Steps to follow"
+        ],
+        [
+          "workaround",
+          "CHANGE_ME",
+          "A temporary fix"
+        ],
+        [
+          "SLA",
+          "CHANGE_ME",
+          "Service Level Agreement"
+        ],
+        [
+          "end user",
+          "CHANGE_ME",
+          "The person using the system"
+        ]
+      ]
+    },
+    {
+      "week": 11,
+      "prefix": "it_tic_mail",
+      "emoji": "📢",
+      "topic_l2": "IT Workplace Communication",
+      "topic_l1": "CHANGE_ME",
+      "grammar_l2": "Polite Requests + Would you mind...",
+      "grammar_l1": "CHANGE_ME",
+      "vocab": [
+        [
+          "update",
+          "CHANGE_ME",
+          "New information about status"
+        ],
+        [
+          "status",
+          "CHANGE_ME",
+          "The current state of something"
+        ],
+        [
+          "outage",
+          "CHANGE_ME",
+          "When a service is down"
+        ],
+        [
+          "maintenance",
+          "CHANGE_ME",
+          "Regular repair and upkeep"
+        ],
+        [
+          "deploy",
+          "CHANGE_ME",
+          "To release new software"
+        ],
+        [
+          "rollback",
+          "CHANGE_ME",
+          "To undo a change"
+        ],
+        [
+          "downtime",
+          "CHANGE_ME",
+          "Time when systems are offline"
+        ],
+        [
+          "incident",
+          "CHANGE_ME",
+          "An unexpected problem"
+        ],
+        [
+          "notify",
+          "CHANGE_ME",
+          "To inform someone"
+        ],
+        [
+          "approve",
+          "CHANGE_ME",
+          "To say yes officially"
+        ],
+        [
+          "documentation",
+          "CHANGE_ME",
+          "Written instructions"
+        ],
+        [
+          "handover",
+          "CHANGE_ME",
+          "To pass work to someone else"
+        ]
+      ]
+    },
+    {
+      "week": 12,
+      "prefix": "it_career",
+      "emoji": "🚀",
+      "topic_l2": "IT Careers & Certifications",
+      "topic_l1": "CHANGE_ME",
+      "grammar_l2": "Future (will/going to) + Review",
+      "grammar_l1": "CHANGE_ME",
+      "vocab": [
+        [
+          "career",
+          "CHANGE_ME",
+          "A long-term job path"
+        ],
+        [
+          "certification",
+          "CHANGE_ME",
+          "An official qualification"
+        ],
+        [
+          "CompTIA",
+          "CHANGE_ME",
+          "An IT certification organization"
+        ],
+        [
+          "resume",
+          "CHANGE_ME",
+          "A document listing your experience"
+        ],
+        [
+          "interview",
+          "CHANGE_ME",
+          "A meeting for a job application"
+        ],
+        [
+          "specialize",
+          "CHANGE_ME",
+          "To focus on one area"
+        ],
+        [
+          "networking",
+          "CHANGE_ME",
+          "Meeting people for career growth"
+        ],
+        [
+          "internship",
+          "CHANGE_ME",
+          "A training job for beginners"
+        ],
+        [
+          "qualification",
+          "CHANGE_ME",
+          "A skill or certificate"
+        ],
+        [
+          "promotion",
+          "CHANGE_ME",
+          "A move to a higher position"
+        ],
+        [
+          "self-study",
+          "CHANGE_ME",
+          "Learning on your own"
+        ],
+        [
+          "hands-on",
+          "CHANGE_ME",
+          "Learning by doing"
+        ]
+      ]
+    }
+  ]
+}
