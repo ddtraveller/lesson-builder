@@ -31,6 +31,7 @@ Use this skill when:
    - 📊 **Syllabus** — Course overview page
 5. **Output location** — "Where should files go?" (default: `HTML/courses/{topic_slug}/`)
 6. **Color theme** — "Any color preference?" (or auto-pick)
+7. **AI Images** — "Would you like to generate hero images for each lesson using Replicate FLUX Dev? Requires a `REPLICATE_API_TOKEN` in `.env`. Cost: ~$0.03-0.05 per image." (default: no)
 
 **If a config file exists** in `config/` matching the topic, load it instead of asking.
 
@@ -208,19 +209,52 @@ The `onerror` handler hides the image gracefully if it hasn't been uploaded to S
 
 ## Image Generation (Optional)
 
-Generate AI illustrations using FLUX Dev on Replicate. Requires `REPLICATE_API_TOKEN` in `.env`.
+This skill includes `generate_images.py` — a generic batch image generator using Replicate FLUX Dev. It reads prompts from a JSON file and generates images.
 
-```python
-import replicate
-output = replicate.run("black-forest-labs/flux-dev", input={
-    "prompt": style_prefix + scene_description + style_suffix,
-    "guidance": 3.5, "num_outputs": 1,
-    "aspect_ratio": "16:9",  # or "1:1", "4:5"
-    "output_format": "png", "num_inference_steps": 28,
-})
+### Bundled tool: `generate_images.py`
+
+Located at: `{skill_dir}/generate_images.py`
+
+```bash
+# Generate all images from a prompts JSON
+python generate_images.py heygen_prompts.json --output-dir imgs/heygen
+
+# List status (which images exist vs pending)
+python generate_images.py heygen_prompts.json --list
+
+# Preview prompts without spending credits
+python generate_images.py heygen_prompts.json --dry-run
+
+# Generate one specific image
+python generate_images.py heygen_prompts.json --id heygen_intro_hero
 ```
 
-Cost: ~$0.03-0.05 per image. Token from: https://replicate.com/account/api-tokens
+### Image prompts JSON format
+
+The generator script creates a `{course_id}_prompts.json` alongside the course config:
+
+```json
+{
+  "style_prefix": "Warm, friendly educational illustration, ...",
+  "style_suffix": ", professional quality, no text in image",
+  "output_dir": "imgs/{course_id}",
+  "images": {
+    "{unit_prefix}_hero": {
+      "prompt": "Scene description for this unit's hero image",
+      "aspect_ratio": "16:9"
+    }
+  }
+}
+```
+
+### Workflow
+
+1. Generator script creates HTML files with `<img>` tags pointing to `../../../imgs/{course_id}/`
+2. Generator script also creates `{course_id}_prompts.json` with image prompts
+3. Run `python generate_images.py {course_id}_prompts.json` to generate images
+4. Upload images to S3
+
+Requires `REPLICATE_API_TOKEN` in `.env`. Cost: ~$0.03-0.05 per image. Token from: https://replicate.com/account/api-tokens
 
 **Important:** When generating images with people, specify the ethnicity/appearance matching the target learner population in the style prefix (e.g., "Southeast Asian Thai adults" for Thai courses).
 
