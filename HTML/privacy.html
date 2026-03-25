@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — Lesson Builder</title>
+<style>
+  :root { --primary: #f97316; --bg: #fafafa; --text: #1a1a1a; --muted: #666; --border: #e5e5e5; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+  .container { max-width: 720px; margin: 0 auto; padding: 3rem 1.5rem; }
+  h1 { font-size: 1.8rem; margin-bottom: 0.25rem; }
+  .subtitle { color: var(--muted); margin-bottom: 2rem; }
+  h2 { font-size: 1.2rem; margin: 2rem 0 0.75rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+  h2:first-of-type { border-top: none; padding-top: 0; }
+  p, li { margin-bottom: 0.75rem; }
+  ul { padding-left: 1.5rem; }
+  a { color: var(--primary); }
+  .badge { display: inline-block; background: #fff7ed; color: #ea580c; border: 1px solid #fdba74; border-radius: 4px; padding: 0.15rem 0.5rem; font-size: 0.85rem; margin-left: 0.25rem; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+  th, td { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); }
+  th { font-weight: 600; white-space: nowrap; }
+  .footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Privacy Policy</h1>
+<p class="subtitle">Lesson Builder — Claude Code Skill<br>Last updated: March 25, 2026</p>
+
+<h2>What Lesson Builder Is</h2>
+<p>Lesson Builder is a skill for <a href="https://claude.ai/claude-code">Claude Code</a> that generates standalone bilingual course pages (HTML/CSS/JS). It runs locally on your machine inside the Claude Code environment. It does not operate a server or collect data from end users of the generated pages.</p>
+
+<h2>Data the Generated Pages Store</h2>
+<p>Pages created by Lesson Builder may store data <strong>locally in the user's browser</strong>:</p>
+<table>
+  <tr><th>Storage</th><th>Purpose</th><th>Sent externally?</th></tr>
+  <tr><td>localStorage</td><td>Exam scores and gradebook</td><td>No</td></tr>
+  <tr><td>Browser cache</td><td>Google Fonts</td><td>Font request to Google (see below)</td></tr>
+</table>
+<p>Generated pages contain <strong>no cookies, no analytics, no tracking pixels, and no user accounts</strong>.</p>
+
+<h2>External Services in Generated Pages</h2>
+<table>
+  <tr><th>Service</th><th>What</th><th>Data sent</th></tr>
+  <tr><td>Google Fonts</td><td>Font loading (Sarabun, Nunito, DM Sans)</td><td>Standard HTTP request (IP address, user-agent)</td></tr>
+  <tr><td>Web Speech API</td><td>Text-to-speech pronunciation</td><td>Processed locally by the browser; no data leaves the device</td></tr>
+</table>
+
+<h2>Optional Integrations Used During Generation <span class="badge">build-time only</span></h2>
+<p>These services are used <strong>only during course generation</strong> inside Claude Code — not by end users viewing the pages. All are optional and require explicit configuration.</p>
+
+<table>
+  <tr><th>Service</th><th>Purpose</th><th>Data sent</th><th>Privacy policy</th></tr>
+  <tr>
+    <td><strong>Replicate</strong></td>
+    <td>AI image generation (FLUX Dev)</td>
+    <td>Text prompts describing lesson illustrations</td>
+    <td><a href="https://replicate.com/privacy">replicate.com/privacy</a></td>
+  </tr>
+  <tr>
+    <td><strong>Google NotebookLM</strong></td>
+    <td>AI-powered content research and verification</td>
+    <td>Course topics, curriculum queries, subject matter questions</td>
+    <td><a href="https://policies.google.com/privacy">policies.google.com/privacy</a></td>
+  </tr>
+  <tr>
+    <td><strong>Anthropic (Claude)</strong></td>
+    <td>Fact-checking skill for content verification</td>
+    <td>Generated course content (grammar rules, vocabulary, quiz answers) sent to Claude for verification</td>
+    <td><a href="https://www.anthropic.com/privacy">anthropic.com/privacy</a></td>
+  </tr>
+</table>
+
+<p>Your API tokens for these services are stored locally (in <code>.env</code> files or environment variables) and are never embedded in generated pages.</p>
+
+<h2>Web Search</h2>
+<p>When web search is enabled, the skill may search the web during generation to verify course content (vocabulary definitions, grammar rules, subject matter accuracy). Search queries contain course topics and are processed by the search provider configured in Claude Code. No end-user data is involved.</p>
+
+<h2>Data We Collect</h2>
+<p><strong>None.</strong> Lesson Builder is an open-source skill that runs locally. We do not operate servers, collect telemetry, or receive any data from you or your users.</p>
+
+<h2>Children's Privacy</h2>
+<p>Lesson Builder generates educational content that may be used by learners of all ages. The generated pages do not collect any personal information from children or any other users.</p>
+
+<h2>Changes to This Policy</h2>
+<p>Updates will be posted to this page with a revised date. For significant changes, a note will be added to the <a href="https://github.com/ddtraveller/lesson-builder">GitHub repository</a>.</p>
+
+<h2>Contact</h2>
+<p>Questions about this policy can be raised as issues on the <a href="https://github.com/ddtraveller/lesson-builder/issues">GitHub repository</a>.</p>
+
+<div class="footer">
+  <p>&copy; 2026 David Dockhorn. Lesson Builder is released under the MIT License.</p>
+</div>
+
+</div>
+</body>
+</html>
