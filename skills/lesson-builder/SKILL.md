@@ -170,6 +170,42 @@ Print-optimized (`@media print`). Fill-in-the-blank, matching, unscramble, writi
 ### 📊 Syllabus Page
 Course overview with sticky header, week navigation, hero section, scope table, week cards (objectives + vocab + grammar pattern), assessment rubric, outcomes. Uses different font stack (DM Sans/Noto Sans Thai/DM Serif Display).
 
+## Image Location Rules
+
+Images are **never committed to git** — they are generated locally and uploaded to S3 separately.
+
+### Directory structure
+```
+(site root)
+├── HTML/
+│   └── courses/
+│       └── {course_id}/       ← generated HTML files live here
+│           └── *.html
+└── imgs/
+    └── {course_id}/           ← images live here (S3 sibling to HTML/)
+        └── {prefix}_hero.png
+```
+
+### Path convention in HTML
+From `HTML/courses/{course_id}/`, images are referenced with a **relative path** going up three levels to the site root:
+```html
+<img src="../../../imgs/{course_id}/{image_name}.png" alt="...">
+```
+
+### Hero images
+Each lesson page should include a hero image in the header section:
+```html
+<img class="hero-img" src="../../../imgs/{course_id}/{unit_prefix}_hero.png"
+     alt="{unit title}" onerror="this.style.display='none'">
+```
+The `onerror` handler hides the image gracefully if it hasn't been uploaded to S3 yet.
+
+### Key rules
+- **NEVER commit image files to git.** The `.gitignore` blocks `imgs/`, `*.png`, `*.jpg`, etc.
+- Images are uploaded to S3 to match the relative path structure from the HTML directory
+- Use `onerror="this.style.display='none'"` on all `<img>` tags so pages render cleanly before images are uploaded
+- Image filenames follow the pattern: `{unit_prefix}_{type}.png` (e.g., `claude_intro_hero.png`, `perm_building_hero.png`)
+
 ## Image Generation (Optional)
 
 Generate AI illustrations using FLUX Dev on Replicate. Requires `REPLICATE_API_TOKEN` in `.env`.
