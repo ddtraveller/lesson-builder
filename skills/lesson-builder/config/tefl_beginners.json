@@ -1,0 +1,340 @@
+{
+  "course_id": "tefl_beginners",
+  "title": "English for Everyday Life & Work",
+  "title_l1": "ภาษาอังกฤษสำหรับชีวิตประจำวันและการทำงาน",
+  "description": "A 12-week course for Thai adults who are absolute beginners in English, covering greetings, numbers, food, office, and daily life topics.",
+  "level": "Pre-A1 → A1",
+  "schedule": "1 hour/week × 12 weeks",
+
+  "l1": "th",
+  "l1_name": "Thai",
+  "l1_name_native": "ภาษาไทย",
+  "l2": "en",
+  "l2_name": "English",
+
+  "output_dir": "HTML/tefl/beginners",
+  "file_prefix": "begin",
+  "syllabus_file": "syllabus_tefl_beginners.html",
+
+  "theme": {
+    "primary": "#f97316",
+    "primary_dark": "#ea580c",
+    "primary_light": "#fdba74",
+    "primary_pale": "#fff7ed",
+    "accent": "#f59e0b"
+  },
+
+  "page_types": {
+    "lesson": "every",
+    "activities": "every",
+    "exam": "every",
+    "flashcards": "random:2",
+    "conversation": "random:4",
+    "pronunciation": "random:3",
+    "worksheet": "random:3",
+    "syllabus": true
+  },
+
+  "page_structure": {
+    "lesson": {
+      "sections": ["introduction", "vocabulary", "grammar", "tutorial_steps", "activity", "reference_table", "summary"],
+      "section_checks": true,
+      "section_check_questions": 3,
+      "homework": true,
+      "references": true,
+      "audio_buttons": true,
+      "hero_image": true
+    },
+    "exam": {
+      "categories": 4,
+      "difficulty_selector": true,
+      "gradebook": true
+    }
+  },
+
+  "vocab_per_unit": 12,
+
+  "research": {
+    "notebooklm": false,
+    "web_search": true,
+    "fact_check": false
+  },
+
+  "images": {
+    "enabled": true,
+    "provider": "replicate",
+    "model": "black-forest-labs/flux-dev",
+    "style_prefix": "Warm, friendly educational illustration, clean modern flat design with soft pastel gradients, Southeast Asian Thai adult characters with warm brown skin and black hair, bright welcoming colors, ",
+    "style_suffix": ", professional educational textbook quality, warm natural lighting, inviting atmosphere, clear visual storytelling, no text or words in the image",
+    "hero_image": true,
+    "per_unit_image": true,
+    "aspect_ratio": "16:9"
+  },
+
+  "units": [
+    {
+      "week": 1, "prefix": "begin_greetings", "emoji": "👋",
+      "topic_l2": "Greetings & Introductions",
+      "topic_l1": "การทักทายและการแนะนำตัว",
+      "grammar_l2": "Pronouns + Verb 'to be' (am/is/are)",
+      "grammar_l1": "สรรพนาม + กริยา to be (am/is/are)",
+      "vocab": [
+        ["hello", "สวัสดี", "A common greeting"],
+        ["goodbye", "ลาก่อน", "Said when leaving"],
+        ["name", "ชื่อ", "What someone is called"],
+        ["nice", "ดี / น่ายินดี", "Pleasant, agreeable"],
+        ["meet", "พบ / เจอ", "To see someone for the first time"],
+        ["please", "กรุณา / ได้โปรด", "Used to make polite requests"],
+        ["thank you", "ขอบคุณ", "Expression of gratitude"],
+        ["sorry", "ขอโทษ", "Expression of apology"],
+        ["yes", "ใช่ / ครับ / ค่ะ", "Affirmative response"],
+        ["no", "ไม่", "Negative response"],
+        ["Mr.", "นาย / คุณ (ผู้ชาย)", "Title for a man"],
+        ["Ms.", "นาง / นางสาว / คุณ (ผู้หญิง)", "Title for a woman"]
+      ],
+      "page_types_override": {"conversation": true}
+    },
+    {
+      "week": 2, "prefix": "begin_office", "emoji": "🏢",
+      "topic_l2": "The Office & Workplace",
+      "topic_l1": "สำนักงานและที่ทำงาน",
+      "grammar_l2": "Verb 'to be' — Negative (isn't / aren't)",
+      "grammar_l1": "กริยา to be — ปฏิเสธ (isn't / aren't)",
+      "vocab": [
+        ["office", "สำนักงาน", "A place where people work"],
+        ["desk", "โต๊ะทำงาน", "A table for working"],
+        ["chair", "เก้าอี้", "A seat with a back"],
+        ["computer", "คอมพิวเตอร์", "An electronic device for work"],
+        ["phone", "โทรศัพท์", "A device for making calls"],
+        ["email", "อีเมล", "Electronic mail messages"],
+        ["boss", "หัวหน้า", "The person in charge"],
+        ["colleague", "เพื่อนร่วมงาน", "A person you work with"],
+        ["meeting", "การประชุม", "When people gather to discuss"],
+        ["company", "บริษัท", "A business organization"],
+        ["work", "ทำงาน / งาน", "To do a job; a job"],
+        ["employee", "พนักงาน", "A person who works for a company"]
+      ],
+      "page_types_override": {"flashcards": true}
+    },
+    {
+      "week": 3, "prefix": "begin_numbers", "emoji": "🔢",
+      "topic_l2": "Numbers, Days & Time",
+      "topic_l1": "ตัวเลข วัน และเวลา",
+      "grammar_l2": "Verb 'to be' — Questions (Is she...? Are they...?)",
+      "grammar_l1": "กริยา to be — คำถาม (Is she...? Are they...?)",
+      "vocab": [
+        ["number", "ตัวเลข / จำนวน", "A mathematical value"],
+        ["one", "หนึ่ง", "The number 1"],
+        ["ten", "สิบ", "The number 10"],
+        ["twenty", "ยี่สิบ", "The number 20"],
+        ["Monday", "วันจันทร์", "The first day of the work week"],
+        ["Friday", "วันศุกร์", "The fifth day of the work week"],
+        ["today", "วันนี้", "This current day"],
+        ["tomorrow", "พรุ่งนี้", "The day after today"],
+        ["yesterday", "เมื่อวาน", "The day before today"],
+        ["morning", "เช้า", "The early part of the day"],
+        ["afternoon", "บ่าย", "The middle part of the day"],
+        ["o'clock", "นาฬิกา (บอกเวลา)", "Used to tell time on the hour"]
+      ],
+      "page_types_override": {"worksheet": true}
+    },
+    {
+      "week": 4, "prefix": "begin_jobs", "emoji": "👷",
+      "topic_l2": "Jobs & Work Roles",
+      "topic_l1": "อาชีพและบทบาทการทำงาน",
+      "grammar_l2": "Articles (a/an) + 'What' Questions",
+      "grammar_l1": "คำนำหน้านาม (a/an) + คำถาม What",
+      "vocab": [
+        ["teacher", "ครู", "A person who teaches"],
+        ["doctor", "หมอ / แพทย์", "A person who treats sick people"],
+        ["nurse", "พยาบาล", "A person who cares for patients"],
+        ["driver", "คนขับรถ", "A person who drives vehicles"],
+        ["engineer", "วิศวกร", "A person who designs and builds things"],
+        ["manager", "ผู้จัดการ", "A person who leads a team"],
+        ["waiter", "พนักงานเสิร์ฟ", "A person who serves food"],
+        ["cook", "พ่อครัว / แม่ครัว", "A person who prepares food"],
+        ["farmer", "ชาวนา / เกษตรกร", "A person who grows food"],
+        ["police officer", "ตำรวจ", "A person who enforces the law"],
+        ["student", "นักเรียน / นักศึกษา", "A person who studies"],
+        ["job", "งาน / อาชีพ", "Work that you do regularly for money"]
+      ],
+      "page_types_override": {"flashcards": true}
+    },
+    {
+      "week": 5, "prefix": "begin_family", "emoji": "👨‍👩‍👧‍👦",
+      "topic_l2": "Family & Personal Info",
+      "topic_l1": "ครอบครัวและข้อมูลส่วนตัว",
+      "grammar_l2": "Possessive Adjectives (my/your/his/her)",
+      "grammar_l1": "คำแสดงความเป็นเจ้าของ (my/your/his/her)",
+      "vocab": [
+        ["family", "ครอบครัว", "A group of related people"],
+        ["mother", "แม่", "A female parent"],
+        ["father", "พ่อ", "A male parent"],
+        ["son", "ลูกชาย", "A male child"],
+        ["daughter", "ลูกสาว", "A female child"],
+        ["brother", "พี่ชาย / น้องชาย", "A male sibling"],
+        ["sister", "พี่สาว / น้องสาว", "A female sibling"],
+        ["husband", "สามี", "A married man"],
+        ["wife", "ภรรยา", "A married woman"],
+        ["friend", "เพื่อน", "A person you like and trust"],
+        ["country", "ประเทศ", "A nation or state"],
+        ["age", "อายุ", "How old someone is"]
+      ],
+      "page_types_override": {"conversation": true}
+    },
+    {
+      "week": 6, "prefix": "begin_routines", "emoji": "⏰",
+      "topic_l2": "Schedules & Daily Routines",
+      "topic_l1": "ตารางเวลาและกิจวัตรประจำวัน",
+      "grammar_l2": "Present Simple + 3rd Person -s/-es",
+      "grammar_l1": "Present Simple + การเติม -s/-es (he/she/it)",
+      "vocab": [
+        ["start", "เริ่ม", "To begin doing something"],
+        ["finish", "เสร็จ / จบ", "To complete something"],
+        ["work", "ทำงาน", "To do a job"],
+        ["eat", "กิน", "To consume food"],
+        ["lunch", "อาหารกลางวัน", "The midday meal"],
+        ["break", "พัก", "A rest period"],
+        ["arrive", "มาถึง", "To reach a place"],
+        ["leave", "ออก / ไป", "To go away from a place"],
+        ["open", "เปิด", "To make something not closed"],
+        ["close", "ปิด", "To make something not open"],
+        ["early", "เช้า / เร็ว", "Before the expected time"],
+        ["late", "สาย / ช้า", "After the expected time"]
+      ],
+      "page_types_override": {"pronunciation": true}
+    },
+    {
+      "week": 7, "prefix": "begin_food", "emoji": "🍜",
+      "topic_l2": "Food & Ordering",
+      "topic_l1": "อาหารและการสั่งอาหาร",
+      "grammar_l2": "Present Simple — Negative (don't/doesn't)",
+      "grammar_l1": "Present Simple — ปฏิเสธ (don't/doesn't)",
+      "vocab": [
+        ["rice", "ข้าว", "A staple grain food"],
+        ["chicken", "ไก่", "A common meat"],
+        ["water", "น้ำ", "A drink essential for life"],
+        ["coffee", "กาแฟ", "A hot drink from coffee beans"],
+        ["tea", "ชา", "A hot drink from tea leaves"],
+        ["food", "อาหาร", "Things you eat"],
+        ["drink", "เครื่องดื่ม / ดื่ม", "Liquid to consume; to consume liquid"],
+        ["menu", "เมนู", "A list of food choices"],
+        ["order", "สั่ง", "To ask for food or drink"],
+        ["hungry", "หิว", "Wanting to eat"],
+        ["delicious", "อร่อย", "Very good tasting"],
+        ["spicy", "เผ็ด", "Having a hot flavor"]
+      ],
+      "page_types_override": {"conversation": true}
+    },
+    {
+      "week": 8, "prefix": "begin_email", "emoji": "📧",
+      "topic_l2": "Emails & Messages at Work",
+      "topic_l1": "อีเมลและข้อความในที่ทำงาน",
+      "grammar_l2": "Present Simple — Questions + Wh-words",
+      "grammar_l1": "Present Simple — คำถาม + What/When/Where/Who",
+      "vocab": [
+        ["send", "ส่ง", "To make something go to someone"],
+        ["read", "อ่าน", "To look at and understand text"],
+        ["write", "เขียน", "To put words on paper or screen"],
+        ["message", "ข้อความ", "A written communication"],
+        ["reply", "ตอบ", "To respond to a message"],
+        ["meeting", "การประชุม", "A gathering for discussion"],
+        ["schedule", "ตารางเวลา / กำหนดการ", "A plan for when things happen"],
+        ["time", "เวลา", "When something happens"],
+        ["date", "วันที่", "A specific day"],
+        ["subject", "หัวข้อ (อีเมล)", "The topic line of an email"],
+        ["Dear", "เรียน (คำขึ้นต้นอีเมล)", "Formal email greeting"],
+        ["Regards", "ขอแสดงความนับถือ", "Formal email closing"]
+      ],
+      "page_types_override": {"worksheet": true}
+    },
+    {
+      "week": 9, "prefix": "begin_directions", "emoji": "🗺️",
+      "topic_l2": "Directions & Transportation",
+      "topic_l1": "การบอกทางและการเดินทาง",
+      "grammar_l2": "Imperatives + Prepositions of Place",
+      "grammar_l1": "คำสั่ง + คำบุพบทบอกสถานที่ (in/on/at/near)",
+      "vocab": [
+        ["go", "ไป", "To move to a place"],
+        ["turn", "เลี้ยว", "To change direction"],
+        ["left", "ซ้าย", "The opposite of right"],
+        ["right", "ขวา", "The opposite of left"],
+        ["straight", "ตรงไป", "Without turning"],
+        ["stop", "หยุด", "To not move anymore"],
+        ["street", "ถนน", "A road in a town"],
+        ["station", "สถานี", "A place where buses or trains stop"],
+        ["bus", "รถเมล์ / รถบัส", "A large vehicle for passengers"],
+        ["taxi", "แท็กซี่", "A car you pay to ride in"],
+        ["near", "ใกล้", "A short distance away"],
+        ["far", "ไกล", "A long distance away"]
+      ],
+      "page_types_override": {"pronunciation": true}
+    },
+    {
+      "week": 10, "prefix": "begin_phone", "emoji": "📱",
+      "topic_l2": "Phone Calls & Requests",
+      "topic_l1": "การโทรศัพท์และการขอร้อง",
+      "grammar_l2": "Can / Can't (Ability & Requests)",
+      "grammar_l1": "Can / Can't (ความสามารถและการขอร้อง)",
+      "vocab": [
+        ["call", "โทร", "To phone someone"],
+        ["speak", "พูด", "To talk"],
+        ["hold", "ถือสาย / รอสาย", "To wait on a phone call"],
+        ["wait", "รอ", "To stay until something happens"],
+        ["number", "หมายเลข", "A phone number"],
+        ["help", "ช่วย", "To assist someone"],
+        ["repeat", "พูดซ้ำ", "To say again"],
+        ["understand", "เข้าใจ", "To know the meaning"],
+        ["slowly", "ช้าๆ", "Not fast"],
+        ["available", "ว่าง", "Free, not busy"],
+        ["problem", "ปัญหา", "Something that is wrong"],
+        ["sure", "แน่นอน / ได้เลย", "Certain; yes of course"]
+      ],
+      "page_types_override": {"conversation": true}
+    },
+    {
+      "week": 11, "prefix": "begin_shopping", "emoji": "🛒",
+      "topic_l2": "Shopping & Money",
+      "topic_l1": "การช้อปปิ้งและเงิน",
+      "grammar_l2": "There is/are + How much/How many",
+      "grammar_l1": "There is/are + How much/How many",
+      "vocab": [
+        ["buy", "ซื้อ", "To get something by paying money"],
+        ["sell", "ขาย", "To give something for money"],
+        ["pay", "จ่ายเงิน", "To give money for something"],
+        ["price", "ราคา", "How much something costs"],
+        ["money", "เงิน", "What you use to buy things"],
+        ["baht", "บาท", "Thai currency"],
+        ["cheap", "ถูก", "Not expensive"],
+        ["expensive", "แพง", "Costing a lot of money"],
+        ["shop", "ร้านค้า", "A place to buy things"],
+        ["market", "ตลาด", "An open area where people sell things"],
+        ["size", "ขนาด", "How big something is"],
+        ["color", "สี", "Red, blue, green, etc."]
+      ],
+      "page_types_override": {"worksheet": true}
+    },
+    {
+      "week": 12, "prefix": "begin_past", "emoji": "📖",
+      "topic_l2": "Talking About Past Events",
+      "topic_l1": "การพูดเกี่ยวกับเหตุการณ์ในอดีต",
+      "grammar_l2": "Simple Past (was/were + regular -ed + irregular)",
+      "grammar_l1": "Simple Past (was/were + กริยาปกติ -ed + กริยาอปกติ)",
+      "vocab": [
+        ["yesterday", "เมื่อวาน", "The day before today"],
+        ["last week", "สัปดาห์ที่แล้ว", "The week before this one"],
+        ["ago", "ที่แล้ว", "In the past (2 days ago)"],
+        ["went", "ไป (อดีตของ go)", "Past of 'go'"],
+        ["had", "มี (อดีตของ have)", "Past of 'have'"],
+        ["came", "มา (อดีตของ come)", "Past of 'come'"],
+        ["saw", "เห็น (อดีตของ see)", "Past of 'see'"],
+        ["did", "ทำ (อดีตของ do)", "Past of 'do'"],
+        ["made", "ทำ/สร้าง (อดีตของ make)", "Past of 'make'"],
+        ["before", "ก่อน", "Earlier than"],
+        ["finished", "เสร็จแล้ว", "Past of 'finish'"],
+        ["happened", "เกิดขึ้น", "Past of 'happen'"]
+      ],
+      "page_types_override": {"pronunciation": true}
+    }
+  ]
+}

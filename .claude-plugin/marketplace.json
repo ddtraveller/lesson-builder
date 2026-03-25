@@ -1,0 +1,14 @@
+{
+  "name": "lesson-builder-marketplace",
+  "owner": {
+    "name": "ddtraveller"
+  },
+  "plugins": [
+    {
+      "name": "lesson-builder",
+      "source": ".",
+      "description": "Generate complete bilingual TEFL/ESL courses with configurable page types — lessons, exams, flashcards, conversations, pronunciation drills, worksheets, and syllabi.",
+      "version": "1.0.0"
+    }
+  ]
+}

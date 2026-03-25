@@ -1,0 +1,8 @@
+{
+  "name": "lesson-builder",
+  "description": "Generate complete bilingual TEFL/ESL courses with configurable page types — lessons, exams, flashcards, conversations, pronunciation drills, worksheets, and syllabi. Works for any language pair and topic.",
+  "version": "1.0.0",
+  "author": {
+    "name": "ddtraveller"
+  }
+}
