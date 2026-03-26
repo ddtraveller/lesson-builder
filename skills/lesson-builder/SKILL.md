@@ -27,7 +27,13 @@ Use this skill when:
 2. **Topic/Subject** — "What topic should the course cover?" (e.g., "General English for beginners", "Business English", "English through IT skills")
 3. **Languages** — "What is the learner's first language (L1) and target language (L2)?" (default: Thai → English)
 4. **Number of weeks/units** — "How many units?" (default: 12)
-5. **Page types** — "Which page types per unit?" Show options:
+5. **Age group** — "Who is this course for?"
+   - 👶 **Children (4-7)** — Audio-first, big visuals, tap/drag interactions, no reading required
+   - 👦 **Older children (8-12)** — Can read simple text, handle basic game rules
+   - 🧑 **Adults** — Full text-based lessons with grammar explanations
+6. **Page types** — "Which page types per unit?" Show options based on age group:
+
+   **Adult page types:**
    - 📄 **Lesson** — Main content with vocabulary, grammar, tutorials, section quizzes
    - 📝 **Activities** — Hands-on practice with difficulty levels (Easy/Medium/Hard)
    - 📝 **Exam** — Interactive exam with difficulty selector and score tracking
@@ -36,6 +42,14 @@ Use this skill when:
    - 🔊 **Pronunciation** — Sound drills targeting L1 interference patterns
    - 🖨️ **Worksheet** — Print-friendly exercises with hidden answer key
    - 📊 **Syllabus** — Course overview page
+
+   **Children's page types (ages 4-7):**
+   - 📖 **Story** — Illustrated story with big images, 1-2 sentences per page, audio narration, tap-to-hear vocabulary (4-6 words per unit)
+   - 🎮 **Game** — Interactive mini-games: drag-and-drop matching, tap-the-correct-one, memory card pairs. Config/vocab feeds the content
+   - 🎵 **Song** — Sing-along with line-by-line lyrics, karaoke-style highlighting, vocabulary words in color, actions/movements
+   - 🎨 **Coloring** — SVG line drawings with labeled English words. Tap color palette then tap regions to fill. Speaks word on tap. Printable version
+   - 🏷️ **Stickers** — Drag vocabulary stickers onto a themed scene background. Speaks English name on placement. Free-play reinforcement
+   - 🌟 **Reward** — Progress/celebration page with stars, stickers collected, words learned counter. Congratulations animation
 6. **Output location** — "Where should files go?" (default: `HTML/courses/{topic_slug}/`)
 7. **Color theme** — "Any color preference?" (or auto-pick)
 
