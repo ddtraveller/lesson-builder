@@ -50,6 +50,17 @@ Use this skill when:
    - 🎨 **Coloring** — SVG line drawings with labeled English words. Tap color palette then tap regions to fill. Speaks word on tap. Printable version
    - 🏷️ **Stickers** — Drag vocabulary stickers onto a themed scene background. Speaks English name on placement. Free-play reinforcement
    - 🌟 **Reward** — Progress/celebration page with stars, stickers collected, words learned counter. Congratulations animation
+
+   **Older children's page types (ages 8-12):**
+   Can also use any of the 4-7 page types above, plus:
+   - 💬 **Comic** — Illustrated comic strip with speech bubbles teaching vocabulary in context. 6-8 panels per strip, bilingual dialogue, audio per bubble, 3 comprehension questions at the end. Characters and scenarios match the unit theme
+   - 🏆 **Quiz Show** — Game-show style quiz with countdown timer (15s per question), 3 lifelines (50/50, skip, hint), escalating difficulty levels, animated score counter, sound effects. 10-15 questions mixing vocab, grammar, and reading comprehension
+   - 🧩 **Word Puzzle** — Three puzzle types per page: crossword (clues in L1, answers in L2), word search grid with hidden vocabulary, and word scramble (unscramble letters). Timer optional, hint system reveals one letter at a time. Printable version
+   - 🗺️ **Adventure** — Choose-your-own-adventure branching story (10-15 scenes, 3-4 endings). Each choice point tests vocabulary or grammar — correct choices lead to better outcomes. Tracks path taken, shows vocabulary learned at the end. Replayable for different endings
+   - 📓 **Journal** — Guided creative writing with sentence starters, word bank from unit vocab, and example sentences. 3 writing prompts per unit, increasing difficulty. Typed responses saved to localStorage. Teacher can view/print completed journals
+   - 🎬 **Video Lesson** — Structured video learning page: pre-watch vocabulary preview with audio, embedded video player (YouTube/MP4), pause-and-answer comprehension checks at timestamps, post-watch quiz, key phrases summary. Video URL configured per unit
+   - 🎲 **Board Game** — Virtual board game (snakes-and-ladders or path style). Roll dice, land on squares with vocabulary challenges — answer correctly to stay, wrong answer slides back. 2-4 player support (pass-and-play). Tracks wins in localStorage
+   - 📰 **Reading** — Short illustrated reading passage (100-200 words) at appropriate level with highlighted vocabulary, audio read-aloud, adjustable speed. Followed by true/false, multiple choice, and "find the word" comprehension exercises. Bilingual glossary sidebar
 6. **Output location** — "Where should files go?" (default: `HTML/courses/{topic_slug}/`)
 7. **Color theme** — "Any color preference?" (or auto-pick)
 
