@@ -1,0 +1,364 @@
+{
+  "course_id": "tefl_intermediate",
+  "title": "English for Career Growth",
+  "title_l1": "ภาษาอังกฤษเพื่อความก้าวหน้าในอาชีพ",
+  "description": "A 12-week intermediate course for Thai adults who have basic English, covering workplace communication, presentations, negotiations, and professional writing.",
+  "level": "A2 → B1",
+  "schedule": "1 hour/week × 12 weeks",
+
+  "l1": "th",
+  "l1_name": "Thai",
+  "l1_name_native": "ภาษาไทย",
+  "l2": "en",
+  "l2_name": "English",
+
+  "output_dir": "HTML/tefl/intermediate",
+  "file_prefix": "inter",
+  "syllabus_file": "syllabus_tefl_intermediate.html",
+
+  "theme": {
+    "primary": "#2563eb",
+    "primary_dark": "#1d4ed8",
+    "primary_light": "#93c5fd",
+    "primary_pale": "#eff6ff",
+    "accent": "#0ea5e9"
+  },
+
+  "page_types": {
+    "lesson": "every",
+    "activities": "every",
+    "exam": "every",
+    "flashcards": "random:3",
+    "conversation": "random:4",
+    "pronunciation": "random:3",
+    "worksheet": "random:3",
+    "syllabus": true
+  },
+
+  "page_structure": {
+    "lesson": {
+      "sections": ["introduction", "vocabulary", "grammar", "tutorial_steps", "activity", "reference_table", "summary"],
+      "section_checks": true,
+      "section_check_questions": 3,
+      "homework": true,
+      "references": true,
+      "audio_buttons": true,
+      "hero_image": true
+    },
+    "exam": {
+      "categories": 5,
+      "difficulty_selector": true,
+      "gradebook": true
+    }
+  },
+
+  "vocab_per_unit": 14,
+
+  "research": {
+    "notebooklm": true,
+    "web_search": true,
+    "fact_check": true
+  },
+
+  "images": {
+    "enabled": true,
+    "provider": "replicate",
+    "model": "black-forest-labs/flux-dev",
+    "style_prefix": "Warm, professional educational illustration, clean modern flat design with soft blue gradients, Southeast Asian Thai adult characters with warm brown skin and black hair in professional settings, ",
+    "style_suffix": ", professional educational textbook quality, warm natural lighting, inviting corporate atmosphere, clear visual storytelling, no text or words in the image",
+    "hero_image": true,
+    "per_unit_image": true,
+    "aspect_ratio": "16:9"
+  },
+
+  "units": [
+    {
+      "week": 1, "prefix": "inter_opinions", "emoji": "💬",
+      "topic_l2": "Expressing Opinions & Agreement",
+      "topic_l1": "การแสดงความคิดเห็นและความเห็นด้วย",
+      "grammar_l2": "Present Simple vs Present Continuous",
+      "grammar_l1": "Present Simple เทียบกับ Present Continuous",
+      "vocab": [
+        ["opinion", "ความคิดเห็น", "What someone thinks about something"],
+        ["agree", "เห็นด้วย", "To have the same opinion"],
+        ["disagree", "ไม่เห็นด้วย", "To have a different opinion"],
+        ["suggest", "แนะนำ / เสนอ", "To offer an idea"],
+        ["prefer", "ชอบมากกว่า", "To like one thing more than another"],
+        ["believe", "เชื่อ", "To think something is true"],
+        ["however", "อย่างไรก็ตาม", "But; on the other hand"],
+        ["although", "แม้ว่า / ถึงแม้", "Despite the fact that"],
+        ["definitely", "อย่างแน่นอน", "Without any doubt"],
+        ["actually", "จริงๆ แล้ว", "In fact; really"],
+        ["point", "ประเด็น", "A specific idea or argument"],
+        ["issue", "ปัญหา / ประเด็น", "A topic for discussion or a problem"],
+        ["perspective", "มุมมอง", "A way of looking at something"],
+        ["reasonable", "สมเหตุสมผล", "Fair and sensible"]
+      ],
+      "page_types_override": {"conversation": true}
+    },
+    {
+      "week": 2, "prefix": "inter_meetings", "emoji": "🤝",
+      "topic_l2": "Meetings & Team Discussions",
+      "topic_l1": "การประชุมและการอภิปรายในทีม",
+      "grammar_l2": "Modal Verbs: should / could / would",
+      "grammar_l1": "กริยาช่วย: should / could / would",
+      "vocab": [
+        ["agenda", "วาระการประชุม", "A list of items to discuss"],
+        ["proposal", "ข้อเสนอ", "A plan or suggestion"],
+        ["deadline", "กำหนดส่ง", "The last day to finish something"],
+        ["update", "อัพเดท / ข้อมูลล่าสุด", "New information about something"],
+        ["feedback", "ข้อเสนอแนะ", "Comments about someone's work"],
+        ["assign", "มอบหมาย", "To give a task to someone"],
+        ["progress", "ความคืบหน้า", "How much has been done"],
+        ["priority", "ลำดับความสำคัญ", "What is most important"],
+        ["postpone", "เลื่อน", "To delay to a later time"],
+        ["approve", "อนุมัติ", "To officially agree or accept"],
+        ["minutes", "บันทึกการประชุม", "The written record of a meeting"],
+        ["chairperson", "ประธานที่ประชุม", "The person who leads a meeting"],
+        ["consensus", "ฉันทามติ", "General agreement among a group"],
+        ["objective", "วัตถุประสงค์", "A goal or aim"]
+      ],
+      "page_types_override": {"flashcards": true}
+    },
+    {
+      "week": 3, "prefix": "inter_email_pro", "emoji": "✉️",
+      "topic_l2": "Professional Email Writing",
+      "topic_l1": "การเขียนอีเมลอย่างมืออาชีพ",
+      "grammar_l2": "Formal vs Informal Register",
+      "grammar_l1": "ภาษาทางการ เทียบกับ ภาษาไม่เป็นทางการ",
+      "vocab": [
+        ["attachment", "ไฟล์แนบ", "A file sent with an email"],
+        ["regarding", "เกี่ยวกับ", "About; concerning"],
+        ["request", "คำขอ / ร้องขอ", "To ask for something formally"],
+        ["confirm", "ยืนยัน", "To say something is true or agreed"],
+        ["apologize", "ขออภัย", "To say sorry formally"],
+        ["inform", "แจ้งให้ทราบ", "To tell someone officially"],
+        ["forward", "ส่งต่อ", "To send an email to someone else"],
+        ["recipient", "ผู้รับ", "The person who receives something"],
+        ["cc", "สำเนาถึง", "Carbon copy — send a copy to"],
+        ["sincerely", "ด้วยความนับถือ", "A formal closing for letters/emails"],
+        ["inquire", "สอบถาม", "To ask for information politely"],
+        ["correspondence", "การติดต่อสื่อสาร", "Written communication"],
+        ["acknowledge", "รับทราบ", "To confirm you received something"],
+        ["appropriate", "เหมาะสม", "Suitable for the situation"]
+      ],
+      "page_types_override": {"worksheet": true}
+    },
+    {
+      "week": 4, "prefix": "inter_present", "emoji": "📊",
+      "topic_l2": "Giving Presentations",
+      "topic_l1": "การนำเสนอผลงาน",
+      "grammar_l2": "Connecting Words (first, next, finally, in addition)",
+      "grammar_l1": "คำเชื่อม (first, next, finally, in addition)",
+      "vocab": [
+        ["presentation", "การนำเสนอ", "A talk given to an audience"],
+        ["slide", "สไลด์", "A page in a presentation"],
+        ["audience", "ผู้ฟัง / ผู้ชม", "People watching a presentation"],
+        ["introduction", "บทนำ / การแนะนำ", "The beginning part"],
+        ["conclusion", "บทสรุป", "The ending part"],
+        ["chart", "แผนภูมิ", "A visual display of data"],
+        ["data", "ข้อมูล", "Facts and statistics"],
+        ["highlight", "จุดเด่น / เน้น", "To draw attention to something"],
+        ["summarize", "สรุป", "To give a brief overview"],
+        ["visual", "ภาพประกอบ", "Something you can see"],
+        ["engage", "ดึงดูดความสนใจ", "To attract and hold attention"],
+        ["outline", "โครงร่าง", "A general plan or summary"],
+        ["transition", "การเปลี่ยน", "Moving from one part to another"],
+        ["impact", "ผลกระทบ", "A strong effect on something"]
+      ],
+      "page_types_override": {"pronunciation": true}
+    },
+    {
+      "week": 5, "prefix": "inter_past_exp", "emoji": "📝",
+      "topic_l2": "Describing Past Experiences",
+      "topic_l1": "การบอกเล่าประสบการณ์ในอดีต",
+      "grammar_l2": "Past Simple vs Present Perfect",
+      "grammar_l1": "Past Simple เทียบกับ Present Perfect",
+      "vocab": [
+        ["experience", "ประสบการณ์", "Something that happened to you"],
+        ["achieve", "บรรลุ / ทำสำเร็จ", "To successfully complete something"],
+        ["improve", "ปรับปรุง / พัฒนา", "To make something better"],
+        ["recently", "เมื่อเร็วๆ นี้", "Not long ago"],
+        ["already", "แล้ว", "Before now; by this time"],
+        ["yet", "ยัง", "Until now (in questions/negatives)"],
+        ["since", "ตั้งแต่", "From a time in the past until now"],
+        ["ever", "เคย", "At any time (in questions)"],
+        ["never", "ไม่เคย", "Not at any time"],
+        ["challenge", "ความท้าทาย", "Something difficult to do"],
+        ["opportunity", "โอกาส", "A chance to do something"],
+        ["develop", "พัฒนา", "To grow or become more advanced"],
+        ["accomplish", "ทำสำเร็จ", "To finish successfully"],
+        ["milestone", "เหตุการณ์สำคัญ", "An important event or achievement"]
+      ],
+      "page_types_override": {"conversation": true}
+    },
+    {
+      "week": 6, "prefix": "inter_negotiate", "emoji": "⚖️",
+      "topic_l2": "Negotiation & Persuasion",
+      "topic_l1": "การเจรจาต่อรองและการโน้มน้าว",
+      "grammar_l2": "First Conditional (If + present, will + verb)",
+      "grammar_l1": "Conditional แบบที่ 1 (If + present, will + verb)",
+      "vocab": [
+        ["negotiate", "เจรจาต่อรอง", "To discuss to reach an agreement"],
+        ["compromise", "ประนีประนอม", "Each side gives up something"],
+        ["offer", "เสนอ / ข้อเสนอ", "To present something for acceptance"],
+        ["accept", "ยอมรับ", "To say yes to something"],
+        ["reject", "ปฏิเสธ", "To say no to something"],
+        ["condition", "เงื่อนไข", "Something required for agreement"],
+        ["benefit", "ผลประโยชน์", "An advantage or good result"],
+        ["budget", "งบประมาณ", "The amount of money available"],
+        ["discount", "ส่วนลด", "A reduction in price"],
+        ["terms", "ข้อกำหนด / เงื่อนไข", "The conditions of an agreement"],
+        ["persuade", "โน้มน้าว", "To convince someone"],
+        ["alternative", "ทางเลือก", "Another option"],
+        ["mutual", "ร่วมกัน", "Shared by both sides"],
+        ["flexible", "ยืดหยุ่น", "Willing to change or adapt"]
+      ],
+      "page_types_override": {"conversation": true}
+    },
+    {
+      "week": 7, "prefix": "inter_problems", "emoji": "🔧",
+      "topic_l2": "Problem Solving & Complaints",
+      "topic_l1": "การแก้ปัญหาและการร้องเรียน",
+      "grammar_l2": "Second Conditional (If + past, would + verb)",
+      "grammar_l1": "Conditional แบบที่ 2 (If + past, would + verb)",
+      "vocab": [
+        ["complaint", "ข้อร้องเรียน", "A statement that something is wrong"],
+        ["solution", "วิธีแก้ปัญหา", "An answer to a problem"],
+        ["apologize", "ขอโทษ", "To say you are sorry"],
+        ["resolve", "แก้ไข", "To find a solution"],
+        ["investigate", "สืบสวน / ตรวจสอบ", "To look into something carefully"],
+        ["responsible", "รับผิดชอบ", "In charge; to blame"],
+        ["unfortunately", "น่าเสียดาย", "Sadly; it is bad that"],
+        ["inconvenience", "ความไม่สะดวก", "Trouble or difficulty caused"],
+        ["refund", "คืนเงิน", "To give money back"],
+        ["replace", "เปลี่ยนแทน", "To put something new in place of old"],
+        ["dissatisfied", "ไม่พอใจ", "Not happy with something"],
+        ["escalate", "ยกระดับ", "To make more serious or send to a higher level"],
+        ["compensation", "ค่าชดเชย", "Something given to make up for a problem"],
+        ["policy", "นโยบาย", "Official rules of an organization"]
+      ],
+      "page_types_override": {"worksheet": true}
+    },
+    {
+      "week": 8, "prefix": "inter_interview", "emoji": "🎯",
+      "topic_l2": "Job Interviews & CVs",
+      "topic_l1": "การสัมภาษณ์งานและประวัติย่อ",
+      "grammar_l2": "Present Perfect Continuous (have been + -ing)",
+      "grammar_l1": "Present Perfect Continuous (have been + -ing)",
+      "vocab": [
+        ["interview", "สัมภาษณ์", "A formal meeting to assess a candidate"],
+        ["resume", "ประวัติย่อ / เรซูเม่", "A document listing your qualifications"],
+        ["qualification", "คุณสมบัติ", "Skills or education needed for a job"],
+        ["strength", "จุดแข็ง", "Something you are good at"],
+        ["weakness", "จุดอ่อน", "Something you need to improve"],
+        ["salary", "เงินเดือน", "Money paid for work each month"],
+        ["hire", "จ้าง", "To give someone a job"],
+        ["apply", "สมัคร", "To formally ask for a job"],
+        ["candidate", "ผู้สมัคร", "A person applying for a job"],
+        ["reference", "บุคคลอ้างอิง", "Someone who can recommend you"],
+        ["motivated", "มีแรงจูงใจ", "Having a strong desire to do well"],
+        ["teamwork", "การทำงานเป็นทีม", "Working together as a group"],
+        ["promotion", "การเลื่อนตำแหน่ง", "Moving to a higher position"],
+        ["relocate", "ย้ายที่", "To move to a different place"]
+      ],
+      "page_types_override": {"conversation": true}
+    },
+    {
+      "week": 9, "prefix": "inter_travel", "emoji": "✈️",
+      "topic_l2": "Business Travel & Hotels",
+      "topic_l1": "การเดินทางเพื่อธุรกิจและโรงแรม",
+      "grammar_l2": "Future Plans: will vs going to vs Present Continuous",
+      "grammar_l1": "การพูดเรื่องอนาคต: will / going to / Present Continuous",
+      "vocab": [
+        ["reservation", "การจอง", "An arrangement to save a place"],
+        ["flight", "เที่ยวบิน", "A journey by airplane"],
+        ["departure", "การออกเดินทาง", "Leaving a place"],
+        ["arrival", "การมาถึง", "Reaching a destination"],
+        ["itinerary", "กำหนดการเดินทาง", "A plan of a journey"],
+        ["accommodation", "ที่พัก", "A place to stay"],
+        ["check-in", "เช็คอิน", "To register at a hotel or airport"],
+        ["check-out", "เช็คเอาท์", "To leave and pay at a hotel"],
+        ["luggage", "สัมภาระ", "Bags and suitcases for travel"],
+        ["boarding pass", "บัตรผ่านขึ้นเครื่อง", "A card allowing you to board a plane"],
+        ["currency", "สกุลเงิน", "The money used in a country"],
+        ["receipt", "ใบเสร็จ", "A paper showing what you paid"],
+        ["transfer", "การเดินทางต่อ / โอน", "Moving from one place or vehicle to another"],
+        ["delay", "ล่าช้า", "Later than planned"]
+      ],
+      "page_types_override": {"flashcards": true}
+    },
+    {
+      "week": 10, "prefix": "inter_reports", "emoji": "📈",
+      "topic_l2": "Reports & Data Analysis",
+      "topic_l1": "รายงานและการวิเคราะห์ข้อมูล",
+      "grammar_l2": "Passive Voice (is done / was done / has been done)",
+      "grammar_l1": "Passive Voice (ถูกกระทำ — is done / was done)",
+      "vocab": [
+        ["report", "รายงาน", "A document with findings or results"],
+        ["analysis", "การวิเคราะห์", "Detailed examination of something"],
+        ["increase", "เพิ่มขึ้น", "To become larger or more"],
+        ["decrease", "ลดลง", "To become smaller or less"],
+        ["trend", "แนวโน้ม", "A general direction of change"],
+        ["percentage", "เปอร์เซ็นต์ / ร้อยละ", "A number out of 100"],
+        ["compare", "เปรียบเทียบ", "To look at differences and similarities"],
+        ["significant", "สำคัญ / มีนัยสำคัญ", "Large enough to be important"],
+        ["revenue", "รายได้", "Money a company earns"],
+        ["quarter", "ไตรมาส", "A three-month period"],
+        ["forecast", "การพยากรณ์", "A prediction about the future"],
+        ["graph", "กราฟ", "A visual display of numbers"],
+        ["conclude", "สรุป", "To come to a final decision"],
+        ["statistic", "สถิติ", "A number that gives information"]
+      ],
+      "page_types_override": {"worksheet": true}
+    },
+    {
+      "week": 11, "prefix": "inter_culture", "emoji": "🌏",
+      "topic_l2": "Cross-Cultural Communication",
+      "topic_l1": "การสื่อสารข้ามวัฒนธรรม",
+      "grammar_l2": "Reported Speech (She said that... / He told me...)",
+      "grammar_l1": "การรายงานคำพูด (She said that... / He told me...)",
+      "vocab": [
+        ["culture", "วัฒนธรรม", "The beliefs and customs of a group"],
+        ["custom", "ประเพณี / ธรรมเนียม", "A traditional practice"],
+        ["polite", "สุภาพ", "Having good manners"],
+        ["gesture", "ท่าทาง", "A movement of the body to communicate"],
+        ["misunderstanding", "ความเข้าใจผิด", "A failure to understand correctly"],
+        ["diversity", "ความหลากหลาย", "Having many different types"],
+        ["etiquette", "มารยาท", "The rules of polite behavior"],
+        ["offend", "ทำให้ขุ่นเคือง", "To make someone upset or angry"],
+        ["taboo", "สิ่งต้องห้าม", "Something not allowed by social custom"],
+        ["stereotype", "ภาพจำ / อคติ", "A fixed, oversimplified idea about a group"],
+        ["sensitive", "อ่อนไหว / ละเอียดอ่อน", "Easily affected; needing careful treatment"],
+        ["adapt", "ปรับตัว", "To change to fit new conditions"],
+        ["norm", "บรรทัดฐาน", "What is considered normal behavior"],
+        ["tolerance", "ความอดทน / ความอดกลั้น", "Accepting differences without judging"]
+      ],
+      "page_types_override": {"pronunciation": true}
+    },
+    {
+      "week": 12, "prefix": "inter_future", "emoji": "🚀",
+      "topic_l2": "Career Goals & Future Plans",
+      "topic_l1": "เป้าหมายอาชีพและแผนอนาคต",
+      "grammar_l2": "Review: All Tenses + Conditionals",
+      "grammar_l1": "ทบทวน: Tenses ทั้งหมด + Conditionals",
+      "vocab": [
+        ["career", "อาชีพ / สายอาชีพ", "A long-term professional path"],
+        ["goal", "เป้าหมาย", "Something you want to achieve"],
+        ["skill", "ทักษะ", "An ability from training or practice"],
+        ["ambition", "ความทะเยอทะยาน", "A strong desire to succeed"],
+        ["training", "การฝึกอบรม", "Learning new skills for a job"],
+        ["certificate", "ใบรับรอง / ประกาศนียบัตร", "A document proving you completed something"],
+        ["network", "เครือข่าย", "A group of professional contacts"],
+        ["mentor", "ที่ปรึกษา", "An experienced person who guides you"],
+        ["leadership", "ภาวะผู้นำ", "The ability to lead others"],
+        ["innovation", "นวัตกรรม", "A new idea or method"],
+        ["strategic", "เชิงกลยุทธ์", "Related to long-term planning"],
+        ["vision", "วิสัยทัศน์", "A clear picture of the future"],
+        ["commitment", "ความมุ่งมั่น", "A strong dedication to something"],
+        ["entrepreneur", "ผู้ประกอบการ", "A person who starts a business"]
+      ],
+      "page_types_override": {"flashcards": true}
+    }
+  ]
+}
