@@ -17,10 +17,17 @@ Use this skill when:
 
 **If the user invokes this skill without specifying all parameters, ASK:**
 
-1. **Topic/Subject** — "What topic should the course cover?" (e.g., "General English for beginners", "Business English", "English through IT skills")
-2. **Languages** — "What is the learner's first language (L1) and target language (L2)?" (default: Thai → English)
-3. **Number of weeks/units** — "How many units?" (default: 12)
-4. **Page types** — "Which page types per unit?" Show options:
+1. **Research method** (ask FIRST) — "How should I research course content?"
+   - 🔬 **NotebookLM** (default, recommended) — AI-powered research using Google NotebookLM. Creates a research notebook, imports web sources on the topic, and queries them for verified content per unit. Produces higher-quality, citation-backed material.
+   - 🌐 **Web Search** — Search the web directly for curriculum references, grammar examples, and vocabulary verification.
+   - 📚 **Training data only** — Generate from AI knowledge without external research. Fastest but least verified.
+
+   If the user picks NotebookLM, **immediately verify it is set up** before asking remaining questions (see "NotebookLM Setup Guide" below). Do NOT proceed to content generation until auth is confirmed.
+
+2. **Topic/Subject** — "What topic should the course cover?" (e.g., "General English for beginners", "Business English", "English through IT skills")
+3. **Languages** — "What is the learner's first language (L1) and target language (L2)?" (default: Thai → English)
+4. **Number of weeks/units** — "How many units?" (default: 12)
+5. **Page types** — "Which page types per unit?" Show options:
    - 📄 **Lesson** — Main content with vocabulary, grammar, tutorials, section quizzes
    - 📝 **Activities** — Hands-on practice with difficulty levels (Easy/Medium/Hard)
    - 📝 **Exam** — Interactive exam with difficulty selector and score tracking
@@ -29,11 +36,68 @@ Use this skill when:
    - 🔊 **Pronunciation** — Sound drills targeting L1 interference patterns
    - 🖨️ **Worksheet** — Print-friendly exercises with hidden answer key
    - 📊 **Syllabus** — Course overview page
-5. **Output location** — "Where should files go?" (default: `HTML/courses/{topic_slug}/`)
-6. **Color theme** — "Any color preference?" (or auto-pick)
-7. **AI Images** — "Would you like to generate hero images for each lesson using Replicate FLUX Dev? Requires a `REPLICATE_API_TOKEN` in `.env`. Cost: ~$0.03-0.05 per image." (default: no)
+6. **Output location** — "Where should files go?" (default: `HTML/courses/{topic_slug}/`)
+7. **Color theme** — "Any color preference?" (or auto-pick)
 
-**If a config file exists** in `config/` matching the topic, load it instead of asking.
+**If a config file exists** in `config/` matching the topic, load it instead of asking. Still check that the research method in the config is available (e.g., if `notebooklm: true`, verify auth before proceeding).
+
+## NotebookLM Setup Guide
+
+When the user chooses NotebookLM (or a config has `notebooklm: true`), run this setup sequence:
+
+### 1. Check if notebooklm-py is installed
+```bash
+pip show notebooklm-py 2>&1
+```
+If not found, install it:
+```bash
+pip install notebooklm-py
+```
+
+### 2. Check authentication (use PYTHONIOENCODING=utf-8 on Windows to avoid encoding crashes)
+```bash
+PYTHONIOENCODING=utf-8 python -m notebooklm auth check --test --json
+```
+
+Parse the JSON result:
+- If `checks.token_fetch` is `true` → auth is good, proceed
+- If `checks.token_fetch` is `false` or `null` → auth expired or missing
+
+### 3. If auth is expired/missing, guide the user through login
+Tell the user:
+> NotebookLM needs to authenticate with your Google account. Please run this command in your terminal (outside Claude Code):
+> ```
+> python -m notebooklm login
+> ```
+> This will open a browser window. Sign in with your Google account and wait for the CLI to confirm success.
+
+If the user reports the browser didn't open, suggest:
+> Try installing the browser first:
+> ```
+> python -m playwright install chromium
+> ```
+> Then retry `python -m notebooklm login`.
+
+If login still fails, suggest deleting stale auth and retrying:
+> ```
+> del %USERPROFILE%\.notebooklm\storage_state.json   (Windows)
+> rm ~/.notebooklm/storage_state.json                 (Mac/Linux)
+> python -m notebooklm login
+> ```
+
+### 4. Verify auth works after login
+```bash
+PYTHONIOENCODING=utf-8 python -m notebooklm create "test" --json
+```
+If this succeeds (returns a notebook ID), auth is confirmed. Delete the test notebook:
+```bash
+PYTHONIOENCODING=utf-8 python -m notebooklm notebook delete <id>
+```
+
+### 5. If auth cannot be established, offer fallback
+Tell the user: *"NotebookLM authentication couldn't be set up. Would you like to fall back to web search or training data instead?"*
+
+**IMPORTANT Windows note:** Always prefix notebooklm commands with `PYTHONIOENCODING=utf-8` when running via Bash tool. The CLI uses the `rich` library which crashes on Windows cp1252 encoding when outputting unicode characters (checkmarks, tables). The `--json` flag also helps avoid this, but set the env var as a safety measure.
 
 ## How it works
 
@@ -41,22 +105,33 @@ Use this skill when:
 Either load from a config JSON (`config/{course_id}.json`) or ask interactively.
 
 ### Step 2: Research
-Verify course content against authoritative sources **before** generating.
+Verify course content against authoritative sources **before** generating. Use whichever method the user chose (or config specifies).
 
-**NotebookLM** (default — use if `notebooklm` skill/CLI is available):
-```bash
-notebooklm create "Course: {topic}"
-notebooklm source add-research "{topic} curriculum CEFR"
-notebooklm ask "What are the key concepts of {week topic}?"
-```
+**NotebookLM** (default):
+1. Create a research notebook:
+   ```bash
+   PYTHONIOENCODING=utf-8 python -m notebooklm create "Course: {topic}" --json
+   ```
+2. Add research sources (2-3 queries covering curriculum, grammar, and L1 interference):
+   ```bash
+   PYTHONIOENCODING=utf-8 python -m notebooklm source add-research "{topic} curriculum CEFR {level}"
+   PYTHONIOENCODING=utf-8 python -m notebooklm source add-research "teaching English {L1} speakers {level} common errors"
+   ```
+3. Query for content per topic area:
+   ```bash
+   PYTHONIOENCODING=utf-8 python -m notebooklm ask "What are the key grammar topics for {level}?" --json
+   PYTHONIOENCODING=utf-8 python -m notebooklm ask "What vocabulary is essential for {topic area}?" --json
+   ```
+4. Use the research answers to inform the generated course content.
 
-**If NotebookLM is not available**, fall back to **WebSearch/WebFetch**:
+**Web Search** (fallback or if user chose it):
 - Search for the unit's subject topic from 2+ authoritative sources
 - Search for the grammar point with examples
 - Verify vocabulary definitions and L1 translations
 - Save source citations for the references section
 
-**If neither is available**, inform the user: *"I'll generate content from my training data. For higher accuracy, consider installing the NotebookLM skill or enabling web search."*
+**Training data only** (last resort):
+Inform the user: *"Generating content from training data. For higher accuracy, consider using NotebookLM or web search."*
 
 ### Step 3: Fact-Check
 Use the `fact-checker` skill (default — if available) to verify:
@@ -68,7 +143,7 @@ Use the `fact-checker` skill (default — if available) to verify:
 **If fact-checker is not available**, inform the user: *"I'll do my best to verify content, but consider reviewing grammar rules and translations before publishing."*
 
 ### Step 4: Generate
-Write a Python generator script (`generate_{course_id}.py`) that produces all files, then run it.
+Write a Python generator script (`generate_{course_id}.py`) that produces all files, then run it. The script filename MUST match the `course_id` from the config (e.g., `generate_tefl_intermediate.py` for course_id `tefl_intermediate`). Never reuse or overwrite another course's generator.
 
 ### Step 5: Images (optional)
 If configured and Replicate API token is available, generate illustrations using FLUX Dev.
@@ -171,90 +246,21 @@ Print-optimized (`@media print`). Fill-in-the-blank, matching, unscramble, writi
 ### 📊 Syllabus Page
 Course overview with sticky header, week navigation, hero section, scope table, week cards (objectives + vocab + grammar pattern), assessment rubric, outcomes. Uses different font stack (DM Sans/Noto Sans Thai/DM Serif Display).
 
-## Image Location Rules
-
-Images are **never committed to git** — they are generated locally and uploaded to S3 separately.
-
-### Directory structure
-```
-(site root)
-├── HTML/
-│   └── courses/
-│       └── {course_id}/       ← generated HTML files live here
-│           └── *.html
-└── imgs/
-    └── {course_id}/           ← images live here (S3 sibling to HTML/)
-        └── {prefix}_hero.png
-```
-
-### Path convention in HTML
-From `HTML/courses/{course_id}/`, images are referenced with a **relative path** going up three levels to the site root:
-```html
-<img src="../../../imgs/{course_id}/{image_name}.png" alt="...">
-```
-
-### Hero images
-Each lesson page should include a hero image in the header section:
-```html
-<img class="hero-img" src="../../../imgs/{course_id}/{unit_prefix}_hero.png"
-     alt="{unit title}" onerror="this.style.display='none'">
-```
-The `onerror` handler hides the image gracefully if it hasn't been uploaded to S3 yet.
-
-### Key rules
-- **NEVER commit image files to git.** The `.gitignore` blocks `imgs/`, `*.png`, `*.jpg`, etc.
-- Images are uploaded to S3 to match the relative path structure from the HTML directory
-- Use `onerror="this.style.display='none'"` on all `<img>` tags so pages render cleanly before images are uploaded
-- Image filenames follow the pattern: `{unit_prefix}_{type}.png` (e.g., `claude_intro_hero.png`, `perm_building_hero.png`)
-
 ## Image Generation (Optional)
 
-This skill includes `generate_images.py` — a generic batch image generator using Replicate FLUX Dev. It reads prompts from a JSON file and generates images.
+Generate AI illustrations using FLUX Dev on Replicate. Requires `REPLICATE_API_TOKEN` in `.env`.
 
-### Bundled tool: `generate_images.py`
-
-Located at: `{skill_dir}/generate_images.py`
-
-```bash
-# Generate all images from a prompts JSON
-python generate_images.py heygen_prompts.json --output-dir imgs/heygen
-
-# List status (which images exist vs pending)
-python generate_images.py heygen_prompts.json --list
-
-# Preview prompts without spending credits
-python generate_images.py heygen_prompts.json --dry-run
-
-# Generate one specific image
-python generate_images.py heygen_prompts.json --id heygen_intro_hero
+```python
+import replicate
+output = replicate.run("black-forest-labs/flux-dev", input={
+    "prompt": style_prefix + scene_description + style_suffix,
+    "guidance": 3.5, "num_outputs": 1,
+    "aspect_ratio": "16:9",  # or "1:1", "4:5"
+    "output_format": "png", "num_inference_steps": 28,
+})
 ```
 
-### Image prompts JSON format
-
-The generator script creates a `{course_id}_prompts.json` alongside the course config:
-
-```json
-{
-  "style_prefix": "Warm, friendly educational illustration, ...",
-  "style_suffix": ", professional quality, no text in image",
-  "output_dir": "imgs/{course_id}",
-  "images": {
-    "{unit_prefix}_hero": {
-      "prompt": "Scene description for this unit's hero image",
-      "aspect_ratio": "16:9"
-    }
-  }
-}
-```
-
-### Workflow
-
-1. Generator script creates HTML files with `<img>` tags pointing to `../../../imgs/{course_id}/`
-2. Generator script also creates `{course_id}_prompts.json` with image prompts
-3. Run `python generate_images.py {course_id}_prompts.json` to generate images
-4. Upload images to S3
-
-Requires `REPLICATE_API_TOKEN` in `.env`. Cost: ~$0.03-0.05 per image. Token from: https://replicate.com/account/api-tokens
+Cost: ~$0.03-0.05 per image. Token from: https://replicate.com/account/api-tokens
 
 **Important:** When generating images with people, specify the ethnicity/appearance matching the target learner population in the style prefix (e.g., "Southeast Asian Thai adults" for Thai courses).
 
@@ -340,7 +346,8 @@ Gradebook: `wdc_saveScore(examKey, percentage, grade)` saves to localStorage.
 
 ## Example Configs
 
-- `config/tefl_beginners.json` — 12-week Thai→English beginner course (everyday + work)
+- `config/tefl_beginners.json` — 12-week Thai→English beginner course (everyday + work), web search research
+- `config/tefl_intermediate.json` — 12-week Thai→English intermediate course (career growth), NotebookLM research
 - `config/schema.md` — Full configuration schema documentation
 
 ## Extending
