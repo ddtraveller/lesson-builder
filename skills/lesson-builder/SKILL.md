@@ -44,11 +44,12 @@ Use this skill when:
    - 📊 **Syllabus** — Course overview page
 
    **Children's page types (ages 4-7):**
-   - 📖 **Story** — Illustrated story with big images, 1-2 sentences per page, audio narration, tap-to-hear vocabulary (4-6 words per unit)
-   - 🎮 **Game** — Interactive mini-games: drag-and-drop matching, tap-the-correct-one, memory card pairs. Config/vocab feeds the content
-   - 🎵 **Song** — Sing-along with line-by-line lyrics, karaoke-style highlighting, vocabulary words in color, actions/movements
+   - 📖 **Story** — Illustrated story with big images, 1-2 sentences per page, audio narration, tap-to-hear vocabulary (4-6 words per unit). **Each page's illustration (emoji or image) MUST match the page's text content** — e.g., a page about "The apple is red" should show 🍎 not 🌈. Never reuse the same generic image across all pages
+   - 🎮 **Game** — Interactive mini-games: match (tap English then Thai pair), tap (hear word → tap correct answer from 3 choices), memory (flip card pairs). Config/vocab feeds the content. **Do not use undefined helper functions** — all string escaping must be inline or use the word directly if it contains no quotes
+   - 🎵 **Song** — Embedded YouTube video of a real children's ESL song (sung, not spoken) with bilingual sing-along lyrics below, Thai translations per line, and TPR action instructions per line (e.g., "Clap hands", "Point to blue")
    - 🎨 **Coloring** — SVG line drawings with labeled English words. Tap color palette then tap regions to fill. Speaks word on tap. Printable version
-   - 🏷️ **Stickers** — Drag vocabulary stickers onto a themed scene background. Speaks English name on placement. Free-play reinforcement
+   - 🏷️ **Stickers** — Click-to-add themed stickers (animals, objects — not abstract shapes) onto a scene. Stickers appear at random positions, are draggable after placement, and speak English name on click. Includes stamp trail checkbox (leaves semi-transparent stamps while dragging). Thai instructions explaining click-to-add and drag-to-move. Clear Scene button resets board
+   - 🃏 **Flashcards** — Flip-card grid (3x2) with emoji/image on front, English word + Thai translation on back. Tap to flip + hear TTS. Teacher toolbar: "Flip All to Text/Images" toggle, Shuffle, Reset. Counter shows flipped/total. Core page type — include in every unit as a teacher's resource
    - 🌟 **Reward** — Progress/celebration page with stars, stickers collected, words learned counter. Congratulations animation
 
    **Older children's page types (ages 8-12):**
@@ -61,7 +62,7 @@ Use this skill when:
    - 🎬 **Video Lesson** — Structured video learning page: pre-watch vocabulary preview with audio, embedded video player (YouTube/MP4), pause-and-answer comprehension checks at timestamps, post-watch quiz, key phrases summary. Video URL configured per unit
    - 🎲 **Board Game** — Virtual board game (snakes-and-ladders or path style). Roll dice, land on squares with vocabulary challenges — answer correctly to stay, wrong answer slides back. 2-4 player support (pass-and-play). Tracks wins in localStorage
    - 📰 **Reading** — Short illustrated reading passage (100-200 words) at appropriate level with highlighted vocabulary, audio read-aloud, adjustable speed. Followed by true/false, multiple choice, and "find the word" comprehension exercises. Bilingual glossary sidebar
-6. **Output location** — "Where should files go?" (default: `HTML/courses/{topic_slug}/`)
+7. **Output location** — "Where should files go?" (default: `HTML/courses/{topic_slug}/`)
 7. **Color theme** — "Any color preference?" (or auto-pick)
 
 **If a config file exists** in `config/` matching the topic, load it instead of asking. Still check that the research method in the config is available (e.g., if `notebooklm: true`, verify auth before proceeding).
@@ -126,7 +127,7 @@ Tell the user:
    > ```
    > ! python notebooklm_login.py
    > ```
-   This script (`notebooklm_login.py` in the project root) launches Chromium directly via playwright, navigates to NotebookLM, waits for user login, then saves auth state to the same location as `notebooklm login`.
+   This script (`notebooklm_login.py` in the watdonchan project root) launches Chromium directly via playwright, navigates to NotebookLM, waits for user login, then saves auth state to the same location as `notebooklm login`.
 
 **Key gotchas learned from experience:**
 - The Bash tool CANNOT run `notebooklm login` — it's interactive (waits for ENTER). Always tell the user to use `!` prefix
@@ -204,6 +205,38 @@ Write a Python generator script (`generate_{course_id}.py`) that produces all fi
 
 ### Step 5: Images (optional)
 If configured and Replicate API token is available, generate illustrations using FLUX Dev.
+
+**IMPORTANT: Image path convention.** Images are stored in `imgs/` at the project root (sibling to `HTML/`), NOT inside `HTML/`. The structure is:
+```
+imgs/tefl/{course_slug}/          ← generated images (hero.png, {prefix}.png)
+HTML/tefl/{course_slug}/          ← lesson HTML files
+```
+Image `src` attributes in HTML use relative paths from the HTML file's location:
+- Lesson files: `src="../../../imgs/tefl/{course_slug}/{prefix}.png"`
+- Syllabus file (in `HTML/`): `src="../imgs/tefl/{course_slug}/hero.png"`
+
+The `imgs/` directory is gitignored (*.png) — images are uploaded to S3 separately.
+
+### Step 6: Hero Video (optional)
+After generating all pages and images, **ask the user** if they want a hero video for the course:
+
+> "Would you like a hero video for this course? Options:
+> 1. 🎬 **HeyGen** — AI avatar presents the course intro (realistic talking-head video)
+> 2. 🎥 **Remotion** — Animated motion graphics intro (React-based video)
+> 3. ⏭️ **Skip** — No hero video"
+
+If the user chooses **HeyGen**: invoke the `/heygen` skill (or `/avatar-video` for precise control) with:
+- A script introducing the course in L1 (the learner's language), with key L2 phrases
+- The hero image as background or overlay
+- Course title and key selling points (level, duration, topics covered)
+
+If the user chooses **Remotion**: invoke the `/remotion-best-practices` skill with:
+- A course intro animation using the course's color theme
+- Title cards showing course name in both L1 and L2
+- Quick preview of weekly topics with icons/emojis
+- The hero image as a featured visual element
+
+The video should be embedded in the syllabus page as the hero section.
 
 ## Configuration System
 
@@ -302,6 +335,205 @@ Print-optimized (`@media print`). Fill-in-the-blank, matching, unscramble, writi
 
 ### 📊 Syllabus Page
 Course overview with sticky header, week navigation, hero section, scope table, week cards (objectives + vocab + grammar pattern), assessment rubric, outcomes. Uses different font stack (DM Sans/Noto Sans Thai/DM Serif Display).
+
+## Children's Page Type Specifications (Ages 4-7)
+
+### 📖 Story Page
+Paginated story with prev/next buttons and page dots. Each page has:
+- **Illustration** (`.story-emoji` div) — a large emoji matching that specific page's content. **CRITICAL: each page gets a DIFFERENT emoji that matches its vocabulary word** (e.g., page about "cat" → 🐱, page about "dog" → 🐶). Never use the same emoji on every page.
+- **English sentence** (`.story-text`) — 1-2 simple sentences with the vocab word in `<b>` tags. Clickable to hear TTS.
+- **Thai translation** (`.story-thai`) — matching translation with vocab word bolded.
+- **Speak button** — pronounces the target vocabulary word.
+- Arrow key navigation (Left/Right). 6 pages per story (one per vocab word).
+
+### 🎮 Game Page
+Three game tabs in one page: Match, Tap, Memory.
+- **Match**: 3 random vocab pairs displayed as cards (English + Thai). Tap one, then tap its match. Correct = green + score. Wrong = red shake + reset.
+- **Tap**: Shows a prompt with one English word + Thai translation. 3 Thai answer cards — tap the correct one. Auto-advances after 1 second on correct answer.
+- **Memory**: 3 pairs (6 cards) face-down. Flip two to find matches. English cards trigger TTS on flip.
+
+**JS rules**: All functions must be self-contained in the file. The `initTap()` function builds the prompt with an inline `onclick="speak('word')"` — use the vocab word directly in the string, do NOT call helper functions that aren't defined (e.g., never use `ss()`, `escape()`, or any function not explicitly declared in the script block).
+
+### 🎵 Song Page
+Embeds a real, publicly available children's song via **YouTube iframe embed** with bilingual sing-along lyrics below. No TTS or Web Audio API — children hear actual sung music from established ESL channels.
+
+**Structure:**
+- **Song info box** (`.song-info`): Song title in L2 + L1, channel credit line.
+- **YouTube embed** (`.video-wrapper`): Responsive 16:9 iframe using `youtube-nocookie.com/embed/{VIDEO_ID}?rel=0` for privacy-enhanced mode. Uses `loading="lazy"` and `allowfullscreen`.
+- **Sing-along tip** (`.sing-tip`): Bilingual instruction for how to participate (e.g., "Point to things that match each color!").
+- **Lyrics section** (`.lyrics-header` + `.song-line` divs): 6 lyric lines, each with:
+  - **Line number** (`.song-num`) — numbered circle badge
+  - **English lyric** (`.song-en`) — key phrase from the song
+  - **Thai translation** (`.song-th`) — matching translation
+  - **Action instruction** (`.song-action`) — physical action for TPR (e.g., "Clap hands", "Stomp feet")
+
+**Song selection criteria:**
+- Must be freely embeddable on YouTube (public videos with embedding enabled)
+- From established children's ESL channels: Super Simple Songs, Dream English Kids, Pinkfong, Fun Kids English, Busy Beavers
+- Age-appropriate for 4-7 year olds
+- Vocabulary must align with the unit's topic and target words
+- Sung (not spoken) — children should hear actual music, not TTS
+
+**Current song assignments (verified YouTube IDs):**
+
+| Unit | Song | Channel | Video ID |
+|------|------|---------|----------|
+| Colors | I See Something Blue | Super Simple Songs | `jYAWf8Y91hA` |
+| Numbers | Let's Count 1 to 10 | Dream English Kids | `85M1yxIcHpw` |
+| Animals | It's a Dog | Dream English Kids | `tNK0ToOgntw` |
+| Family | The Family Song | Busy Beavers | `dH5RTW0gh30` |
+| Food | Do You Like Broccoli Ice Cream? | Super Simple Songs | `frN3nvhIHUk` |
+| Body | Head Shoulders Knees & Toes | Super Simple Songs | `ZanHgPprl-0` |
+| Clothes | Clothing Song For Kids | Dream English Kids | `KFQxBCvgx70` |
+| Toys | My Teddy Bear | Super Simple Songs | `666UZRBO5q8` |
+| Weather | Weather Song: Sun Comes Up | Dream English Kids | `XcW9Ct000yY` |
+| School | School Supplies Song | Fun Kids English | `BwBTozQisb4` |
+| Home | My House | Pinkfong | `qZyJPZxsmZk` |
+| Nature | Walking In The Jungle | Super Simple Songs | `GoSq-yZcJ-4` |
+
+**To replace a song:** Update the `video_id` in the song data, verify the new ID works via `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=NEW_ID&format=json`, and update the lyrics/translations to match.
+
+### 🎨 Coloring Page
+SVG-based coloring with tap-to-fill. Color palette at top (6 colors matching unit vocab). Tap a palette color, then tap an SVG region to fill it. Each region has an English label that speaks on tap. Print button with `@media print` that hides palette/nav.
+
+### 🏷️ Stickers Page
+Click-to-add interactive sticker board:
+- **Sticker tray**: 6 themed stickers (animals, food, objects — NOT abstract shapes like circles/squares). Each sticker shows the emoji + color name or vocab word. **Emoji color rule**: CSS `color` does NOT change emoji rendering on most platforms — emojis have built-in colors. When a unit teaches colors, choose animals/objects whose native emoji color matches the target color (e.g., 🐸 green frog, 🐳 blue whale, 🐞 red ladybug, 🐥 yellow chick, 🦊 orange fox, 🐙 purple octopus). Do NOT rely on CSS to recolor emojis.
+- **Click to add**: Clicking a tray sticker places it at a **random position** on the scene board (10-80% range) and speaks the English word. New sticker animates in with a pop effect.
+- **Drag to move**: Placed stickers are draggable via mouse/touch.
+- **Stamp trail**: A checkbox labeled in both languages. When enabled, dragging a sticker leaves semi-transparent emoji stamps (`.stamp` class, `opacity: 0.45`, `pointer-events: none`) along the drag path, spaced ~20px apart.
+- **Thai instructions**: Two lines explaining (1) click to add a sticker and (2) drag to reposition.
+- **Clear Scene**: Removes all placed stickers and stamps.
+
+### 🃏 Flashcards Page
+Core teacher resource — include in **every unit**. 3x2 grid (2 columns on mobile) of flip cards with CSS 3D transforms:
+- **Front**: Large emoji/image (`.card-img`, 4.5em) on a light gradient background. Content-appropriate emoji per vocabulary word (same rules as Story page).
+- **Back**: English word (`.card-word`, 2.2em bold white) + Thai translation (`.card-thai`) on a colored gradient.
+- **Tap to flip**: Toggles `.flipped` class which rotates `.card-inner` 180° via `transform: rotateY(180deg)`. Also triggers `speak()` for the English word.
+- **Toolbar** (3 buttons):
+  - **Flip All** — Toggles all cards between image side and text side. Button text changes between "Flip All to Text" and "Flip All to Images". Useful for teachers showing all words at once.
+  - **Shuffle** — Randomizes card order in the grid by rearranging DOM children.
+  - **Reset** — Flips all cards back to image side.
+- **Counter**: Shows "N / 6 flipped" updated on every flip action.
+- Uses `perspective: 800px` on the card container and `backface-visibility: hidden` on both faces for clean 3D flip effect.
+
+### 🌟 Reward Page
+Celebration page with confetti animation, star display, word count, and a "Next Week" link to the next unit's story page.
+
+## Nav Footer (All Pages)
+
+Every page in a unit MUST include a `.nav-footer` with links to **ALL** page types generated for that unit, not just a subset. For example, if a unit has Story, Game, Song, Coloring, Stickers, and Reward, then every one of those 6 pages must link to all 6 plus the Home/Syllabus link. This ensures students can navigate freely between activities without returning to the syllabus.
+
+The generator script must track which page types each unit has and inject the complete nav footer into every page for that unit.
+
+## Syllabus Page Layout
+
+When a syllabus includes both a hero video and hero image:
+- **Video** goes first (inside `.hero-video` div, no `poster` attribute)
+- **Image** goes below as a separate element (inside `.hero-img` div)
+- They must NOT overlap — use `margin-top: 20px` on the image container for spacing
+- Never use the video `poster` attribute to double as the hero image display
+
+## Quality Checklist — Run Before Delivery
+
+After generating all files for a course, verify these before delivering to the user:
+
+### 1. Test one unit end-to-end first
+Generate **only unit 1** first. Open every page in a browser and verify:
+- [ ] All interactive features work (games load, songs play, stickers place)
+- [ ] No JS console errors
+- [ ] Nav footer links to all pages in the unit
+- [ ] Story emojis vary per page
+- [ ] TTS speaks correctly on all buttons
+
+Only after unit 1 passes, generate remaining units using the same templates.
+
+### 2. Cross-file consistency
+- [ ] Every function called in JS is defined in the same `<script>` block — pages are standalone HTML with no shared JS files
+- [ ] Nav footer on every page lists ALL page types for that unit
+- [ ] No hardcoded page-type subsets (e.g., only Story/Game/Song) — always derive from the unit's actual page list
+
+### 3. Content-specific visuals
+- [ ] Story page emojis: each of the 6 pages shows a DIFFERENT emoji matching its vocabulary word
+- [ ] Sticker page: uses themed concrete objects (animals, food, etc.), not abstract shapes
+- [ ] Emoji colors match the text: if the label says "blue bird", the emoji must naturally render as blue (🐳 not 🐦). CSS `color` does NOT recolor emojis — choose emojis whose built-in rendering matches the intended color
+- [ ] Song page: embeds a real YouTube children's song (verify video ID is valid and not removed)
+
+### 4. Common JS bugs to avoid
+- **Never reference undefined functions.** Every function used in `onclick`, `innerHTML` strings, or event handlers must be defined in the same script block. Grep all generated files for function calls and verify each is defined.
+- **Quote safety in inline handlers.** When building `onclick="speak('word')"` via string concatenation, the word itself must not contain single quotes. For safe words (no quotes), use the string directly — do NOT wrap in an escape helper unless that helper is defined.
+- **Always cancel speechSynthesis** before speaking to prevent queue buildup.
+
+## Unicode Emoji Color Reference
+
+**CSS `color` does NOT change emoji rendering.** Emojis have built-in colors baked into the font. Always use the correct Unicode codepoint for the intended color. Verify by rendering in a browser before bulk-generating.
+
+### Colored Circles (for coloring pages, targets, indicators)
+
+| Color | Emoji | Decimal | Hex | Name |
+|-------|-------|---------|-----|------|
+| Red | 🔴 | `&#128308;` | `&#x1F534;` | Large Red Circle |
+| Orange | 🟠 | `&#128992;` | `&#x1F7E0;` | Large Orange Circle |
+| Yellow | 🟡 | `&#128993;` | `&#x1F7E1;` | Large Yellow Circle |
+| Green | 🟢 | `&#128994;` | `&#x1F7E2;` | Large Green Circle |
+| Blue | 🔵 | `&#128309;` | `&#x1F535;` | Large Blue Circle |
+| Purple | 🟣 | `&#128995;` | `&#x1F7E3;` | Large Purple Circle |
+| Brown | 🟤 | `&#128996;` | `&#x1F7E4;` | Large Brown Circle |
+| Black | ⚫ | `&#9899;` | `&#x26AB;` | Black Circle |
+| White | ⚪ | `&#9898;` | `&#x26AA;` | White Circle |
+
+### Colored Squares
+
+| Color | Emoji | Decimal | Hex | Name |
+|-------|-------|---------|-----|------|
+| Red | 🟥 | `&#128997;` | `&#x1F7E5;` | Large Red Square |
+| Orange | 🟧 | `&#128999;` | `&#x1F7E7;` | Large Orange Square |
+| Yellow | 🟨 | `&#129000;` | `&#x1F7E8;` | Large Yellow Square |
+| Green | 🟩 | `&#129001;` | `&#x1F7E9;` | Large Green Square |
+| Blue | 🟦 | `&#128998;` | `&#x1F7E6;` | Large Blue Square |
+| Purple | 🟪 | `&#129002;` | `&#x1F7EA;` | Large Purple Square |
+
+### Colored Hearts
+
+| Color | Emoji | Decimal | Hex | Name |
+|-------|-------|---------|-----|------|
+| Red | ❤️ | `&#10084;&#65039;` | `&#x2764;&#xFE0F;` | Red Heart |
+| Orange | 🧡 | `&#129505;` | `&#x1F9E1;` | Orange Heart |
+| Yellow | 💛 | `&#128155;` | `&#x1F49B;` | Yellow Heart |
+| Green | 💚 | `&#128154;` | `&#x1F49A;` | Green Heart |
+| Blue | 💙 | `&#128153;` | `&#x1F499;` | Blue Heart |
+| Purple | 💜 | `&#128156;` | `&#x1F49C;` | Purple Heart |
+| Brown | 🤎 | `&#129294;` | `&#x1F90E;` | Brown Heart |
+| Black | 🖤 | `&#128420;` | `&#x1F5A4;` | Black Heart |
+| White | 🤍 | `&#129293;` | `&#x1F90D;` | White Heart |
+| Pink | 🩷 | `&#129527;` | `&#x1FA77;` | Pink Heart |
+
+### Color-Accurate Animals (for stickers, stories)
+
+Use these when you need an animal emoji that naturally renders in the target color:
+
+| Color | Animals |
+|-------|---------|
+| Red | 🐞 ladybug, 🦞 lobster, 🦀 crab, 🐙 octopus (reddish) |
+| Orange | 🦊 fox, 🐅 tiger, 🐈 cat (orange tabby), 🦁 lion |
+| Yellow | 🐥 chick, 🐤 baby chick, 🐝 bee, ⭐ star |
+| Green | 🐸 frog, 🐢 turtle, 🐊 crocodile, 🦎 lizard |
+| Blue | 🐳 whale, 🐬 dolphin, 🦋 butterfly (blue), 🐟 fish |
+| Purple | 🐙 octopus, 🦄 unicorn (purple mane), 🪼 jellyfish |
+| Brown | 🐻 bear, 🐵 monkey, 🦉 owl, 🐿️ chipmunk |
+| Pink | 🐷 pig, 🦩 flamingo, 🌸 cherry blossom |
+| White | 🐰 rabbit, 🐑 sheep, 🦢 swan, ☁️ cloud |
+| Black | 🐧 penguin, 🦇 bat, 🕷️ spider, 🐈‍⬛ black cat |
+| Gray | 🐘 elephant, 🦏 rhino, 🐺 wolf, 🐭 mouse |
+
+### Common Pitfalls
+
+| Wrong | Codepoint | Actually renders as | Use instead |
+|-------|-----------|-------------------|-------------|
+| "Yellow diamond" | `&#128311;` 🔷 | **Blue** diamond | `&#128993;` 🟡 Yellow circle |
+| "Blue diamond" | `&#128310;` 🔶 | **Orange** diamond | `&#128309;` 🔵 Blue circle |
+| "Colored bird" | `&#128038;` 🐦 | Red/brown bird | 🐳 whale or 🐬 dolphin for blue |
+| "Colored cat" | `&#128008;` 🐈 | Brown/gray cat | 🐞 ladybug for red, 🦊 fox for orange |
 
 ## Image Generation (Optional)
 
