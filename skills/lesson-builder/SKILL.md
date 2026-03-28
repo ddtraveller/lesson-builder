@@ -47,9 +47,9 @@ Use this skill when:
    - 📖 **Story** — Illustrated story with big images, 1-2 sentences per page, audio narration, tap-to-hear vocabulary (4-6 words per unit). **Each page's illustration (emoji or image) MUST match the page's text content** — e.g., a page about "The apple is red" should show 🍎 not 🌈. Never reuse the same generic image across all pages
    - 🎮 **Game** — Interactive mini-games: match (tap English then Thai pair), tap (hear word → tap correct answer from 3 choices), memory (flip card pairs). Config/vocab feeds the content. **Do not use undefined helper functions** — all string escaping must be inline or use the word directly if it contains no quotes
    - 🎵 **Song** — Embedded YouTube video of a real children's ESL song (sung, not spoken) with bilingual sing-along lyrics below, Thai translations per line, and TPR action instructions per line (e.g., "Clap hands", "Point to blue")
-   - 🎨 **Coloring** — SVG line drawings with labeled English words. Tap color palette then tap regions to fill. Speaks word on tap. Printable version
+   - 🎨 **Coloring** — AI-generated black-and-white line art coloring pages (via `generate_images.py` + FLUX Dev). Each vocab word gets a dedicated outline image. Interactive canvas paint-over: pick a color from the palette, then finger-paint/draw directly on the line art. Eraser tool, adjustable brush size. Outline stays visible via `multiply` blend mode compositing. Two print modes: "Print Blank" outputs clean outlines only (for crayons/markers), "Print Colored" outputs the child's painted version. Tap word label to hear TTS pronunciation
    - 🏷️ **Stickers** — Click-to-add themed stickers (animals, objects — not abstract shapes) onto a scene. Stickers appear at random positions, are draggable after placement, and speak English name on click. Includes stamp trail checkbox (leaves semi-transparent stamps while dragging). Thai instructions explaining click-to-add and drag-to-move. Clear Scene button resets board
-   - 🃏 **Flashcards** — Flip-card grid (3x2) with emoji/image on front, English word + Thai translation on back. Tap to flip + hear TTS. Teacher toolbar: "Flip All to Text/Images" toggle, Shuffle, Reset. Counter shows flipped/total. Core page type — include in every unit as a teacher's resource
+   - 🃏 **Flashcards** — Flip-card grid (3x2) with emoji/image on front, English word + Thai translation on back. Tap to flip + hear TTS. Teacher toolbar: "Flip All to Text/Images" toggle, Shuffle, Reset, Print. Counter shows flipped/total. Print button triggers `window.print()` with `@media print` CSS that hides all UI except the card grid, showing emoji + English word + Thai translation per card. Core page type — include in every unit as a teacher's resource
    - 🌟 **Reward** — Progress/celebration page with stars, stickers collected, words learned counter. Congratulations animation
 
    **Older children's page types (ages 8-12):**
@@ -341,10 +341,37 @@ Course overview with sticky header, week navigation, hero section, scope table, 
 ### 📖 Story Page
 Paginated story with prev/next buttons and page dots. Each page has:
 - **Illustration** (`.story-emoji` div) — a large emoji matching that specific page's content. **CRITICAL: each page gets a DIFFERENT emoji that matches its vocabulary word** (e.g., page about "cat" → 🐱, page about "dog" → 🐶). Never use the same emoji on every page.
-- **English sentence** (`.story-text`) — 1-2 simple sentences with the vocab word in `<b>` tags. Clickable to hear TTS.
+- **English sentences** (`.story-text`) — 2-4 lines of **rhyming verse** with the vocab word in `<b>` tags. Clickable to hear TTS.
 - **Thai translation** (`.story-thai`) — matching translation with vocab word bolded.
 - **Speak button** — pronounces the target vocabulary word.
 - Arrow key navigation (Left/Right). 6 pages per story (one per vocab word).
+
+#### Dr. Seuss-Style Rhyming Story Strategy
+
+Stories MUST be written as **rhyming mini-narratives**, NOT flat flashcard sentences. Each story should feel like a tiny Dr. Seuss book — silly, rhythmic, and fun to read aloud.
+
+**Rhyming rules:**
+- Use **AABB rhyming couplets** (pairs of lines that rhyme) — easy for kids to predict and chant along
+- Each page introduces ONE vocab word but weaves it into 2-4 lines of verse
+- The story should have a **narrative arc** — a character doing something, a situation building, a silly conclusion
+- Use **cumulative/building** structure where possible — each page references or builds on what came before
+- Include **absurd humor** — Dr. Seuss's secret weapon (a dog wearing a log, a robot with wobbly eyes, a fish in a dish)
+- Add **sound effects and onomatopoeia** — CRASH! SPLAT! ZOOM! POP! — kids love these
+- Use **repetition and refrains** — repeating phrases kids can chant ("Oh me! Oh my!", "What do you see?")
+
+**Story concept patterns (pick one per unit):**
+| Pattern | Description | Example |
+|---------|-------------|---------|
+| **Cumulative** | Each page adds to a growing scene | Painter adding colors to a rainbow |
+| **Chain/Parade** | Characters or items line up one by one | Animals joining a silly parade |
+| **Building/Assembly** | Something is constructed piece by piece | Robot being built, getting dressed |
+| **Journey/Exploration** | Character moves through spaces discovering things | Mouse exploring a house, nature walk |
+| **Feast/Appetite** | Character tries everything | Hungry monster at a buffet |
+| **Chaos/Escalation** | Situation gets sillier and sillier | Weather changing every minute |
+| **Introduction** | Meet characters who each do something goofy | Family members with funny habits |
+| **Discovery** | Character finds things one by one | First day of school, toy chest |
+
+**Thai translations** should be natural and conversational — do NOT force the Thai to rhyme. The Thai explains what's happening in the story clearly for the child.
 
 ### 🎮 Game Page
 Three game tabs in one page: Match, Tap, Memory.
@@ -394,7 +421,31 @@ Embeds a real, publicly available children's song via **YouTube iframe embed** w
 **To replace a song:** Update the `video_id` in the song data, verify the new ID works via `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=NEW_ID&format=json`, and update the lyrics/translations to match.
 
 ### 🎨 Coloring Page
-SVG-based coloring with tap-to-fill. Color palette at top (6 colors matching unit vocab). Tap a palette color, then tap an SVG region to fill it. Each region has an English label that speaks on tap. Print button with `@media print` that hides palette/nav.
+AI-generated black-and-white line art with interactive canvas paint-over. Each vocabulary word has a dedicated coloring outline image generated via `generate_images.py` (Replicate FLUX Dev) with a style prefix enforcing thick clean outlines, no shading, pure white background.
+
+**Image generation:**
+- Create a JSON prompts file (e.g., `coloring_prompts.json`) with `style_prefix` for coloring page style, 1:1 aspect ratio, one image per vocab word
+- Run `python generate_images.py coloring_prompts.json` to batch-generate all outline images
+- Images saved to `imgs/coloring/{topic}_{word}.png`
+
+**Interactive canvas architecture (two-canvas system per card):**
+- **Draw canvas** (hidden, z-index 2) — captures user's paint strokes at 300x300px resolution
+- **Display canvas** (visible, z-index 1) — composites: white background → user's drawing → line art on top via `globalCompositeOperation='multiply'`
+- This keeps the black outlines always visible on top of the user's coloring
+- Touch and mouse events with `touch-action: none` for mobile finger painting
+
+**UI controls:**
+- **Color palette** — 10 color circles + eraser button. Active color highlighted with border
+- **Brush size slider** — range 4-40px with live preview dot
+- **Eraser** — uses `destination-out` composite operation to remove paint strokes
+- **Clear All** — clears all draw canvases and re-renders composites
+- **Print Blank** — temporarily strips user drawing from display canvases, calls `window.print()`, then restores composites after 500ms timeout
+- **Print Colored** — calls `window.print()` directly with user's artwork visible
+- **Word labels** — below each card, tap to hear TTS pronunciation
+
+**Print CSS** (`@media print`): hides header, palette, brush slider, toolbar, nav footer, footer, and word labels. Cards print in a 3-column grid with no box shadow, just a light border. Output is either clean outlines (Print Blank) or the child's colored version (Print Colored).
+
+**Fallback**: If images haven't been generated yet, the canvas shows a gray placeholder with the word text and "(image pending)" message.
 
 ### 🏷️ Stickers Page
 Click-to-add interactive sticker board:
@@ -410,10 +461,11 @@ Core teacher resource — include in **every unit**. 3x2 grid (2 columns on mobi
 - **Front**: Large emoji/image (`.card-img`, 4.5em) on a light gradient background. Content-appropriate emoji per vocabulary word (same rules as Story page).
 - **Back**: English word (`.card-word`, 2.2em bold white) + Thai translation (`.card-thai`) on a colored gradient.
 - **Tap to flip**: Toggles `.flipped` class which rotates `.card-inner` 180° via `transform: rotateY(180deg)`. Also triggers `speak()` for the English word.
-- **Toolbar** (3 buttons):
+- **Toolbar** (4 buttons):
   - **Flip All** — Toggles all cards between image side and text side. Button text changes between "Flip All to Text" and "Flip All to Images". Useful for teachers showing all words at once.
   - **Shuffle** — Randomizes card order in the grid by rearranging DOM children.
   - **Reset** — Flips all cards back to image side.
+  - **Print** — Calls `window.print()`. `@media print` CSS hides header, toolbar, counter, nav-footer, footer, and instructional text. Cards display as a 3-column grid showing emoji (`.card-front`), English word (`.card-word`), and Thai translation (`.card-thai`) on each card. Both `.card-front` and `.card-back` are visible in print (no flip transform). Cards have a light border for cut lines.
 - **Counter**: Shows "N / 6 flipped" updated on every flip action.
 - Uses `perspective: 800px` on the card container and `backface-visibility: hidden` on both faces for clean 3D flip effect.
 
@@ -535,23 +587,95 @@ Use these when you need an animal emoji that naturally renders in the target col
 | "Colored bird" | `&#128038;` 🐦 | Red/brown bird | 🐳 whale or 🐬 dolphin for blue |
 | "Colored cat" | `&#128008;` 🐈 | Brown/gray cat | 🐞 ladybug for red, 🦊 fox for orange |
 
-## Image Generation (Optional)
+## Image Generation via `generate_images.py` (FLUX Dev on Replicate)
 
-Generate AI illustrations using FLUX Dev on Replicate. Requires `REPLICATE_API_TOKEN` in `.env`.
+A bundled `generate_images.py` script handles batch image generation using [FLUX Dev](https://replicate.com/black-forest-labs/flux-dev) on [Replicate](https://replicate.com/). It reads prompts from a JSON file and generates images in one command. Requires `REPLICATE_API_TOKEN` in a `.env` file.
 
-```python
-import replicate
-output = replicate.run("black-forest-labs/flux-dev", input={
-    "prompt": style_prefix + scene_description + style_suffix,
-    "guidance": 3.5, "num_outputs": 1,
-    "aspect_ratio": "16:9",  # or "1:1", "4:5"
-    "output_format": "png", "num_inference_steps": 28,
-})
+**Setup:**
+```bash
+pip install replicate
+# Create .env with: REPLICATE_API_TOKEN=r8_your_token_here
 ```
 
-Cost: ~$0.03-0.05 per image. Token from: https://replicate.com/account/api-tokens
+**Cost:** ~$0.03-0.05 per image. Token from: https://replicate.com/account/api-tokens
 
-**Important:** When generating images with people, specify the ethnicity/appearance matching the target learner population in the style prefix (e.g., "Southeast Asian Thai adults" for Thai courses).
+### Prompts JSON Format
+
+Create a JSON file with `style_prefix`, `style_suffix`, per-image prompts, and generation settings:
+
+```json
+{
+  "style_prefix": "Art style and constraints that apply to ALL images. ",
+  "style_suffix": " Negative constraints appended to all prompts.",
+  "output_dir": "imgs/my_output",
+  "settings": {
+    "guidance": 3.5,
+    "num_inference_steps": 28,
+    "aspect_ratio": "1:1",
+    "output_format": "png"
+  },
+  "images": {
+    "image_id": {
+      "prompt": "Specific scene description for this image"
+    }
+  }
+}
+```
+
+The script assembles the final prompt as: `style_prefix + prompt + style_suffix` (joined with `, `).
+
+### Commands
+
+```bash
+# Preview all prompts without spending API credits
+python generate_images.py prompts.json --dry-run
+
+# List all images and which are done vs pending
+python generate_images.py prompts.json --list
+
+# Generate all pending images (skips existing files)
+python generate_images.py prompts.json
+
+# Generate one specific image
+python generate_images.py prompts.json --id animals_cat
+
+# Override settings from CLI
+python generate_images.py prompts.json --guidance 4 --steps 30 --aspect 16:9
+```
+
+**Resilience:** Skips existing images automatically. Retries 4 times with exponential backoff on rate limits. 3-second delay between API calls.
+
+### Coloring Page Image Generation
+
+For children's coloring pages, use a style prefix that enforces black-and-white line art:
+
+```json
+{
+  "style_prefix": "Simple black and white line drawing coloring page for young children ages 4-7. Thick clean bold outlines, no shading, no fill, no gray tones, no crosshatching, pure white background. Large simple shapes easy to color with crayons or markers. Single object centered in frame, cute friendly child-appropriate style. ",
+  "style_suffix": " No color, no shading, no gradients, no gray areas. Pure black outlines on pure white background only.",
+  "output_dir": "imgs/coloring",
+  "settings": { "aspect_ratio": "1:1" },
+  "images": {
+    "animals_cat": { "prompt": "A cute sitting cat with round face, whiskers, pointy ears, curled tail. Simple cartoon style." },
+    "animals_dog": { "prompt": "A happy puppy sitting with floppy ears and wagging tail. Simple cartoon style." }
+  }
+}
+```
+
+See `config/coloring_prompts_example.json` for a complete 52-image example across 8 topics.
+
+**Naming convention:** `{topic}_{word}.png` (e.g., `animals_cat.png`, `food_rice.png`). The coloring page HTML references images at `imgs/coloring/{topic}_{word}.png`.
+
+### Other Image Use Cases
+
+| Use Case | Aspect | Style Prefix Key Points |
+|----------|--------|------------------------|
+| Coloring pages | 1:1 | B&W line art, thick outlines, no shading, white background |
+| Story illustrations | 16:9 | Watercolor children's book, warm colors, scene-specific |
+| Game assets | 1:1 | Kawaii cartoon, flat design, pastel colors |
+| Comic panels | 16:9 or 4:5 | B&W ink, bold lines, Love and Rockets style |
+
+**Important:** When generating images with people, specify the ethnicity/appearance matching the target learner population in the style prefix (e.g., "Southeast Asian Thai ethnicity with warm brown skin, straight black hair" for Thai courses).
 
 ## Generator Script Pattern
 
