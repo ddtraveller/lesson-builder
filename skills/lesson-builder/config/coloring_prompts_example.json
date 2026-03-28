@@ -1,0 +1,169 @@
+{
+  "style_prefix": "Simple black and white line drawing coloring page for young children ages 4-7. Thick clean bold outlines, no shading, no fill, no gray tones, no crosshatching, pure white background. Large simple shapes easy to color with crayons or markers. Single object centered in frame, cute friendly child-appropriate style. ",
+  "style_suffix": " No color, no shading, no gradients, no gray areas. Pure black outlines on pure white background only.",
+  "output_dir": "imgs/coloring",
+  "settings": {
+    "guidance": 3.5,
+    "num_inference_steps": 28,
+    "aspect_ratio": "1:1",
+    "output_format": "png"
+  },
+  "images": {
+    "animals_cat": {
+      "prompt": "A cute sitting cat with a round face, whiskers, pointy ears, and a curled tail. Simple cartoon style."
+    },
+    "animals_dog": {
+      "prompt": "A happy puppy dog sitting with floppy ears, a wagging tail, and a big friendly smile. Simple cartoon style."
+    },
+    "animals_bird": {
+      "prompt": "A small cheerful bird perched on a branch with spread wings and a round body. Simple cartoon style."
+    },
+    "animals_fish": {
+      "prompt": "A tropical fish with big round eye, flowing fins, and scales pattern. Simple cartoon style."
+    },
+    "animals_rabbit": {
+      "prompt": "A cute bunny rabbit sitting upright with long floppy ears and a fluffy round tail. Simple cartoon style."
+    },
+    "animals_elephant": {
+      "prompt": "A baby elephant with big floppy ears, a long curled trunk, and stubby legs. Simple cartoon style."
+    },
+    "body_head": {
+      "prompt": "A child's face and head from the front, showing hair, eyes, nose, mouth, and ears. Simple cartoon style, friendly smile."
+    },
+    "body_hand": {
+      "prompt": "An open hand with five spread fingers, palm facing viewer. Simple cartoon style, child-sized proportions."
+    },
+    "body_foot": {
+      "prompt": "A bare foot seen from the side with five toes. Simple cartoon style, child-sized proportions."
+    },
+    "body_eye": {
+      "prompt": "A single large cartoon eye with eyelashes, pupil, and iris detail. Simple cartoon style, cute and expressive."
+    },
+    "body_ear": {
+      "prompt": "A single human ear seen from the side, large and simple. Cartoon style with clear outer ear shape."
+    },
+    "body_mouth": {
+      "prompt": "A smiling mouth showing teeth, with lips clearly outlined. Simple cartoon style, happy expression."
+    },
+    "colors_red": {
+      "prompt": "A big juicy strawberry with leaves on top and small seeds on the surface. Simple cartoon style."
+    },
+    "colors_blue": {
+      "prompt": "A cute cartoon whale spouting water from its blowhole, swimming in simple waves. Simple cartoon style."
+    },
+    "colors_yellow": {
+      "prompt": "A bright happy sun with a smiling face and wavy rays coming out all around. Simple cartoon style."
+    },
+    "colors_green": {
+      "prompt": "A happy cartoon frog sitting on a lily pad with big round eyes. Simple cartoon style."
+    },
+    "colors_orange": {
+      "prompt": "A round orange fruit with a small leaf and stem on top, with a small slice beside it. Simple cartoon style."
+    },
+    "colors_purple": {
+      "prompt": "A bunch of grapes hanging from a vine with a curly tendril and leaf. Simple cartoon style."
+    },
+    "food_apple": {
+      "prompt": "A big round apple with a stem and leaf on top, with a small highlight shine. Simple cartoon style."
+    },
+    "food_banana": {
+      "prompt": "A curved banana that is partially peeled, showing the fruit inside. Simple cartoon style."
+    },
+    "food_rice": {
+      "prompt": "A bowl of steaming rice with chopsticks resting on the side. Simple cartoon style, Asian rice bowl."
+    },
+    "food_milk": {
+      "prompt": "A glass bottle of milk with a small glass beside it, both filled. Simple cartoon style."
+    },
+    "food_water": {
+      "prompt": "A glass of water with ice cubes and a straw. Simple cartoon style, clear and simple."
+    },
+    "food_egg": {
+      "prompt": "A whole egg and a cracked egg with the yolk showing in the half shell. Simple cartoon style."
+    },
+    "nature_tree": {
+      "prompt": "A big friendly tree with a thick trunk, spreading branches, and a full round leafy canopy. Simple cartoon style."
+    },
+    "nature_flower": {
+      "prompt": "A large daisy flower with round petals, a center disc, stem, and two leaves. Simple cartoon style."
+    },
+    "nature_water": {
+      "prompt": "A small pond or lake with gentle ripples, a few reeds on the bank, and small stones. Simple cartoon style."
+    },
+    "nature_rock": {
+      "prompt": "A large round boulder with a few small rocks beside it and tiny grass tufts. Simple cartoon style."
+    },
+    "nature_grass": {
+      "prompt": "A patch of tall grass blades with a small ladybug sitting on one blade. Simple cartoon style."
+    },
+    "nature_sky": {
+      "prompt": "Fluffy clouds in the sky with a smiling sun peeking from behind one cloud and small birds flying. Simple cartoon style."
+    },
+    "numbers_one": {
+      "prompt": "The large number 1 decorated with one star beside it. Simple cartoon style, bold thick number."
+    },
+    "numbers_two": {
+      "prompt": "The large number 2 decorated with two butterflies. Simple cartoon style, bold thick number."
+    },
+    "numbers_three": {
+      "prompt": "The large number 3 decorated with three flowers. Simple cartoon style, bold thick number."
+    },
+    "numbers_four": {
+      "prompt": "The large number 4 decorated with four hearts. Simple cartoon style, bold thick number."
+    },
+    "numbers_five": {
+      "prompt": "The large number 5 decorated with five balloons. Simple cartoon style, bold thick number."
+    },
+    "numbers_six": {
+      "prompt": "The large number 6 decorated with six small fish. Simple cartoon style, bold thick number."
+    },
+    "numbers_seven": {
+      "prompt": "The large number 7 decorated with seven circles. Simple cartoon style, bold thick number."
+    },
+    "numbers_eight": {
+      "prompt": "The large number 8 decorated with eight tiny bees. Simple cartoon style, bold thick number."
+    },
+    "numbers_nine": {
+      "prompt": "The large number 9 decorated with nine dots. Simple cartoon style, bold thick number."
+    },
+    "numbers_ten": {
+      "prompt": "The large number 10 decorated with ten small stars scattered around. Simple cartoon style, bold thick numbers."
+    },
+    "school_book": {
+      "prompt": "An open book with visible pages and text lines, sitting flat. Simple cartoon style, thick outlines."
+    },
+    "school_pen": {
+      "prompt": "A pencil and pen crossed together with a small star where they cross. Simple cartoon style."
+    },
+    "school_teacher": {
+      "prompt": "A friendly female teacher standing at a chalkboard holding a pointer, wearing glasses. Simple cartoon style."
+    },
+    "school_desk": {
+      "prompt": "A school desk with a chair, a book and pencil on the desk surface. Simple cartoon style."
+    },
+    "school_bag": {
+      "prompt": "A child's school backpack with two straps, a front pocket, and a zipper. Simple cartoon style."
+    },
+    "school_friend": {
+      "prompt": "Two children standing side by side smiling and waving, one boy and one girl. Simple cartoon style."
+    },
+    "toys_ball": {
+      "prompt": "A large round bouncy ball with a star pattern on it. Simple cartoon style, thick outlines."
+    },
+    "toys_doll": {
+      "prompt": "A cute rag doll with pigtails, a dress, button eyes, and a smile. Simple cartoon style."
+    },
+    "toys_car": {
+      "prompt": "A small toy car with round wheels, windows, and a smiling front. Simple cartoon style."
+    },
+    "toys_bear": {
+      "prompt": "A cute teddy bear sitting with round ears, button nose, and a bow tie. Simple cartoon style."
+    },
+    "toys_blocks": {
+      "prompt": "A stack of three building blocks with letters A, B, C on them. Simple cartoon style."
+    },
+    "toys_kite": {
+      "prompt": "A diamond-shaped kite flying with a long curvy tail with bows, and a string. Simple cartoon style."
+    }
+  }
+}
