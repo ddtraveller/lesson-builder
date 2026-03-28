@@ -341,10 +341,37 @@ Course overview with sticky header, week navigation, hero section, scope table, 
 ### 📖 Story Page
 Paginated story with prev/next buttons and page dots. Each page has:
 - **Illustration** (`.story-emoji` div) — a large emoji matching that specific page's content. **CRITICAL: each page gets a DIFFERENT emoji that matches its vocabulary word** (e.g., page about "cat" → 🐱, page about "dog" → 🐶). Never use the same emoji on every page.
-- **English sentence** (`.story-text`) — 1-2 simple sentences with the vocab word in `<b>` tags. Clickable to hear TTS.
+- **English sentences** (`.story-text`) — 2-4 lines of **rhyming verse** with the vocab word in `<b>` tags. Clickable to hear TTS.
 - **Thai translation** (`.story-thai`) — matching translation with vocab word bolded.
 - **Speak button** — pronounces the target vocabulary word.
 - Arrow key navigation (Left/Right). 6 pages per story (one per vocab word).
+
+#### Dr. Seuss-Style Rhyming Story Strategy
+
+Stories MUST be written as **rhyming mini-narratives**, NOT flat flashcard sentences. Each story should feel like a tiny Dr. Seuss book — silly, rhythmic, and fun to read aloud.
+
+**Rhyming rules:**
+- Use **AABB rhyming couplets** (pairs of lines that rhyme) — easy for kids to predict and chant along
+- Each page introduces ONE vocab word but weaves it into 2-4 lines of verse
+- The story should have a **narrative arc** — a character doing something, a situation building, a silly conclusion
+- Use **cumulative/building** structure where possible — each page references or builds on what came before
+- Include **absurd humor** — Dr. Seuss's secret weapon (a dog wearing a log, a robot with wobbly eyes, a fish in a dish)
+- Add **sound effects and onomatopoeia** — CRASH! SPLAT! ZOOM! POP! — kids love these
+- Use **repetition and refrains** — repeating phrases kids can chant ("Oh me! Oh my!", "What do you see?")
+
+**Story concept patterns (pick one per unit):**
+| Pattern | Description | Example |
+|---------|-------------|---------|
+| **Cumulative** | Each page adds to a growing scene | Painter adding colors to a rainbow |
+| **Chain/Parade** | Characters or items line up one by one | Animals joining a silly parade |
+| **Building/Assembly** | Something is constructed piece by piece | Robot being built, getting dressed |
+| **Journey/Exploration** | Character moves through spaces discovering things | Mouse exploring a house, nature walk |
+| **Feast/Appetite** | Character tries everything | Hungry monster at a buffet |
+| **Chaos/Escalation** | Situation gets sillier and sillier | Weather changing every minute |
+| **Introduction** | Meet characters who each do something goofy | Family members with funny habits |
+| **Discovery** | Character finds things one by one | First day of school, toy chest |
+
+**Thai translations** should be natural and conversational — do NOT force the Thai to rhyme. The Thai explains what's happening in the story clearly for the child.
 
 ### 🎮 Game Page
 Three game tabs in one page: Match, Tap, Memory.
