@@ -51,6 +51,28 @@ Use this skill when:
    - 🏷️ **Stickers** — Click-to-add themed stickers (animals, objects — not abstract shapes) onto a scene. Stickers appear at random positions, are draggable after placement, and speak English name on click. Includes stamp trail checkbox (leaves semi-transparent stamps while dragging). Thai instructions explaining click-to-add and drag-to-move. Clear Scene button resets board
    - 🃏 **Flashcards** — Flip-card grid (3x2) with emoji/image on front, English word + Thai translation on back. Tap to flip + hear TTS. Teacher toolbar: "Flip All to Text/Images" toggle, Shuffle, Reset, Print. Counter shows flipped/total. Print button triggers `window.print()` with `@media print` CSS that hides all UI except the card grid, showing emoji + English word + Thai translation per card. Core page type — include in every unit as a teacher's resource
    - 🌟 **Reward** — Progress/celebration page with stars, stickers collected, words learned counter. Congratulations animation
+   - 🎬 **Avatar Video** — Interactive vocabulary game page powered by HeyGen AI avatar videos. Each unit gets a unique game mechanic and a unique avatar "look" (talking photo). Structure: Thai intro video → interactive game with 6 vocab items in a simple HTML table (2x3 grid, fixed-size cells with min/max constraints) → per-item HeyGen reveal video (English with Sara Cheerful voice) → Thai outro video reviewing all words + confetti. **Game mechanic varies per unit** — never repeat the same mechanic. Proven mechanics include:
+     - **Phone guessing game** (Family) — Thai family voice plays, kid guesses, avatar reveals in English
+     - **Shake the tree** (Food) — Tap trees, catch falling food with bounce physics
+     - **Build a robot** (Body) — Tap body parts to assemble a robot outline
+     - **Princess dress-up** (Clothes) — Tap wardrobe items onto a princess silhouette with sparkle effects
+     - **Toy shop listening** (Toys) — Avatar asks for a toy by name, kid taps the correct one; wrong tap shakes
+     - **Weather wizard** (Weather) — Tap spell orbs to transform the sky with CSS animations (rain, snow, wind, sun)
+     - **Scavenger hunt** (School) — Avatar asks "where is the ___?", kid finds and taps the correct item
+     - **Dream home builder** (Home) — Tap items to build rooms in a house cross-section
+     - **Paint the mountain** (Nature) — Tap palette to bring color back to a grayscale mountain scene
+
+     **Implementation rules:**
+     - All interactive items use simple HTML `<table>` with `<tbody>` — never CSS grid or flexbox for item layouts (causes visibility/sizing bugs)
+     - Every `<td>` must have `width`, `min-width`, `max-width`, `height`, `min-height`, `max-height` set to identical values + `overflow: hidden`
+     - Use `transition: background 0.2s, border-color 0.2s` — never `transition: all` (causes size animation side effects)
+     - Game screen must use `overflow-y: auto; justify-content: flex-start; padding-top: 16px` to prevent bottom-row clipping
+     - HeyGen videos: intro/outro use Thai voice (Achara Friendly `f2846fb5...`), item reveals use English voice (Sara Cheerful `1bd001e7...`)
+     - Video generation via HeyGen `/v2/video/generate` with `talking_photo` character type. Thai text must be sent via Python (not bash) to avoid encoding errors
+     - Each unit needs a unique HeyGen "look" (talking photo ID) matching the unit theme
+     - Store video IDs in `{unit}_video_ids.json` alongside the HTML page
+     - Videos are `.mp4` files stored in `video/` directory, referenced as `../../video/{unit}_{item}.mp4` from the page
+     - Emoji selection: avoid emojis that look like other objects (e.g., 🪑 for desk, 🍽️ for table). When no good emoji exists, use a styled text badge instead
 
    **Older children's page types (ages 8-12):**
    Can also use any of the 4-7 page types above, plus:
