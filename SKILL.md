@@ -1,6 +1,6 @@
 ---
 name: lesson-builder
-description: Generates complete bilingual TEFL/ESL courses with configurable page types — lessons, exams, flashcards, conversations, pronunciation drills, worksheets, and syllabi. Works for any language pair and topic. Use when the user asks to create lessons, courses, curricula, or language learning materials.
+description: "Generates bilingual TEFL/ESL courses with lessons, exams, flashcards, conversations, pronunciation drills, worksheets, and syllabi for any language pair."
 ---
 
 ## When to use
