@@ -1,9 +1,0 @@
-{
-  "name": "lesson-builder",
-  "description": "Generate complete bilingual TEFL/ESL courses with configurable page types.",
-  "version": "1.0.0",
-  "author": {
-    "name": "ddtraveller"
-  },
-  "skills": ["./skills/"]
-}
