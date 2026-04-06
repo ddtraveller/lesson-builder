@@ -10,87 +10,217 @@ Use this skill when:
 - The user asks to generate activities, exams, flashcards, or other course pages
 - The user says "build lesson", "create course", "generate syllabus", etc.
 
+## Step 0: Authenticate Services (ALWAYS RUN FIRST)
+
+**On every invocation**, before asking any questions, immediately check both NotebookLM and Replicate. Report results to the user upfront so they know what's available.
+
+### 0a. Check NotebookLM
+
+```bash
+pip show notebooklm-py 2>&1
+```
+If installed, test auth:
+```bash
+PYTHONIOENCODING=utf-8 python -m notebooklm auth check --test --json
+```
+
+**If `checks.token_fetch` is `true`:** NotebookLM is ready. Tell the user:
+> "NotebookLM: authenticated and ready for AI-powered research."
+
+**If auth fails or package not installed:** Guide the user through login per [NOTEBOOKLM.md](NOTEBOOKLM.md). If they decline or login fails after troubleshooting, set research fallback to **web search** and tell the user:
+> "NotebookLM: not available. Will use web search for content research instead."
+
+### 0b. Check Replicate
+
+```bash
+python -c "import os; from dotenv import load_dotenv; load_dotenv(); token=os.getenv('REPLICATE_API_TOKEN',''); print('HAS_TOKEN' if token and token.startswith('r8_') else 'NO_TOKEN')" 2>&1
+```
+
+If that fails (no dotenv), try:
+```bash
+python -c "import os; token=os.environ.get('REPLICATE_API_TOKEN',''); print('HAS_TOKEN' if token and token.startswith('r8_') else 'NO_TOKEN')" 2>&1
+```
+
+Also check for a `.env` file in the project root containing `REPLICATE_API_TOKEN`.
+
+**If token found:** Tell the user:
+> "Replicate: API token found. Image generation is available."
+
+**If no token:** Tell the user:
+> "Replicate: No API token found. Image generation will be skipped. To enable it later, add `REPLICATE_API_TOKEN=r8_yourtoken` to a `.env` file and get a token from https://replicate.com/account/api-tokens"
+
+Set `images.enabled = false` in the course config regardless of what the config file says.
+
+### 0c. Report Summary
+
+After both checks, present a status box:
+
+> **Service Status:**
+> - NotebookLM: [Ready / Unavailable — using web search]
+> - Replicate: [Ready / Unavailable — skipping image generation]
+
+Then proceed to interactive mode.
+
 ## Interactive Mode — Ask Before Building
 
 **If the user invokes this skill without specifying all parameters, ASK:**
 
-1. **Research method** (ask FIRST) — "How should I research course content?"
-   - **NotebookLM** (default, recommended) — AI-powered research using Google NotebookLM. Creates a research notebook, imports web sources on the topic, and queries them for verified content per unit. Produces higher-quality, citation-backed material.
-   - **Web Search** — Search the web directly for curriculum references, grammar examples, and vocabulary verification.
-   - **Training data only** — Generate from AI knowledge without external research. Fastest but least verified.
-
-   If the user picks NotebookLM, **immediately verify it is set up** before asking remaining questions. See [NOTEBOOKLM.md](NOTEBOOKLM.md) for setup guide. Do NOT proceed to content generation until auth is confirmed.
-
-2. **Topic/Subject** — "What topic should the course cover?" (e.g., "General English for beginners", "Business English", "English through IT skills")
-3. **Languages** — "What is the learner's first language (L1) and target language (L2)?" (default: Thai → English)
-4. **Number of weeks/units** — "How many units?" (default: 12)
-5. **Age group** — "Who is this course for?"
+1. **Topic/Subject** — "What topic should the course cover?" (e.g., "General English for beginners", "Business English", "English through IT skills")
+2. **Languages** — "What is the learner's first language (L1) and target language (L2)?" (default: Thai → English)
+3. **Number of weeks/units** — "How many units?" (default: 12)
+4. **Age group** — "Who is this course for?"
    - **Children (4-7)** — Audio-first, big visuals, tap/drag interactions, no reading required
    - **Older children (8-12)** — Can read simple text, handle basic game rules
    - **Adults** — Full text-based lessons with grammar explanations
-6. **Page types** — "Which page types per unit?" Show options based on age group:
+5. **Page types** — "Which page types per unit?" Show options based on age group:
 
    **Adult page types:**
    - Lesson, Activities, Exam, Flashcards, Conversation, Pronunciation, Worksheet, Syllabus
 
    **Children's page types:** See [CHILDREN_PAGES.md](CHILDREN_PAGES.md) for full list and specifications (Story, Game, Song, Coloring, Stickers, Flashcards, Reward, Avatar Video for ages 4-7; Comic, Quiz Show, Word Puzzle, Adventure, Journal, Video Lesson, Board Game, Reading for ages 8-12)
 
-7. **Output location** — "Where should files go?" (default: `HTML/courses/{topic_slug}/`)
-8. **Color theme** — "Any color preference?" (or auto-pick)
+6. **Output location** — "Where should files go?" (default: `HTML/courses/{topic_slug}/`)
+7. **Color theme** — "Any color preference?" (or auto-pick)
 
-**If a config file exists** in `config/` matching the topic, load it instead of asking. Still check that the research method in the config is available (e.g., if `notebooklm: true`, verify auth before proceeding).
+**Research method is auto-selected** based on Step 0 results:
+- If NotebookLM auth succeeded → use NotebookLM
+- If NotebookLM unavailable → use Web Search
+- User can override to "training data only" if they want speed over accuracy
 
-## How it works
+**If a config file exists** in `config/` matching the topic, load it instead of asking. Still respect the auth results from Step 0 (e.g., if config has `notebooklm: true` but auth failed, fall back to web search; if config has `images.enabled: true` but no Replicate token, disable images).
 
-### Step 1: Gather Requirements
-Either load from a config JSON (`config/{course_id}.json`) or ask interactively.
+## How it works — Buddy Workflow Integration
 
-### Step 2: Research
-Verify course content against authoritative sources **before** generating. Use whichever method the user chose (or config specifies).
+The lesson builder uses a structured spec → plan → tasks → implement pipeline adapted from the buddy workflow. This ensures each course is well-designed before code generation begins.
 
-**NotebookLM** (default):
-1. Create a research notebook:
-   ```bash
-   PYTHONIOENCODING=utf-8 python -m notebooklm create "Course: {topic}" --json
-   ```
-2. Add research sources (2-3 queries covering curriculum, grammar, and L1 interference):
-   ```bash
-   PYTHONIOENCODING=utf-8 python -m notebooklm source add-research "{topic} curriculum CEFR {level}"
-   PYTHONIOENCODING=utf-8 python -m notebooklm source add-research "teaching English {L1} speakers {level} common errors"
-   ```
-3. Query for content per topic area:
-   ```bash
-   PYTHONIOENCODING=utf-8 python -m notebooklm ask "What are the key grammar topics for {level}?" --json
-   PYTHONIOENCODING=utf-8 python -m notebooklm ask "What vocabulary is essential for {topic area}?" --json
-   ```
-4. Use the research answers to inform the generated course content.
+### Phase 1: Specification (`/buddy:spec` pattern)
 
-**Web Search** (fallback or if user chose it):
-- Search for the unit's subject topic from 2+ authoritative sources
-- Verify vocabulary definitions and L1 translations
-- Save source citations for the references section
+After gathering requirements interactively (or loading a config), create a course specification:
 
-**Training data only** (last resort):
-Inform the user: *"Generating content from training data. For higher accuracy, consider using NotebookLM or web search."*
+1. Create folder: `specs/{YYYYMMDD}-{course_id}/`
+2. Write `specs/{YYYYMMDD}-{course_id}/spec.md` containing:
+   - Course identity (title, languages, level, schedule)
+   - Target audience and age group
+   - Unit breakdown with topics, vocabulary themes, and grammar points
+   - Page types per unit (with assignment modes)
+   - Research method and available services (from Step 0)
+   - Image generation availability
+   - Theme and output configuration
+   - Acceptance criteria (what "done" looks like for this course)
+3. Mark unclear aspects with `[NEEDS CLARIFICATION: ...]`
+4. Present clarification questions to the user
+5. Update spec with answers, set status to "Ready for Review"
 
-### Step 3: Fact-Check
-Use the `fact-checker` skill (if available) to verify grammar rules, vocabulary, quiz answers, and real-world examples.
+### Phase 2: Research & Planning (`/buddy:plan` pattern)
 
-### Step 4: Generate
-Write a Python generator script (`generate_{course_id}.py`) that produces all files, then run it. The script filename MUST match the `course_id` from the config. Never reuse or overwrite another course's generator.
+Once the spec is confirmed, research content and create an implementation plan:
 
-### Step 5: Images (optional)
-If configured and Replicate API token is available, generate illustrations using FLUX Dev. See [IMAGE_GENERATION.md](IMAGE_GENERATION.md) for the full guide, prompts format, and emoji color reference.
+1. **Research** using the method determined in Step 0:
 
-### Step 6: Hero Video (optional)
-After generating all pages and images, **ask the user** if they want a hero video for the course:
+   **NotebookLM** (if available):
+   - Create a research notebook:
+     ```bash
+     PYTHONIOENCODING=utf-8 python -m notebooklm create "Course: {topic}" --json
+     ```
+   - Add research sources (2-3 queries covering curriculum, grammar, and L1 interference):
+     ```bash
+     PYTHONIOENCODING=utf-8 python -m notebooklm source add-research "{topic} curriculum CEFR {level}"
+     PYTHONIOENCODING=utf-8 python -m notebooklm source add-research "teaching English {L1} speakers {level} common errors"
+     ```
+   - Query for content per topic area:
+     ```bash
+     PYTHONIOENCODING=utf-8 python -m notebooklm ask "What are the key grammar topics for {level}?" --json
+     PYTHONIOENCODING=utf-8 python -m notebooklm ask "What vocabulary is essential for {topic area}?" --json
+     ```
+   - Save research findings to `specs/{YYYYMMDD}-{course_id}/research.md`
 
-> "Would you like a hero video for this course? Options:
-> 1. **HeyGen** — AI avatar presents the course intro (realistic talking-head video)
-> 2. **Remotion** — Animated motion graphics intro (React-based video)
-> 3. **Skip** — No hero video"
+   **Web Search** (fallback):
+   - Search for curriculum references, grammar examples, and vocabulary verification from 2+ authoritative sources
+   - Verify vocabulary definitions and L1 translations
+   - Save source citations to `specs/{YYYYMMDD}-{course_id}/research.md`
 
-The video should be embedded in the syllabus page as the hero section.
+   **Training data only** (if user chose speed):
+   - Inform: *"Generating from training data. For higher accuracy, re-run with NotebookLM or web search."*
+
+2. **Fact-Check** using the `fact-checker` skill (if available) to verify grammar rules, vocabulary, quiz answers, and real-world examples.
+
+3. Write `specs/{YYYYMMDD}-{course_id}/plan.md` containing:
+   - Research summary and sources used
+   - Generation strategy (which units first, page type order)
+   - Python generator script architecture (functions, modules, line count estimates)
+   - Unit content outlines (vocabulary lists, grammar topics, activity ideas per unit — informed by research)
+   - Image generation plan (if Replicate available)
+   - Video plan (if applicable)
+   - Risk assessment (large script splitting, encoding issues, etc.)
+4. Mark unclear aspects, get clarifications, set status to "Ready for Review"
+
+### Phase 3: Task Breakdown (`/buddy:tasks` pattern)
+
+Convert the plan into executable tasks:
+
+1. Write `specs/{YYYYMMDD}-{course_id}/tasks.md` with ordered tasks:
+
+   **Setup tasks:**
+   - T001: Create output directory structure
+   - T002: Create/validate course config JSON
+   - T003: Set up generator script skeleton
+
+   **Core generation tasks (per unit or batch):**
+   - T004: Generate Unit 1 (all page types) — **test unit**
+   - T005: Browser-test Unit 1, verify all interactive features
+   - T006-T00N: Generate remaining units (after Unit 1 passes)
+
+   **Image tasks (if Replicate available):**
+   - T0XX: Create image prompts JSON
+   - T0XX: Generate images via `generate_images.py`
+
+   **Video tasks (if applicable):**
+   - T0XX: Generate hero video (HeyGen/Remotion)
+
+   **Polish tasks:**
+   - T0XX: Cross-file consistency check (nav footers, JS functions)
+   - T0XX: Final browser test of all units
+
+2. Each task has: ID, description, file paths, dependencies, acceptance criteria
+3. Mark parallel tasks with `[P]` flag
+4. Set status to "Ready for Review"
+
+### Phase 4: Implementation (`/buddy:implement` pattern)
+
+Execute the tasks in order:
+
+1. Read all docs in `specs/{YYYYMMDD}-{course_id}/` (spec, plan, tasks, research)
+2. Execute phase-by-phase:
+   - **Setup first** — directories, config, script skeleton
+   - **Unit 1 first** — generate only unit 1 as a test
+   - **Verify Unit 1** — check in browser before proceeding
+   - **Remaining units** — generate after Unit 1 passes
+   - **Images** — if Replicate available
+   - **Video** — if user wants it
+   - **Polish** — consistency checks, final testing
+3. Update `tasks.md` after each task: `- [ ]` → `- [X]`
+4. Report progress after each completed task
+5. On completion, update tasks.md status to "Completed"
+
+### Stepping Through vs. Auto-Run
+
+By default, **pause after Phase 1 (spec)** to confirm with the user before proceeding. The user can say:
+- "Looks good, continue" → proceed through phases 2-4 automatically
+- "Change X" → update spec and re-confirm
+- "Just generate" → skip remaining phases, go straight to generation (legacy mode)
+
+## Legacy Mode (Direct Generation)
+
+If the user says "just generate" or "skip planning", bypass the buddy workflow and generate directly:
+
+1. Gather requirements (interactive or config)
+2. Research (NotebookLM/web search/training data)
+3. Fact-check
+4. Write Python generator script (`generate_{course_id}.py`) and run it
+5. Images (if Replicate available)
+6. Hero video (optional — ask user)
+
+This preserves backward compatibility for quick one-off generation.
 
 ## Configuration System
 
