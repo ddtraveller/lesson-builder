@@ -26,6 +26,112 @@ cp -r lesson-builder/skills/lesson-builder ~/.claude/skills/
 
 The skill walks you through setup interactively — or reads from a JSON config file for repeatable builds.
 
+## Quickstart — Build a Real Course from One Prompt
+
+Lesson Builder is designed to take a single high-level prompt and walk it through the full **buddy workflow** (`spec → plan → tasks → implement`) to produce a complete, research-grounded course. Here's a real worked example showing the full flow.
+
+### 1. Give it a one-line brief
+
+You start in Claude Code with a natural-language request:
+
+```
+Run lesson-builder and generate a TEFL course for Thai learners
+of English, ages 13-14. Use HeyGen for avatar videos, FLUX for
+images, and the NVIDIA NIM model from krueng.ai/tefl/avatar_chatbot.html
+for the live conversation chatbot. Make it research-driven and
+break from the conventions of existing children's courses.
+```
+
+That's the entire input. The skill takes it from there.
+
+### 2. Step 0: automatic auth checks (parallel)
+
+Before asking any questions, the skill checks every optional service in parallel and reports a status box:
+
+```
+Service Status:
+- NotebookLM:      Ready (or: Unavailable — using web search)
+- Tavily Research: Ready (or: Unavailable — falling back)
+- Replicate:       Ready (or: Unavailable — skipping image generation)
+```
+
+If a credential is missing, the skill tries to pull it from your secrets manager
+(AWS SSM Parameter Store by default — see [Optional Integrations](#optional-secrets-manager-auto-login) below).
+
+### 3. Discovery in parallel
+
+The skill fetches any reference URLs you mentioned (here, the avatar chatbot page to extract the exact NVIDIA model ID and Lambda endpoint), then runs **2–3 Tavily Research calls** to gather peer-reviewed evidence on the course topic. For the example above, it ran:
+
+```bash
+PYTHONIOENCODING=utf-8 tvly research \
+  "evidence-based best practices teaching English ESL EFL teenagers \
+   ages 13-14 CEFR A2 B1 2024 2025 research pedagogy" \
+  --model pro --json -o specs/.../tavily/teen_pedagogy.json
+
+PYTHONIOENCODING=utf-8 tvly research \
+  "Thai students learning English L1 interference pronunciation \
+   grammar errors common mistakes teen learners CEFR A2 B1" \
+  --model pro --json -o specs/.../tavily/thai_l1_interference.json
+
+PYTHONIOENCODING=utf-8 tvly research \
+  "AI avatar chatbot conversational practice teen ESL motivation \
+   engagement gamification 2024 effectiveness research" \
+  --model pro --json -o specs/.../tavily/tech_engagement.json
+```
+
+In this run that produced **~71k chars of synthesized markdown across 94 cited sources** from Cambridge RECALL, MDPI, NCBI/PMC, ScienceDirect, Springer, and Thai university theses — the actual evidence base every later phase will cite.
+
+### 4. Phase 1 — `/buddy:spec`
+
+The skill synthesizes the discovery findings into a comprehensive natural-language brief and invokes the `buddy:spec` agent. The brief is **self-contained** because the spec-writer subagent runs in a fresh context — it includes course identity, page-type designs, AI service integration details, the exact Lambda endpoint and model ID, the 12 unit topics, the pedagogical principles to bake in (with research citations), the L1 interference targets to address, and the exact output path for `spec.md`.
+
+You can also invoke `/buddy:spec` manually from your own brief if you want full control over the wording.
+
+The agent reads the Tavily research files, writes `specs/{YYYYMMDD}-{course_id}/spec.md`, and pauses for your review. The skill **does not proceed until you confirm**.
+
+### 5. Phase 2 — `/buddy:plan`
+
+After you approve the spec, the skill invokes `buddy:plan` to produce `plan.md`. This phase also runs the **Tavily → NotebookLM bridge** (if both are authenticated): the cited Tavily reports become NotebookLM URL sources, and the synthesized markdown becomes a text source. The existing `notebooklm ask` loop then runs against the enriched corpus to generate per-unit content outlines grounded in the same sources.
+
+If NotebookLM isn't available, the skill falls back gracefully to Tavily-standalone mode and writes the plan from the research files directly.
+
+### 6. Phase 3 — `/buddy:tasks`
+
+`buddy:tasks` produces `tasks.md` — the ordered T001–T0NN work breakdown. The skill enforces the **Unit 1 verification gate**: T005 generates Unit 1 only, T006 is a browser-verify checkpoint, and bulk generation (T007) only proceeds after Unit 1 has been confirmed working. This is the load-bearing rule that keeps generation reliable.
+
+### 7. Phase 4 — `/buddy:implement`
+
+`buddy:implement` executes the tasks in order: writes the Python generator script, runs it on Unit 1, pauses for your browser verification, then bulk-generates the remaining 11 units. Hero images go through Replicate (FLUX Dev). Avatar videos go through HeyGen. Each new chatbot page is wired to the verified NVIDIA NIM Lambda endpoint with per-unit scenario sets.
+
+### 8. Result
+
+For the example brief above, the run produced:
+
+- **Spec:** `watdonchan/specs/20260407-tefl_teens_13_14/spec.md` — research-grounded, with 15 cited pedagogical principles and corpus-derived L1 targets
+- **Plan + tasks:** in the same directory
+- **Course output:** 60 standalone HTML files (`watdonchan/HTML/tefl/teens_13_14/`) — 12 units × 5 page types (Lesson, Live Chat, Reading + Listening, Quest Quiz, Project & Portfolio) — plus syllabus and portfolio dashboard
+- **Media:** 12 HeyGen avatar videos + ~80 FLUX-generated images, served from S3 via CloudFront
+- **Live chatbot:** every unit has a per-topic NVIDIA NIM scenario set wired to the production Lambda endpoint
+
+### Key patterns
+
+- **One prompt in, complete course out** — the skill orchestrates everything between
+- **Auth-first** — every optional service is checked at Step 0, so you know upfront what you'll get
+- **Pause-and-confirm at each buddy phase** — you review `spec.md` before plan, `plan.md` before tasks, `tasks.md` before implementation. No wasted generation.
+- **Unit 1 verification gate** — bulk generation never runs against an unverified template
+- **Research-grounded by default** — Tavily citations are the evidence base for design decisions; NotebookLM provides per-unit Q&A grounding when available
+- **Pluggable backends** — every backend is optional and degrades gracefully
+
+### Skip the discovery phase
+
+If you already have a course config JSON, you can skip discovery and Phase 1 entirely by referencing it:
+
+```
+/lesson-builder use config/business_english.json
+```
+
+The skill loads the config, runs Step 0 auth checks, and jumps straight to the implementation phase. Useful for re-generating an existing course or building from a hand-crafted spec.
+
 ## What It Generates
 
 Each unit produces standalone HTML/CSS/JS files with no external dependencies (except Google Fonts). Everything is bilingual — learner's language (L1) first, target language (L2) second.
