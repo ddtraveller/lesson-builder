@@ -403,7 +403,25 @@ Target sound description (bilingual), L1 interference callout, minimal pairs wit
 Print-optimized (`@media print`). Fill-in-the-blank, matching, unscramble, writing prompts with dotted lines. Hidden answer key with toggle button.
 
 ### Syllabus Page
-Course overview with sticky header, week navigation, hero section, scope table, week cards (objectives + vocab + grammar pattern), assessment rubric, outcomes. Uses different font stack (DM Sans/Noto Sans Thai/DM Serif Display).
+Course overview with sticky header, week navigation, hero section, scope table, week cards (objectives + vocab + grammar pattern), assessment rubric, outcomes, and **References & Research Basis** section. Uses different font stack (DM Sans/Noto Sans Thai/DM Serif Display).
+
+**References & Research Basis section (REQUIRED):**
+
+Every syllabus MUST include a "References & Research Basis" section that documents the evidence base behind the course design. This serves three purposes:
+1. **Transparency for learners and parents** — they can see this isn't a random course, it's grounded in peer-reviewed research
+2. **Provenance for teachers and reviewers** — they can trace pedagogical decisions back to their sources
+3. **Defensibility if challenged** — academic-grade citation chain protects the course content
+
+The section must include:
+- **Research files used** — list every Tavily Research file in `specs/{date}-{course_id}/tavily/` (filename + brief topic + source count)
+- **Total cited sources** — aggregate count across all research files (e.g., "94 peer-reviewed sources")
+- **Pedagogical principles list** — bullet list of every evidence-based principle baked into the course design, each citing the underlying research file
+- **External corpus references** if used (TLE, ICNALE, CEFR Companion Volume, etc.)
+- **Citation footer note** pointing to where the original research artifacts live (e.g., "Full research reports available in `specs/{date}-{course_id}/tavily/`")
+- **NotebookLM notebook ID** if a per-unit Q&A grounding pass was run in Phase 2 (allows future re-querying against the same corpus)
+- **Optional: links to external research databases** (Cambridge ReCALL, MDPI, NCBI/PMC, ScienceDirect, Springer, ERIC, Council of Europe CEFR portal)
+
+The section should be visually distinct (use a `.references-section` class) and placed near the bottom of the syllabus, after assessment rubric and outcomes but before the footer. Use a slightly muted background (e.g., `--primary-pale` from the course theme) so it reads as supplementary metadata rather than primary content.
 
 When a syllabus includes both a hero video and hero image:
 - **Video** goes first (inside `.hero-video` div, no `poster` attribute)
