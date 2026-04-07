@@ -12,7 +12,7 @@ Use this skill when:
 
 ## Step 0: Authenticate Services (ALWAYS RUN FIRST)
 
-**On every invocation**, before asking any questions, immediately check both NotebookLM and Replicate. Report results to the user upfront so they know what's available.
+**On every invocation**, before asking any questions, immediately check NotebookLM, Tavily Research, and Replicate. Report results to the user upfront so they know what's available.
 
 ### 0a. Check NotebookLM
 
@@ -30,7 +30,45 @@ PYTHONIOENCODING=utf-8 python -m notebooklm auth check --test --json
 **If auth fails or package not installed:** Guide the user through login per [NOTEBOOKLM.md](NOTEBOOKLM.md). If they decline or login fails after troubleshooting, set research fallback to **web search** and tell the user:
 > "NotebookLM: not available. Will use web search for content research instead."
 
-### 0b. Check Replicate
+### 0b. Check Tavily Research (`tvly` CLI)
+
+The lesson builder uses the [tavily-research](https://github.com/tavily-ai/skills) skill (installed at `~/.agents/skills/tavily-research/`) to conduct cited deep research that feeds into NotebookLM. It wraps the `tvly` CLI from Tavily.
+
+Check the CLI is installed and authenticated:
+
+```bash
+which tvly 2>&1
+PYTHONIOENCODING=utf-8 tvly auth --json 2>&1
+```
+
+Parse the JSON: `{"authenticated": true, "source": "config file (...)"}` means good. `false` means a key is needed.
+
+**If `tvly` is on PATH AND `authenticated` is `true`:** Tell the user:
+> "Tavily Research: authenticated. Will be used for deep cited research feeding NotebookLM."
+
+**If `tvly` is on PATH but not authenticated:** Try pulling the key from SSM Parameter Store first (this matches the project convention for API keys):
+```bash
+TAVILY_KEY=$(aws ssm get-parameter --name tavily --with-decryption \
+  --region us-west-2 --profile deploy --query 'Parameter.Value' --output text 2>/dev/null)
+if [ -n "$TAVILY_KEY" ]; then
+  tvly login --api-key "$TAVILY_KEY"
+fi
+```
+If that fails or no SSM parameter exists, tell the user:
+> "Tavily Research: CLI installed but not authenticated and no key in SSM. To enable, get a key from https://app.tavily.com/ and run `! tvly login --api-key tvly-YOUR_KEY` in the prompt."
+
+**If `tvly` is not on PATH:** Tell the user how to install it:
+> "Tavily Research: CLI not installed. To enable deep cited research, run:
+> ```
+> ! curl -fsSL https://cli.tavily.com/install.sh | bash
+> ```
+> After install, the CLI lands in your Python user `Scripts` directory — make sure it's on PATH. Falling back to plain NotebookLM research for now."
+
+**IMPORTANT Windows note:** Always prefix `tvly` commands with `PYTHONIOENCODING=utf-8` and use `-o file` for output instead of stdout. The CLI uses `click.echo` which crashes on cp1252 when the API returns Unicode characters like `\u202f` (narrow no-break space). Same gotcha as `notebooklm`.
+
+Set `research.tavily = true` only if both the CLI is on PATH and `authenticated` is `true` (after attempting SSM auto-login).
+
+### 0c. Check Replicate
 
 ```bash
 python -c "import os; from dotenv import load_dotenv; load_dotenv(); token=os.getenv('REPLICATE_API_TOKEN',''); print('HAS_TOKEN' if token and token.startswith('r8_') else 'NO_TOKEN')" 2>&1
@@ -51,12 +89,13 @@ Also check for a `.env` file in the project root containing `REPLICATE_API_TOKEN
 
 Set `images.enabled = false` in the course config regardless of what the config file says.
 
-### 0c. Report Summary
+### 0d. Report Summary
 
-After both checks, present a status box:
+After all checks, present a status box:
 
 > **Service Status:**
 > - NotebookLM: [Ready / Unavailable — using web search]
+> - Tavily Research: [Ready / Unavailable — using plain NotebookLM source add-research]
 > - Replicate: [Ready / Unavailable — skipping image generation]
 
 Then proceed to interactive mode.
@@ -83,8 +122,10 @@ Then proceed to interactive mode.
 7. **Color theme** — "Any color preference?" (or auto-pick)
 
 **Research method is auto-selected** based on Step 0 results:
-- If NotebookLM auth succeeded → use NotebookLM
-- If NotebookLM unavailable → use Web Search
+- If Tavily Research + NotebookLM both ready → use **Tavily → NotebookLM bridge** (best quality)
+- If only NotebookLM ready → use plain NotebookLM `source add-research`
+- If only Tavily Research ready → use Tavily standalone (writes report directly to research.md)
+- If neither → use Web Search
 - User can override to "training data only" if they want speed over accuracy
 
 **If a config file exists** in `config/` matching the topic, load it instead of asking. Still respect the auth results from Step 0 (e.g., if config has `notebooklm: true` but auth failed, fall back to web search; if config has `images.enabled: true` but no Replicate token, disable images).
@@ -92,6 +133,10 @@ Then proceed to interactive mode.
 ## How it works — Buddy Workflow Integration
 
 The lesson builder uses a structured spec → plan → tasks → implement pipeline adapted from the buddy workflow. This ensures each course is well-designed before code generation begins.
+
+**Templates and worked example:**
+- `templates/buddy/{spec,plan,tasks,research}.md` — placeholder skeletons to copy for a new course
+- `specs/EXAMPLE-tefl_children_10_12/` — complete worked example (Thai children ages 10-12, 12 units, 84 files) showing what each artifact looks like filled in. Read this before starting a new course to understand the proven shape and detail level.
 
 ### Phase 1: Specification (`/buddy:spec` pattern)
 
@@ -117,7 +162,51 @@ Once the spec is confirmed, research content and create an implementation plan:
 
 1. **Research** using the method determined in Step 0:
 
-   **NotebookLM** (if available):
+   **Tavily → NotebookLM bridge** (best quality — both ready):
+   - Run `tvly research` for 2–3 queries covering curriculum, L1 interference, and (optionally) niche vocab. Use `--model pro` for the comprehensive multi-angle pass and `--json` so we get structured sources to feed NotebookLM. **Always set `PYTHONIOENCODING=utf-8`** — the CLI crashes on Windows cp1252 when the API returns Unicode whitespace characters:
+     ```bash
+     mkdir -p specs/{YYYYMMDD}-{course_id}/tavily
+     PYTHONIOENCODING=utf-8 tvly research "{topic} curriculum CEFR {level} for {audience}" \
+       --model pro --json \
+       -o specs/{YYYYMMDD}-{course_id}/tavily/curriculum.json
+     PYTHONIOENCODING=utf-8 tvly research "teaching {L2} to {L1} speakers {level} common errors pronunciation" \
+       --model pro --json \
+       -o specs/{YYYYMMDD}-{course_id}/tavily/l1_interference.json
+     # Optional 3rd query for niche vocab topics
+     PYTHONIOENCODING=utf-8 tvly research "{topic} essential vocabulary {level} authoritative wordlists" \
+       --model pro --json \
+       -o specs/{YYYYMMDD}-{course_id}/tavily/vocab.json
+     ```
+   - **Bridge into NotebookLM** — for each Tavily report, create the notebook (once), then ingest the markdown report (`content` field) as a text source AND ingest each source URL (`sources[*].url`) as a URL source. Verified JSON shape (as of `tavily-cli 0.1.0`): `{"content": "<markdown>", "sources": [{"url": "...", "title": "...", "favicon": "..."}], "status", "created_at", "response_time", "request_id"}`. Cap source ingestion to stay under NotebookLM's 50-source free-tier ceiling:
+     ```bash
+     NB_ID=$(PYTHONIOENCODING=utf-8 python -m notebooklm create "Course: {topic}" --json \
+              | python -c "import sys,json;print(json.load(sys.stdin)['id'])")
+
+     for FILE in specs/{YYYYMMDD}-{course_id}/tavily/*.json; do
+       # 1. Extract markdown report (content field) and ingest as text source
+       python -c "import json; print(json.load(open(r'$FILE', encoding='utf-8'))['content'])" \
+         > "${FILE%.json}.md"
+       PYTHONIOENCODING=utf-8 python -m notebooklm source add "$NB_ID" --file "${FILE%.json}.md"
+
+       # 2. Extract source URLs (sources[*].url) and ingest each (cap at 10 per query)
+       python -c "
+import json
+d = json.load(open(r'$FILE', encoding='utf-8'))
+for s in d.get('sources', [])[:10]:
+    if s.get('url'): print(s['url'])
+" | while read URL; do
+         PYTHONIOENCODING=utf-8 python -m notebooklm source add "$NB_ID" --url "$URL"
+       done
+
+       PYTHONIOENCODING=utf-8 python -m notebooklm source wait "$NB_ID"
+     done
+     ```
+   - Run the existing `notebooklm ask` loop against the enriched corpus to get per-unit content.
+   - Save Q&A answers + Tavily report file paths to `specs/{YYYYMMDD}-{course_id}/research.md` for traceability.
+
+   > **Tip:** Tavily's `mini` model returns ~7 sources, `pro` returns more. Spot-check the top URLs before bulk ingestion — Tavily can surface low-quality results for niche queries. If the JSON shape ever changes in a future `tavily-cli` release, run `PYTHONIOENCODING=utf-8 tvly research "test" --model mini --json -o /tmp/t.json` and inspect `t.json` to update the key paths above.
+
+   **NotebookLM only** (NotebookLM ready, Tavily not):
    - Create a research notebook:
      ```bash
      PYTHONIOENCODING=utf-8 python -m notebooklm create "Course: {topic}" --json
@@ -134,13 +223,24 @@ Once the spec is confirmed, research content and create an implementation plan:
      ```
    - Save research findings to `specs/{YYYYMMDD}-{course_id}/research.md`
 
-   **Web Search** (fallback):
+   **Tavily Research standalone** (Tavily ready, NotebookLM not):
+   - Run the same 2–3 `tvly research --model pro` queries from the bridge block above, but write directly to markdown instead of JSON (always with `PYTHONIOENCODING=utf-8`):
+     ```bash
+     PYTHONIOENCODING=utf-8 tvly research "{topic} curriculum CEFR {level}" --model pro \
+       -o specs/{YYYYMMDD}-{course_id}/research_curriculum.md
+     PYTHONIOENCODING=utf-8 tvly research "teaching {L2} to {L1} speakers common errors" --model pro \
+       -o specs/{YYYYMMDD}-{course_id}/research_l1.md
+     ```
+   - Concatenate or summarize these reports into the final `specs/{YYYYMMDD}-{course_id}/research.md`
+   - No Q&A grounding layer; tell the user this is degraded mode
+
+   **Web Search** (fallback — neither ready):
    - Search for curriculum references, grammar examples, and vocabulary verification from 2+ authoritative sources
    - Verify vocabulary definitions and L1 translations
    - Save source citations to `specs/{YYYYMMDD}-{course_id}/research.md`
 
    **Training data only** (if user chose speed):
-   - Inform: *"Generating from training data. For higher accuracy, re-run with NotebookLM or web search."*
+   - Inform: *"Generating from training data. For higher accuracy, re-run with Tavily Research or NotebookLM."*
 
 2. **Fact-Check** using the `fact-checker` skill (if available) to verify grammar rules, vocabulary, quiz answers, and real-world examples.
 
@@ -156,34 +256,18 @@ Once the spec is confirmed, research content and create an implementation plan:
 
 ### Phase 3: Task Breakdown (`/buddy:tasks` pattern)
 
-Convert the plan into executable tasks:
+Convert the plan into executable tasks. Start from `templates/buddy/tasks.md` — it already encodes the proven shape from `specs/EXAMPLE-tefl_children_10_12/tasks.md`:
 
-1. Write `specs/{YYYYMMDD}-{course_id}/tasks.md` with ordered tasks:
+1. Write `specs/{YYYYMMDD}-{course_id}/tasks.md` with ordered tasks. The load-bearing structure is:
+   - **Setup** (T001): create output directory
+   - **Generator script** (T002–T004): write the script. Collapse to a single task for small courses (<2000 lines); split into Part 1 / Part 2 / COURSE_DATA for larger ones
+   - **Unit 1 gate** (T005–T006): generate Unit 1 only, browser-verify it. **Do not proceed past this gate until Unit 1 is clean.**
+   - **Bulk generation** (T007): all remaining units
+   - **Polish** (T008–T009): cross-file consistency check, syllabus
+   - **Optional extras** (T0XX): image generation if Replicate available, video if requested
 
-   **Setup tasks:**
-   - T001: Create output directory structure
-   - T002: Create/validate course config JSON
-   - T003: Set up generator script skeleton
-
-   **Core generation tasks (per unit or batch):**
-   - T004: Generate Unit 1 (all page types) — **test unit**
-   - T005: Browser-test Unit 1, verify all interactive features
-   - T006-T00N: Generate remaining units (after Unit 1 passes)
-
-   **Image tasks (if Replicate available):**
-   - T0XX: Create image prompts JSON
-   - T0XX: Generate images via `generate_images.py`
-
-   **Video tasks (if applicable):**
-   - T0XX: Generate hero video (HeyGen/Remotion)
-
-   **Polish tasks:**
-   - T0XX: Cross-file consistency check (nav footers, JS functions)
-   - T0XX: Final browser test of all units
-
-2. Each task has: ID, description, file paths, dependencies, acceptance criteria
-3. Mark parallel tasks with `[P]` flag
-4. Set status to "Ready for Review"
+2. Keep tasks terse. Per-task file paths, acceptance criteria, and `[P]` parallel flags are not required — for single-script generator courses they add ceremony without payoff. The Unit 1 gate is the only structural rule that has to hold.
+3. Set status to "Ready for Review".
 
 ### Phase 4: Implementation (`/buddy:implement` pattern)
 
@@ -265,8 +349,9 @@ Courses are defined by JSON config files in `config/`. See `config/schema.md` fo
 
   // Research & quality
   "research": {
+    "tavily": true,              // Run tvly research and feed results into NotebookLM (best quality)
     "notebooklm": true,
-    "web_search": true,
+    "web_search": true,          // Fallback if neither tavily nor notebooklm available
     "fact_check": true
   },
 
