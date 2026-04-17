@@ -1,6 +1,7 @@
 # Tasks: Lesson-Builder Hardening Initiative
 
 **Status:** Draft
+**Branch decision (T002):** Continuing on `feature/buddy-workflow-integration`. Hardening initiative commits start at the commit AFTER snapshot `8943a16` (chore(phase-5): snapshot in-flight work). No branch rename, no force-push.
 **Date:** 2026-04-17
 **Initiative ID:** lesson-builder-hardening
 **Source Spec:** `spec/20260417-lesson-builder-hardening/spec.md` (v1.1.0)
@@ -26,9 +27,9 @@
 
 These run **first**, before any hardening work begins, to isolate the in-flight Phase-5 work from new changes.
 
-- [ ] **T001 (S1):** Commit the existing uncommitted Phase-5 session work on the current branch `feature/buddy-workflow-integration`. Working tree currently shows modified `SKILL.md`, modified `templates/buddy/tasks.md`, and untracked `scripts/` and `spec/`. Stage these by name (never `git add -A`), create a single `chore(phase-5): snapshot in-flight work before hardening initiative` commit (or similar), so hardening changes land on top of a clean tree.
+- [X] **T001 (S1):** Commit the existing uncommitted Phase-5 session work on the current branch `feature/buddy-workflow-integration`. Working tree currently shows modified `SKILL.md`, modified `templates/buddy/tasks.md`, and untracked `scripts/` and `spec/`. Stage these by name (never `git add -A`), create a single `chore(phase-5): snapshot in-flight work before hardening initiative` commit (or similar), so hardening changes land on top of a clean tree.
   - **Acceptance:** `git status` returns clean after this task. The commit message does NOT mention hardening — this snapshot is purely to preserve the pre-existing session work.
-- [ ] **T002 (S1):** Decide and document the branch strategy. **Recommendation: continue on `feature/buddy-workflow-integration`.** Rationale: (a) Phase-5 work already exists here and was built in the same session context as this hardening plan — these are logically related maintenance passes; (b) cutting a new branch off HEAD would carry that Phase-5 commit anyway; (c) project rule is "never push to main" — the branch name doesn't have to match the initiative name as long as it's a feature branch, not main. Add a short note at the top of this tasks file or in the branch's commit log identifying which commits belong to the hardening initiative so the eventual PR body can reference them. Do NOT force-push, do NOT reset.
+- [X] **T002 (S1):** Decide and document the branch strategy. **Recommendation: continue on `feature/buddy-workflow-integration`.** Rationale: (a) Phase-5 work already exists here and was built in the same session context as this hardening plan — these are logically related maintenance passes; (b) cutting a new branch off HEAD would carry that Phase-5 commit anyway; (c) project rule is "never push to main" — the branch name doesn't have to match the initiative name as long as it's a feature branch, not main. Add a short note at the top of this tasks file or in the branch's commit log identifying which commits belong to the hardening initiative so the eventual PR body can reference them. Do NOT force-push, do NOT reset.
   - **Acceptance:** This tasks file (or a commit message) records "hardening initiative commits start at `<commit-sha>`." No branch rename, no force-push.
 
 ---
