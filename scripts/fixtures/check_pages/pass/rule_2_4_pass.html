@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<!-- Rule 2.4 PASS: speechSynthesis.cancel() called before speak() -->
+<html><head><title>Rule 2.4 pass</title></head>
+<body>
+<button onclick="speak('hello')">Speak</button>
+<script>
+function speak(text) {
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    window.speechSynthesis.speak(u);
+}
+</script>
+</body></html>

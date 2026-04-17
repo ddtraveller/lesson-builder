@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<!-- Rule 2.2 BROKEN: Python backslash-quote leakage in script block -->
+<html><head><title>Rule 2.2 broken</title></head>
+<body>
+<script>
+// Python generator emitted \' instead of proper JS escape
+var lang = \'en-US\';
+function speak(text) {
+    var u = new SpeechSynthesisUtterance(text);
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+}
+</script>
+</body></html>

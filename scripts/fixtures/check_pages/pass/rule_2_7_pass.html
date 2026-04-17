@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<!-- Rule 2.7 PASS: script block is syntactically valid JS -->
+<html><head><title>Rule 2.7 pass</title></head>
+<body>
+<script>
+var questions = [
+    { text: "What is 2 + 2?", answer: 4 },
+    { text: "What color is the sky?", answer: "blue" }
+];
+
+function showQuestion(idx) {
+    var q = questions[idx];
+    console.log(q.text);
+}
+
+showQuestion(0);
+</script>
+</body></html>

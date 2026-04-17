@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<!-- Rule 2.6 PASS: img src references an external URL (not checked) -->
+<html><head><title>Rule 2.6 pass</title></head>
+<body>
+<!-- External URLs are not checked for on-disk existence -->
+<img src="https://example.com/img.png" alt="example">
+<!-- Data URIs are also skipped -->
+<img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="pixel">
+</body></html>
