@@ -1,0 +1,35 @@
+{
+  "course_id": "children_10_12",
+  "title": "English Explorer Plus",
+  "title_l1": "อังกฤษสำหรับเด็ก 10-12 ปี",
+  "description": "A 12-week course for Thai children ages 10-12, covering everyday topics with stories, games, songs, reading, quizzes, flashcards and reward pages.",
+  "level": "A1-A2",
+  "schedule": "1 hour/week x 12 weeks",
+  "l1": "th",
+  "l1_name": "Thai",
+  "l2": "en",
+  "l2_name": "English",
+  "output_dir": "HTML/tefl/children_10_12",
+  "file_prefix": "explorers",
+  "page_types": {
+    "story": "every",
+    "game": "every",
+    "song": "every",
+    "reading": "every",
+    "flashcards": "every",
+    "quiz": "every",
+    "reward": "every"
+  },
+  "theme": {
+    "primary": "#0891b2",
+    "primary_dark": "#0e7490",
+    "primary_light": "#67e8f9"
+  },
+  "images": {
+    "enabled": false
+  },
+  "research": {
+    "notebooklm": false,
+    "web_search": false
+  }
+}

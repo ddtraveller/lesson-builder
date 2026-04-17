@@ -18,6 +18,14 @@
 - [ ] T011: Run `python scripts/check_exams.py {{output_dir}} --review-out {{output_dir}}/_exam_review.json` — fix structural issues, then read `_exam_review.json` and verify every question is answerable (complete question, exactly one correct option, plausible distractors). Skip if course has no exam pages.
 - [ ] T012: Run `python scripts/check_pages.py {{output_dir}}` — review findings (report-only until promoted to blocking after two clean runs on shipped courses). Fix any JS escape leakage, undefined function references, or missing media src findings in the generator, then regenerate.
 
+## Patch Path (post-deployment)
+
+For a single learner-reported bug after the course is deployed, use `scripts/regenerate.py` instead of re-running the full generator:
+- Page-level bug: `python scripts/regenerate.py --course-config config/{{course_id}}.json --unit N --page-type TYPE`
+- Single question bug: `python scripts/regenerate.py --course-config config/{{course_id}}.json --unit N --exam-question CATEGORY:DIFFICULTY:INDEX`
+
+This touches only the affected file; all sibling pages remain byte-identical.
+
 {{Optional additional tasks if applicable:}}
 - [ ] T0XX: Generate hero images via Replicate (if `images.enabled`)
 - [ ] T0XX: Generate hero video (if requested)

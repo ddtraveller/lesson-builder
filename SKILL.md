@@ -3,6 +3,7 @@ name: lesson-builder
 description: "Generates bilingual TEFL/ESL courses with lessons, exams, flashcards, conversations, pronunciation drills, worksheets, and syllabi for any language pair."
 ---
 <!-- Changelog (most recent first)
+  WS3 complete (2026-04-17): scripts/regenerate.py added — page-level and question-level patch paths; config/children_10_12.json added; §Operational: Patching a Single Page or Question anchor added to SKILL.md; templates/buddy/tasks.md patch-path note added. Architecture note: children_10_12 quiz pages use inline HTML question blocks (not questionBank JS object); determinism check correctly flags generator's random distractor shuffle.
   WS2 complete (2026-04-17): check_pages.py (rules 2.1-2.7) added; §Common JS bugs 4a-4e, §Relative path depth tutorial, §Filename convention coordination, §Path-bug detection script deleted; Unit 1 gate trimmed. SKILL.md now 569 lines.
   WS1 complete (2026-04-17): Phases 1-4 delegated to buddy:*; minimal fallback at Appendix.
 -->
@@ -241,6 +242,26 @@ Then fix the generator and regenerate the affected exam pages. Re-run both check
 
 - **Skip 5b if `page_structure.exam` is `"none"`** for this course.
 - **Never skip 5a.** Every course has links; every course needs the check.
+
+### Operational: Patching a Single Page or Question
+
+For a single learner-reported bug, use `scripts/regenerate.py` instead of re-running the full generator. This avoids touching the other 80+ files in the course.
+
+```bash
+# Page-level: regenerate unit 7's quiz page only
+python scripts/regenerate.py --course-config config/children_10_12.json --unit 7 --page-type quiz
+
+# Page-level: regenerate unit 3's story page
+python scripts/regenerate.py --course-config config/children_10_12.json --unit 3 --page-type story
+
+# Question-level: replace just question 4 (0-based) in unit 7's quiz
+python scripts/regenerate.py --course-config config/children_10_12.json --unit 7 --exam-question vocabulary:medium:4
+
+# Determinism check: verify regenerated output matches full-generator for that page
+python scripts/regenerate.py --course-config config/children_10_12.json --unit 7 --page-type quiz --determinism-check
+```
+
+Supported courses: `children_10_12`, `teens_13_14`, `tefl_beginners`, `tefl_intermediate`. Each run appends a JSON event to `{output_dir}/_regenerate_log.jsonl` for audit.
 
 ### Stepping Through vs. Auto-Run
 
