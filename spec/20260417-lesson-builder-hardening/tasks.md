@@ -1,6 +1,6 @@
 # Tasks: Lesson-Builder Hardening Initiative
 
-**Status:** Completed (2026-04-17) — all 6 workstreams (WS0-WS6) and global acceptance T098-T099 complete. T095 gate noted: SKILL.md 681 lines vs [440,520] target — flagged for user review. T100: pushed to origin/feature/buddy-workflow-integration. T103 blocked on data (non-blocking). T104 deferred to future session. PR creation left to user per project rule.
+**Status:** Completed (2026-04-17) — all 6 workstreams (WS0-WS6) and global acceptance T098-T099 complete. T095 gate reconciled: SKILL.md 573 lines after post-WS5 duplication trim (Step 0 → `scripts/backend_probes.py` delegation, Configuration System → `config/schema.md` pointer); spec target revised to [500, 575] to reflect the corrected estimate. T100: pushed to origin/feature/buddy-workflow-integration. T103 blocked on data (non-blocking). T104 deferred to future session. PR creation left to user per project rule.
 **Branch decision (T002):** Continuing on `feature/buddy-workflow-integration`. Hardening initiative commits start at the commit AFTER snapshot `8943a16` (chore(phase-5): snapshot in-flight work). No branch rename, no force-push.
 **Date:** 2026-04-17
 **Initiative ID:** lesson-builder-hardening

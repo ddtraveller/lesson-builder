@@ -17,93 +17,26 @@ Use this skill when:
 - The user asks to generate activities, exams, flashcards, or other course pages
 - The user says "build lesson", "create course", "generate syllabus", etc.
 
-## Step 0: Authenticate Services (ALWAYS RUN FIRST)
+## Step 0: Check Backend Availability (ALWAYS RUN FIRST)
 
-**On every invocation**, before asking any questions, immediately check NotebookLM, Tavily Research, and Replicate. Report results to the user upfront so they know what's available.
-
-### 0a. Check NotebookLM
+**On every invocation**, before asking any questions, run the shared backend-availability script and display its output to the user:
 
 ```bash
-pip show notebooklm-py 2>&1
-```
-If installed, test auth:
-```bash
-PYTHONIOENCODING=utf-8 python -m notebooklm auth check --test --json
+python scripts/backend_probes.py
 ```
 
-**If `checks.token_fetch` is `true`:** NotebookLM is ready. Tell the user:
-> "NotebookLM: authenticated and ready for AI-powered research."
+This probes every backend the skill supports (node, tavily, notebooklm, flux, heygen, remotion, capcut, webm) and prints a status line per backend plus an "N/M backends available" summary. The script is the single source of truth for auth and availability checks — do not duplicate its logic in prose.
 
-**If auth fails or package not installed:** Guide the user through login per [templates/notebooklm/query_patterns.md](templates/notebooklm/query_patterns.md) (Auth Troubleshooting section). If they decline or login fails after troubleshooting, set research fallback to **web search** and tell the user:
-> "NotebookLM: not available. Will use web search for content research instead."
+**Downstream behavior based on the report:**
 
-### 0b. Check Tavily Research (`tvly` CLI)
+- **Research**: if tavily+notebooklm both `OK` → Tavily→NotebookLM bridge; if only notebooklm `OK` → plain NotebookLM `source add-research`; if only tavily `OK` → Tavily standalone; if neither → Web Search fallback.
+- **Images**: if flux `SKIP` → `images.backend` falls back to `off` regardless of config.
+- **Video**: each chosen `video.backend` must report `OK`; otherwise warn and fall back to `off` (the availability-check contract is in §Interactive Mode below).
 
-The lesson builder uses the [tavily-research](https://github.com/tavily-ai/skills) skill (installed at `~/.agents/skills/tavily-research/`) to conduct cited deep research that feeds into NotebookLM. It wraps the `tvly` CLI from Tavily.
-
-Check the CLI is installed and authenticated:
-
-```bash
-which tvly 2>&1
-PYTHONIOENCODING=utf-8 tvly auth --json 2>&1
-```
-
-Parse the JSON: `{"authenticated": true, "source": "config file (...)"}` means good. `false` means a key is needed.
-
-**If `tvly` is on PATH AND `authenticated` is `true`:** Tell the user:
-> "Tavily Research: authenticated. Will be used for deep cited research feeding NotebookLM."
-
-**If `tvly` is on PATH but not authenticated:** Try pulling the key from SSM Parameter Store first (this matches the project convention for API keys):
-```bash
-TAVILY_KEY=$(aws ssm get-parameter --name tavily --with-decryption \
-  --region us-west-2 --profile deploy --query 'Parameter.Value' --output text 2>/dev/null)
-if [ -n "$TAVILY_KEY" ]; then
-  tvly login --api-key "$TAVILY_KEY"
-fi
-```
-If that fails or no SSM parameter exists, tell the user:
-> "Tavily Research: CLI installed but not authenticated and no key in SSM. To enable, get a key from https://app.tavily.com/ and run `! tvly login --api-key tvly-YOUR_KEY` in the prompt."
-
-**If `tvly` is not on PATH:** Tell the user how to install it:
-> "Tavily Research: CLI not installed. To enable deep cited research, run:
-> ```
-> ! curl -fsSL https://cli.tavily.com/install.sh | bash
-> ```
-> After install, the CLI lands in your Python user `Scripts` directory — make sure it's on PATH. Falling back to plain NotebookLM research for now."
-
-**IMPORTANT Windows note:** Always prefix `tvly` commands with `PYTHONIOENCODING=utf-8` and use `-o file` for output instead of stdout. The CLI uses `click.echo` which crashes on cp1252 when the API returns Unicode characters like `\u202f` (narrow no-break space). Same gotcha as `notebooklm`.
-
-Set `research.tavily = true` only if both the CLI is on PATH and `authenticated` is `true` (after attempting SSM auto-login).
-
-### 0c. Check Replicate
-
-```bash
-python -c "import os; from dotenv import load_dotenv; load_dotenv(); token=os.getenv('REPLICATE_API_TOKEN',''); print('HAS_TOKEN' if token and token.startswith('r8_') else 'NO_TOKEN')" 2>&1
-```
-
-If that fails (no dotenv), try:
-```bash
-python -c "import os; token=os.environ.get('REPLICATE_API_TOKEN',''); print('HAS_TOKEN' if token and token.startswith('r8_') else 'NO_TOKEN')" 2>&1
-```
-
-Also check for a `.env` file in the project root containing `REPLICATE_API_TOKEN`.
-
-**If token found:** Tell the user:
-> "Replicate: API token found. Image generation is available."
-
-**If no token:** Tell the user:
-> "Replicate: No API token found. Image generation will be skipped. To enable it later, add `REPLICATE_API_TOKEN=r8_yourtoken` to a `.env` file and get a token from https://replicate.com/account/api-tokens"
-
-Set `images.enabled = false` in the course config regardless of what the config file says.
-
-### 0d. Report Summary
-
-After all checks, present a status box:
-
-> **Service Status:**
-> - NotebookLM: [Ready / Unavailable — using web search]
-> - Tavily Research: [Ready / Unavailable — using plain NotebookLM source add-research]
-> - Replicate: [Ready / Unavailable — skipping image generation]
+**If any backend reports `SKIP`** and the user wants to enable it, see:
+- NotebookLM auth troubleshooting → [templates/notebooklm/query_patterns.md](templates/notebooklm/query_patterns.md)
+- Tavily login / install → run `tvly login --api-key ...` or `curl -fsSL https://cli.tavily.com/install.sh | bash`
+- Replicate token → add `REPLICATE_API_TOKEN=r8_...` to `.env`
 
 Then proceed to interactive mode.
 
@@ -371,60 +304,18 @@ Courses are defined by JSON config files in `config/`. See `config/schema.md` fo
 
 ### Key config fields
 
-```jsonc
-{
-  "course_id": "my_course",         // Used for filenames
-  "l1": "th", "l2": "en",           // Language pair
-  "output_dir": "HTML/courses/my_course",
-  "theme": { "primary": "#f97316", ... },
+Top-level keys (per `config/schema.md` — canonical):
 
-  // Page types per unit — flexible assignment
-  "page_types": {
-    "lesson": "every",              // Generate for every unit
-    "activities": "every",
-    "exam": "every",
-    "flashcards": "random:3",       // Randomly assign to 3 units
-    "conversation": "random:4",
-    "pronunciation": "units:6,9,12", // Only these specific units
-    "worksheet": "random:3",
-    "syllabus": true                 // One per course
-  },
+- `course_id`, `l1`, `l2`, `output_dir`, `theme` — course identity
+- `page_types` — which page types each unit gets (see assignment modes below)
+- `page_structure` — sections/options per page type
+- `research` — `tavily`, `notebooklm`, `web_search`, `fact_check` flags
+- `content_truth.backend` — `tavily | notebooklm | off` (Phase 5c validator)
+- `images.backend` — `flux | off`
+- `video.backend` — `heygen | remotion | capcut | webm | off` plus `video.max_count` cap
+- `units` — the actual course content
 
-  // Page structure — what sections each page type contains
-  "page_structure": {
-    "lesson": {
-      "sections": ["introduction", "vocabulary", "grammar", "tutorial_steps", "activity", "reference_table", "summary"],
-      "section_checks": true,
-      "homework": true,
-      "audio_buttons": true
-    },
-    "exam": {
-      "categories": 5,
-      "difficulty_selector": true,
-      "gradebook": true
-    }
-    // ... see schema.md for all options
-  },
-
-  // Research & quality
-  "research": {
-    "tavily": true,              // Run tvly research and feed results into NotebookLM (best quality)
-    "notebooklm": true,
-    "web_search": true,          // Fallback if neither tavily nor notebooklm available
-    "fact_check": true
-  },
-
-  // AI image generation (requires Replicate account)
-  "images": {
-    "enabled": false,
-    "provider": "replicate",
-    "model": "black-forest-labs/flux-dev"
-  },
-
-  // The actual course content
-  "units": [ ... ]          // See schema.md for unit format
-}
-```
+For full field definitions, defaults, and examples, see [`config/schema.md`](config/schema.md) and the worked examples under `config/`.
 
 ### Page type assignment modes
 
