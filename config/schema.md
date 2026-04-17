@@ -124,9 +124,27 @@ A course config is a JSON file that fully describes what to generate. Place conf
     "fact_check": true               // Run fact-checker skill?
   },
 
-  // === Image Generation ===
+  // === Backend Choices Group ===
+  // Set at course-creation time (interactive Q8/9/10). Each field is confirmed
+  // available by scripts/backend_probes.py before being recorded; the config
+  // never stores an unavailable backend. All defaults are "off" to prevent
+  // accidental quota spend.
+
+  // Content-truth validation (Phase 5c)
+  "content_truth": {
+    "backend": "off"                  // "tavily" | "notebooklm" | "off"
+    //   tavily:      cross-check vocab/grammar/exam via Tavily Research CLI
+    //   notebooklm:  query Phase-2 research notebook (ID from research.md)
+    //   off:         skip Phase 5c — no quota consumed
+  },
+
+  // Image generation
   "images": {
-    "enabled": false,                 // Generate images?
+    "backend": "off",                 // "flux" | "off"  (replaces enabled+provider)
+    //   flux: generate via Replicate FLUX Dev model (requires REPLICATE_API_TOKEN)
+    //   off:  no image generation
+    // Legacy fields below kept for backward compatibility with old configs:
+    "enabled": false,                 // Deprecated — use backend instead
     "provider": "replicate",          // "replicate" or "none"
     "model": "black-forest-labs/flux-dev",
     "style_prefix": "Warm educational illustration...",
@@ -134,6 +152,19 @@ A course config is a JSON file that fully describes what to generate. Place conf
     "hero_image": true,               // Generate course hero?
     "per_unit_image": true,           // Generate per-lesson image?
     "aspect_ratio": "16:9"
+  },
+
+  // Video generation
+  "video": {
+    "backend": "off",                 // "heygen" | "remotion" | "capcut" | "webm" | "off"
+    //   heygen:   AI avatar video via HeyGen API (~$2/video — probe SSM for key)
+    //   remotion: React video via watdonchan/ai-english-video Remotion project
+    //   capcut:   prompt-to-human workflow; operator assembles manually
+    //   webm:     NOT YET IMPLEMENTED (probe returns unavailable, falls back to off)
+    //   off:      no video generation
+    "max_count": 0                    // Per-course cap on video generation (0 = no limit when backend=off)
+    //   Required (> 0) when backend != off; prevents surprise spend.
+    //   Generator halts with a readable error when this count is reached.
   },
 
   // === Navigation ===

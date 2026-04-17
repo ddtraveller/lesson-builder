@@ -3,6 +3,7 @@ name: lesson-builder
 description: "Generates bilingual TEFL/ESL courses with lessons, exams, flashcards, conversations, pronunciation drills, worksheets, and syllabi for any language pair."
 ---
 <!-- Changelog (most recent first)
+  WS4+WS6 complete (2026-04-17): scripts/backend_probes.py (shared probe module, 8 backends); scripts/check_content.py (Phase 5c content-truth validator, off/tavily/notebooklm backends, 20%/10%/100% sampling, seeded per course_id); Interactive Mode Q8-Q10 backend choices block added; §Course-creation backend choices availability-check table added; §Phase 5c shipping gate added; config/schema.md updated with unified backend choices group; all example configs updated with content_truth/images.backend/video fields; check_pages.py refactored to import probe_node() from backend_probes.py.
   WS3 complete (2026-04-17): scripts/regenerate.py added — page-level and question-level patch paths; config/children_10_12.json added; §Operational: Patching a Single Page or Question anchor added to SKILL.md; templates/buddy/tasks.md patch-path note added. Architecture note: children_10_12 quiz pages use inline HTML question blocks (not questionBank JS object); determinism check correctly flags generator's random distractor shuffle.
   WS2 complete (2026-04-17): check_pages.py (rules 2.1-2.7) added; §Common JS bugs 4a-4e, §Relative path depth tutorial, §Filename convention coordination, §Path-bug detection script deleted; Unit 1 gate trimmed. SKILL.md now 569 lines.
   WS1 complete (2026-04-17): Phases 1-4 delegated to buddy:*; minimal fallback at Appendix.
@@ -126,6 +127,57 @@ Then proceed to interactive mode.
 6. **Output location** — "Where should files go?" (default: `HTML/courses/{topic_slug}/`)
 7. **Color theme** — "Any color preference?" (or auto-pick)
 
+**Backend choices group (Q8–Q10) — ask contiguously after Q7.** Before showing each prompt, call the matching probe from `scripts/backend_probes.py` and display the availability result inline. If the operator picks a backend that the probe reports as unavailable, show a visible warning and record `off` — never silently accept an unavailable backend. The config file always reflects what was actually confirmed available.
+
+8. **Content-truth validation backend** — probe availability first, then ask:
+   `Content-truth validation backend? [tavily / notebooklm / off]` (default: **off** — no quota spend)
+   - `tavily`: cross-checks vocab cards, grammar boxes, and exam answers via Tavily Research CLI.
+   - `notebooklm`: queries the Phase-2 research notebook (ID stored in research.md).
+   - `off`: skip content-truth validation entirely — no quota consumed.
+   - Records to `content_truth.backend` in the course config.
+
+9. **Image generation backend** — probe availability first, then ask:
+   `Image generation backend? [flux / off]` (default: **off**)
+   - `flux`: generate images via Replicate (FLUX Dev model). Requires `REPLICATE_API_TOKEN` in env or `.env`.
+     *(Note: "FLUX" is the correct name — an earlier iteration of the spec used "FLEX" which was a typo.)*
+   - `off`: no image generation.
+   - Records to `images.backend` in the course config.
+
+10. **Video generation backend** — probe availability first, then ask:
+    `Video generation backend? [heygen / remotion / capcut / webm / off]` (default: **off**)
+    - `heygen`: AI avatar video via HeyGen API. **Costs approximately $2 per lesson video on the current plan** — choose knowingly. Requires the `heygen` SSM parameter (AWS deploy profile).
+    - `remotion`: React-based video generation via the `watdonchan/ai-english-video` Remotion project. Free, requires Node + the project directory.
+    - `capcut`: prompt-to-human workflow — operator assembles video manually in CapCut. Always available; no runtime requirement.
+    - `webm`: NOT YET IMPLEMENTED — probe returns unavailable; will fall back to `off` automatically.
+    - `off`: no video generation.
+    - Records to `video.backend` in the course config.
+    - **Follow-up if not `off`:** `Video max count (integer cap to prevent surprise spend)?` → records to `video.max_count`.
+
+### Course-creation backend choices — availability-check contract
+
+Before each Q8/9/10 prompt, run the corresponding probe and show the result inline:
+
+| Backend | Probe | On unavailable |
+|---------|-------|----------------|
+| `content_truth: tavily` | `probe_tavily()` — `tvly auth --json` | warn, fall back to `off` |
+| `content_truth: notebooklm` | `probe_notebooklm()` — `python -m notebooklm auth check --test --json` | warn, fall back to `off` |
+| `images: flux` | `probe_flux()` — check `REPLICATE_API_TOKEN` in env / `.env` | warn, fall back to `off` |
+| `video: heygen` | `probe_heygen()` — `aws ssm get-parameter --name heygen --profile deploy` | warn, fall back to `off` |
+| `video: remotion` | `probe_remotion()` — check `watdonchan/ai-english-video/node_modules/remotion/` | warn, fall back to `off` |
+| `video: capcut` | `probe_capcut()` — always available | n/a |
+| `video: webm` | `probe_webm()` — NOT YET IMPLEMENTED | warn "not yet implemented", fall back to `off` |
+
+Config never records an unavailable backend. If the operator insists on a backend the probe says is unavailable, the config records `off` and the warning is shown again. The operator must fix the environment (install the tool, add the credential) and re-run the skill to unlock that backend.
+
+**`video.max_count` enforcement.** When `video.backend != off`, the generator MUST check the count of videos generated so far against `video.max_count` before each video call. If the count would be exceeded, halt immediately with a readable error such as:
+
+```
+ERROR: video.max_count=3 reached — refusing to generate video for unit 4.
+To generate more videos, increase max_count in config/<course_id>.json.
+```
+
+Silent truncation (skipping videos without error) is not acceptable. If `video.max_count` is 0 or absent and `video.backend != off`, treat it as "no limit" — but interactive mode MUST prompt the operator to set an explicit count when they choose a non-off backend (see Q10 follow-up above).
+
 **Research method is auto-selected** based on Step 0 results:
 - If Tavily Research + NotebookLM both ready → use **Tavily → NotebookLM bridge** (best quality)
 - If only NotebookLM ready → use plain NotebookLM `source add-research`
@@ -133,7 +185,7 @@ Then proceed to interactive mode.
 - If neither → use Web Search
 - User can override to "training data only" if they want speed over accuracy
 
-**If a config file exists** in `config/` matching the topic, load it instead of asking. Still respect the auth results from Step 0 (e.g., if config has `notebooklm: true` but auth failed, fall back to web search; if config has `images.enabled: true` but no Replicate token, disable images).
+**If a config file exists** in `config/` matching the topic, load it instead of asking. Still respect the auth results from Step 0 and probe results for Q8–Q10 (e.g., if config has `content_truth.backend: tavily` but the probe fails, warn and proceed with `off` for this run).
 
 ## How it works — Buddy Workflow Integration
 
@@ -238,7 +290,32 @@ Issues:
 
 Then fix the generator and regenerate the affected exam pages. Re-run both checks until clean.
 
-#### 5c. When to skip
+#### 5c. Content-truth validation (opt-in, controlled by `content_truth.backend` in config)
+
+```bash
+python scripts/check_content.py {output_dir} config/{course_id}.json
+```
+
+The first line of output always declares the active backend so the operator is never unaware of quota spend:
+- `content-truth backend: off` → exits 0 immediately; prints `Phase 5c skipped by config — no quota consumed.`
+- `content-truth backend: tavily` → runs sampling + Tavily Research queries.
+- `content-truth backend: notebooklm` → runs sampling + NotebookLM notebook queries.
+
+**Sampling rates (seeded per course_id for reproducibility):**
+- 20% of vocab cards per unit
+- 10% of grammar boxes per unit
+- 100% of exam correct-answer entries
+
+**Exit codes and gate behavior:**
+- `backend: off` → exit 0; never blocks shipment.
+- `backend: tavily|notebooklm` + exit 0 → proceed to ship.
+- `backend: tavily|notebooklm` + exit 1 → **SHIPPING BLOCKED.** Operator must resolve each flag (fix content / mark false-positive with justification / explicit override) before shipping. Grep `_content_truth_report.md` for `UNRESOLVED` to enumerate blockers.
+
+Reports written to `{output_dir}/_content_truth_report.json` and `{output_dir}/_content_truth_report.md`.
+
+**When to skip:** 5c is always opt-in. If `content_truth.backend: off` (the default), the check never runs and never blocks. No course is required to run content-truth validation — but if it is enabled, unresolved flags block shipment.
+
+#### 5d. When to skip 5b
 
 - **Skip 5b if `page_structure.exam` is `"none"`** for this course.
 - **Never skip 5a.** Every course has links; every course needs the check.

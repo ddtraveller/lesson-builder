@@ -54,6 +54,15 @@
 
   "vocab_per_unit": 12,
 
+  "content_truth": {
+    "backend": "off"
+  },
+
+  "video": {
+    "backend": "off",
+    "max_count": 0
+  },
+
   "research": {
     "notebooklm": false,
     "web_search": true,
@@ -61,6 +70,7 @@
   },
 
   "images": {
+    "backend": "flux",
     "enabled": true,
     "provider": "replicate",
     "model": "black-forest-labs/flux-dev",

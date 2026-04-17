@@ -26,7 +26,15 @@
     "primary_light": "#67e8f9"
   },
   "images": {
+    "backend": "off",
     "enabled": false
+  },
+  "content_truth": {
+    "backend": "off"
+  },
+  "video": {
+    "backend": "off",
+    "max_count": 0
   },
   "research": {
     "notebooklm": false,

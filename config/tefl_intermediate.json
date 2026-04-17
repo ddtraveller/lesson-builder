@@ -60,7 +60,11 @@
     "fact_check": true
   },
 
+  "content_truth": {
+    "backend": "off"
+  },
   "images": {
+    "backend": "flux",
     "enabled": true,
     "provider": "replicate",
     "model": "black-forest-labs/flux-dev",
@@ -69,6 +73,10 @@
     "hero_image": true,
     "per_unit_image": true,
     "aspect_ratio": "16:9"
+  },
+  "video": {
+    "backend": "off",
+    "max_count": 0
   },
 
   "units": [
