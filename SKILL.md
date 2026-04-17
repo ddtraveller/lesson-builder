@@ -3,6 +3,9 @@ name: lesson-builder
 description: "Generates bilingual TEFL/ESL courses with lessons, exams, flashcards, conversations, pronunciation drills, worksheets, and syllabi for any language pair."
 ---
 <!-- Changelog (most recent first)
+  WS5 complete (2026-04-17): CHILDREN_PAGES.md, NOTEBOOKLM.md, IMAGE_GENERATION.md deleted outright (no redirect stubs). Content migrated to templates/children_pages/{README.md,story_example.html,game_example.html,coloring_example.html}, templates/notebooklm/query_patterns.md, templates/images/{README.md,prompt_style_prefix.txt}. SKILL.md gained §Querying the corpus (Phase 2 anchor) and §Image prompt conventions (Quality Checklist §3 anchor). All SKILL.md references to deleted files updated to template locations. README.md repo tree updated. NOTE: SKILL.md line count 681 — above [440,520] target (see T095 gate note; user review needed).
+  WS4+WS6 complete (2026-04-17): scripts/backend_probes.py (shared probe module, 8 backends); scripts/check_content.py (Phase 5c content-truth validator, off/tavily/notebooklm backends, 20%/10%/100% sampling, seeded per course_id); Interactive Mode Q8-Q10 backend choices block added; §Course-creation backend choices availability-check table added; §Phase 5c shipping gate added; config/schema.md updated with unified backend choices group; all example configs updated with content_truth/images.backend/video fields; check_pages.py refactored to import probe_node() from backend_probes.py.
+  WS3 complete (2026-04-17): scripts/regenerate.py added — page-level and question-level patch paths; config/children_10_12.json added; §Operational: Patching a Single Page or Question anchor added to SKILL.md; templates/buddy/tasks.md patch-path note added. Architecture note: children_10_12 quiz pages use inline HTML question blocks (not questionBank JS object); determinism check correctly flags generator's random distractor shuffle.
   WS2 complete (2026-04-17): check_pages.py (rules 2.1-2.7) added; §Common JS bugs 4a-4e, §Relative path depth tutorial, §Filename convention coordination, §Path-bug detection script deleted; Unit 1 gate trimmed. SKILL.md now 569 lines.
   WS1 complete (2026-04-17): Phases 1-4 delegated to buddy:*; minimal fallback at Appendix.
 -->
@@ -14,93 +17,26 @@ Use this skill when:
 - The user asks to generate activities, exams, flashcards, or other course pages
 - The user says "build lesson", "create course", "generate syllabus", etc.
 
-## Step 0: Authenticate Services (ALWAYS RUN FIRST)
+## Step 0: Check Backend Availability (ALWAYS RUN FIRST)
 
-**On every invocation**, before asking any questions, immediately check NotebookLM, Tavily Research, and Replicate. Report results to the user upfront so they know what's available.
-
-### 0a. Check NotebookLM
+**On every invocation**, before asking any questions, run the shared backend-availability script and display its output to the user:
 
 ```bash
-pip show notebooklm-py 2>&1
-```
-If installed, test auth:
-```bash
-PYTHONIOENCODING=utf-8 python -m notebooklm auth check --test --json
+python scripts/backend_probes.py
 ```
 
-**If `checks.token_fetch` is `true`:** NotebookLM is ready. Tell the user:
-> "NotebookLM: authenticated and ready for AI-powered research."
+This probes every backend the skill supports (node, tavily, notebooklm, flux, heygen, remotion, capcut, webm) and prints a status line per backend plus an "N/M backends available" summary. The script is the single source of truth for auth and availability checks — do not duplicate its logic in prose.
 
-**If auth fails or package not installed:** Guide the user through login per [NOTEBOOKLM.md](NOTEBOOKLM.md). If they decline or login fails after troubleshooting, set research fallback to **web search** and tell the user:
-> "NotebookLM: not available. Will use web search for content research instead."
+**Downstream behavior based on the report:**
 
-### 0b. Check Tavily Research (`tvly` CLI)
+- **Research**: if tavily+notebooklm both `OK` → Tavily→NotebookLM bridge; if only notebooklm `OK` → plain NotebookLM `source add-research`; if only tavily `OK` → Tavily standalone; if neither → Web Search fallback.
+- **Images**: if flux `SKIP` → `images.backend` falls back to `off` regardless of config.
+- **Video**: each chosen `video.backend` must report `OK`; otherwise warn and fall back to `off` (the availability-check contract is in §Interactive Mode below).
 
-The lesson builder uses the [tavily-research](https://github.com/tavily-ai/skills) skill (installed at `~/.agents/skills/tavily-research/`) to conduct cited deep research that feeds into NotebookLM. It wraps the `tvly` CLI from Tavily.
-
-Check the CLI is installed and authenticated:
-
-```bash
-which tvly 2>&1
-PYTHONIOENCODING=utf-8 tvly auth --json 2>&1
-```
-
-Parse the JSON: `{"authenticated": true, "source": "config file (...)"}` means good. `false` means a key is needed.
-
-**If `tvly` is on PATH AND `authenticated` is `true`:** Tell the user:
-> "Tavily Research: authenticated. Will be used for deep cited research feeding NotebookLM."
-
-**If `tvly` is on PATH but not authenticated:** Try pulling the key from SSM Parameter Store first (this matches the project convention for API keys):
-```bash
-TAVILY_KEY=$(aws ssm get-parameter --name tavily --with-decryption \
-  --region us-west-2 --profile deploy --query 'Parameter.Value' --output text 2>/dev/null)
-if [ -n "$TAVILY_KEY" ]; then
-  tvly login --api-key "$TAVILY_KEY"
-fi
-```
-If that fails or no SSM parameter exists, tell the user:
-> "Tavily Research: CLI installed but not authenticated and no key in SSM. To enable, get a key from https://app.tavily.com/ and run `! tvly login --api-key tvly-YOUR_KEY` in the prompt."
-
-**If `tvly` is not on PATH:** Tell the user how to install it:
-> "Tavily Research: CLI not installed. To enable deep cited research, run:
-> ```
-> ! curl -fsSL https://cli.tavily.com/install.sh | bash
-> ```
-> After install, the CLI lands in your Python user `Scripts` directory — make sure it's on PATH. Falling back to plain NotebookLM research for now."
-
-**IMPORTANT Windows note:** Always prefix `tvly` commands with `PYTHONIOENCODING=utf-8` and use `-o file` for output instead of stdout. The CLI uses `click.echo` which crashes on cp1252 when the API returns Unicode characters like `\u202f` (narrow no-break space). Same gotcha as `notebooklm`.
-
-Set `research.tavily = true` only if both the CLI is on PATH and `authenticated` is `true` (after attempting SSM auto-login).
-
-### 0c. Check Replicate
-
-```bash
-python -c "import os; from dotenv import load_dotenv; load_dotenv(); token=os.getenv('REPLICATE_API_TOKEN',''); print('HAS_TOKEN' if token and token.startswith('r8_') else 'NO_TOKEN')" 2>&1
-```
-
-If that fails (no dotenv), try:
-```bash
-python -c "import os; token=os.environ.get('REPLICATE_API_TOKEN',''); print('HAS_TOKEN' if token and token.startswith('r8_') else 'NO_TOKEN')" 2>&1
-```
-
-Also check for a `.env` file in the project root containing `REPLICATE_API_TOKEN`.
-
-**If token found:** Tell the user:
-> "Replicate: API token found. Image generation is available."
-
-**If no token:** Tell the user:
-> "Replicate: No API token found. Image generation will be skipped. To enable it later, add `REPLICATE_API_TOKEN=r8_yourtoken` to a `.env` file and get a token from https://replicate.com/account/api-tokens"
-
-Set `images.enabled = false` in the course config regardless of what the config file says.
-
-### 0d. Report Summary
-
-After all checks, present a status box:
-
-> **Service Status:**
-> - NotebookLM: [Ready / Unavailable — using web search]
-> - Tavily Research: [Ready / Unavailable — using plain NotebookLM source add-research]
-> - Replicate: [Ready / Unavailable — skipping image generation]
+**If any backend reports `SKIP`** and the user wants to enable it, see:
+- NotebookLM auth troubleshooting → [templates/notebooklm/query_patterns.md](templates/notebooklm/query_patterns.md)
+- Tavily login / install → run `tvly login --api-key ...` or `curl -fsSL https://cli.tavily.com/install.sh | bash`
+- Replicate token → add `REPLICATE_API_TOKEN=r8_...` to `.env`
 
 Then proceed to interactive mode.
 
@@ -120,10 +56,61 @@ Then proceed to interactive mode.
    **Adult page types:**
    - Lesson, Activities, Exam, Flashcards, Conversation, Pronunciation, Worksheet, Syllabus
 
-   **Children's page types:** See [CHILDREN_PAGES.md](CHILDREN_PAGES.md) for full list and specifications (Story, Game, Song, Coloring, Stickers, Flashcards, Reward, Avatar Video for ages 4-7; Comic, Quiz Show, Word Puzzle, Adventure, Journal, Video Lesson, Board Game, Reading for ages 8-12)
+   **Children's page types:** See [templates/children_pages/README.md](templates/children_pages/README.md) for full list and specifications (Story, Game, Song, Coloring, Stickers, Flashcards, Reward, Avatar Video for ages 4-7; Comic, Quiz Show, Word Puzzle, Adventure, Journal, Video Lesson, Board Game, Reading for ages 8-12)
 
 6. **Output location** — "Where should files go?" (default: `HTML/courses/{topic_slug}/`)
 7. **Color theme** — "Any color preference?" (or auto-pick)
+
+**Backend choices group (Q8–Q10) — ask contiguously after Q7.** Before showing each prompt, call the matching probe from `scripts/backend_probes.py` and display the availability result inline. If the operator picks a backend that the probe reports as unavailable, show a visible warning and record `off` — never silently accept an unavailable backend. The config file always reflects what was actually confirmed available.
+
+8. **Content-truth validation backend** — probe availability first, then ask:
+   `Content-truth validation backend? [tavily / notebooklm / off]` (default: **off** — no quota spend)
+   - `tavily`: cross-checks vocab cards, grammar boxes, and exam answers via Tavily Research CLI.
+   - `notebooklm`: queries the Phase-2 research notebook (ID stored in research.md).
+   - `off`: skip content-truth validation entirely — no quota consumed.
+   - Records to `content_truth.backend` in the course config.
+
+9. **Image generation backend** — probe availability first, then ask:
+   `Image generation backend? [flux / off]` (default: **off**)
+   - `flux`: generate images via Replicate (FLUX Dev model). Requires `REPLICATE_API_TOKEN` in env or `.env`.
+     *(Note: "FLUX" is the correct name — an earlier iteration of the spec used "FLEX" which was a typo.)*
+   - `off`: no image generation.
+   - Records to `images.backend` in the course config.
+
+10. **Video generation backend** — probe availability first, then ask:
+    `Video generation backend? [heygen / remotion / capcut / webm / off]` (default: **off**)
+    - `heygen`: AI avatar video via HeyGen API. **Costs approximately $2 per lesson video on the current plan** — choose knowingly. Requires the `heygen` SSM parameter (AWS deploy profile).
+    - `remotion`: React-based video generation via the `watdonchan/ai-english-video` Remotion project. Free, requires Node + the project directory.
+    - `capcut`: prompt-to-human workflow — operator assembles video manually in CapCut. Always available; no runtime requirement.
+    - `webm`: NOT YET IMPLEMENTED — probe returns unavailable; will fall back to `off` automatically.
+    - `off`: no video generation.
+    - Records to `video.backend` in the course config.
+    - **Follow-up if not `off`:** `Video max count (integer cap to prevent surprise spend)?` → records to `video.max_count`.
+
+### Course-creation backend choices — availability-check contract
+
+Before each Q8/9/10 prompt, run the corresponding probe and show the result inline:
+
+| Backend | Probe | On unavailable |
+|---------|-------|----------------|
+| `content_truth: tavily` | `probe_tavily()` — `tvly auth --json` | warn, fall back to `off` |
+| `content_truth: notebooklm` | `probe_notebooklm()` — `python -m notebooklm auth check --test --json` | warn, fall back to `off` |
+| `images: flux` | `probe_flux()` — check `REPLICATE_API_TOKEN` in env / `.env` | warn, fall back to `off` |
+| `video: heygen` | `probe_heygen()` — `aws ssm get-parameter --name heygen --profile deploy` | warn, fall back to `off` |
+| `video: remotion` | `probe_remotion()` — check `watdonchan/ai-english-video/node_modules/remotion/` | warn, fall back to `off` |
+| `video: capcut` | `probe_capcut()` — always available | n/a |
+| `video: webm` | `probe_webm()` — NOT YET IMPLEMENTED | warn "not yet implemented", fall back to `off` |
+
+Config never records an unavailable backend. If the operator insists on a backend the probe says is unavailable, the config records `off` and the warning is shown again. The operator must fix the environment (install the tool, add the credential) and re-run the skill to unlock that backend.
+
+**`video.max_count` enforcement.** When `video.backend != off`, the generator MUST check the count of videos generated so far against `video.max_count` before each video call. If the count would be exceeded, halt immediately with a readable error such as:
+
+```
+ERROR: video.max_count=3 reached — refusing to generate video for unit 4.
+To generate more videos, increase max_count in config/<course_id>.json.
+```
+
+Silent truncation (skipping videos without error) is not acceptable. If `video.max_count` is 0 or absent and `video.backend != off`, treat it as "no limit" — but interactive mode MUST prompt the operator to set an explicit count when they choose a non-off backend (see Q10 follow-up above).
 
 **Research method is auto-selected** based on Step 0 results:
 - If Tavily Research + NotebookLM both ready → use **Tavily → NotebookLM bridge** (best quality)
@@ -132,7 +119,7 @@ Then proceed to interactive mode.
 - If neither → use Web Search
 - User can override to "training data only" if they want speed over accuracy
 
-**If a config file exists** in `config/` matching the topic, load it instead of asking. Still respect the auth results from Step 0 (e.g., if config has `notebooklm: true` but auth failed, fall back to web search; if config has `images.enabled: true` but no Replicate token, disable images).
+**If a config file exists** in `config/` matching the topic, load it instead of asking. Still respect the auth results from Step 0 and probe results for Q8–Q10 (e.g., if config has `content_truth.backend: tavily` but the probe fails, warn and proceed with `off` for this run).
 
 ## How it works — Buddy Workflow Integration
 
@@ -159,6 +146,10 @@ Pass inputs from Step 0 + interactive Q&A (topic, L1/L2, weeks, age group, page 
 **Delegate to `buddy:plan` with TEFL-specific research step.**
 
 Run the TEFL-specific corpus loading first (buddy can't do this): use the research method from Step 0 (Tavily→NotebookLM bridge, NotebookLM only, Tavily standalone, or web search). Save findings to `specs/{YYYYMMDD}-{course_id}/research.md`. Then invoke buddy:plan with the research.md content as context. Windows note: always prefix notebooklm/tvly commands with `PYTHONIOENCODING=utf-8`. Plan lands at `specs/{YYYYMMDD}-{course_id}/plan.md`.
+
+#### Querying the corpus
+
+Phrase NotebookLM queries as **"What does [source] say about X?"** — the source-attributed form forces the model to draw from uploaded material rather than general knowledge. Example: "What does the Tavily TEFL report say about vocabulary density for A1 learners?" Always prefix with `PYTHONIOENCODING=utf-8` on Windows to avoid cp1252 crashes. For more query patterns and auth troubleshooting, see [`templates/notebooklm/query_patterns.md`](templates/notebooklm/query_patterns.md).
 
 **Fallback (buddy:plan not available):** see §Appendix: Minimal Inline Fallback.
 
@@ -237,10 +228,55 @@ Issues:
 
 Then fix the generator and regenerate the affected exam pages. Re-run both checks until clean.
 
-#### 5c. When to skip
+#### 5c. Content-truth validation (opt-in, controlled by `content_truth.backend` in config)
+
+```bash
+python scripts/check_content.py {output_dir} config/{course_id}.json
+```
+
+The first line of output always declares the active backend so the operator is never unaware of quota spend:
+- `content-truth backend: off` → exits 0 immediately; prints `Phase 5c skipped by config — no quota consumed.`
+- `content-truth backend: tavily` → runs sampling + Tavily Research queries.
+- `content-truth backend: notebooklm` → runs sampling + NotebookLM notebook queries.
+
+**Sampling rates (seeded per course_id for reproducibility):**
+- 20% of vocab cards per unit
+- 10% of grammar boxes per unit
+- 100% of exam correct-answer entries
+
+**Exit codes and gate behavior:**
+- `backend: off` → exit 0; never blocks shipment.
+- `backend: tavily|notebooklm` + exit 0 → proceed to ship.
+- `backend: tavily|notebooklm` + exit 1 → **SHIPPING BLOCKED.** Operator must resolve each flag (fix content / mark false-positive with justification / explicit override) before shipping. Grep `_content_truth_report.md` for `UNRESOLVED` to enumerate blockers.
+
+Reports written to `{output_dir}/_content_truth_report.json` and `{output_dir}/_content_truth_report.md`.
+
+**When to skip:** 5c is always opt-in. If `content_truth.backend: off` (the default), the check never runs and never blocks. No course is required to run content-truth validation — but if it is enabled, unresolved flags block shipment.
+
+#### 5d. When to skip 5b
 
 - **Skip 5b if `page_structure.exam` is `"none"`** for this course.
 - **Never skip 5a.** Every course has links; every course needs the check.
+
+### Operational: Patching a Single Page or Question
+
+For a single learner-reported bug, use `scripts/regenerate.py` instead of re-running the full generator. This avoids touching the other 80+ files in the course.
+
+```bash
+# Page-level: regenerate unit 7's quiz page only
+python scripts/regenerate.py --course-config config/children_10_12.json --unit 7 --page-type quiz
+
+# Page-level: regenerate unit 3's story page
+python scripts/regenerate.py --course-config config/children_10_12.json --unit 3 --page-type story
+
+# Question-level: replace just question 4 (0-based) in unit 7's quiz
+python scripts/regenerate.py --course-config config/children_10_12.json --unit 7 --exam-question vocabulary:medium:4
+
+# Determinism check: verify regenerated output matches full-generator for that page
+python scripts/regenerate.py --course-config config/children_10_12.json --unit 7 --page-type quiz --determinism-check
+```
+
+Supported courses: `children_10_12`, `teens_13_14`, `tefl_beginners`, `tefl_intermediate`. Each run appends a JSON event to `{output_dir}/_regenerate_log.jsonl` for audit.
 
 ### Stepping Through vs. Auto-Run
 
@@ -268,60 +304,18 @@ Courses are defined by JSON config files in `config/`. See `config/schema.md` fo
 
 ### Key config fields
 
-```jsonc
-{
-  "course_id": "my_course",         // Used for filenames
-  "l1": "th", "l2": "en",           // Language pair
-  "output_dir": "HTML/courses/my_course",
-  "theme": { "primary": "#f97316", ... },
+Top-level keys (per `config/schema.md` — canonical):
 
-  // Page types per unit — flexible assignment
-  "page_types": {
-    "lesson": "every",              // Generate for every unit
-    "activities": "every",
-    "exam": "every",
-    "flashcards": "random:3",       // Randomly assign to 3 units
-    "conversation": "random:4",
-    "pronunciation": "units:6,9,12", // Only these specific units
-    "worksheet": "random:3",
-    "syllabus": true                 // One per course
-  },
+- `course_id`, `l1`, `l2`, `output_dir`, `theme` — course identity
+- `page_types` — which page types each unit gets (see assignment modes below)
+- `page_structure` — sections/options per page type
+- `research` — `tavily`, `notebooklm`, `web_search`, `fact_check` flags
+- `content_truth.backend` — `tavily | notebooklm | off` (Phase 5c validator)
+- `images.backend` — `flux | off`
+- `video.backend` — `heygen | remotion | capcut | webm | off` plus `video.max_count` cap
+- `units` — the actual course content
 
-  // Page structure — what sections each page type contains
-  "page_structure": {
-    "lesson": {
-      "sections": ["introduction", "vocabulary", "grammar", "tutorial_steps", "activity", "reference_table", "summary"],
-      "section_checks": true,
-      "homework": true,
-      "audio_buttons": true
-    },
-    "exam": {
-      "categories": 5,
-      "difficulty_selector": true,
-      "gradebook": true
-    }
-    // ... see schema.md for all options
-  },
-
-  // Research & quality
-  "research": {
-    "tavily": true,              // Run tvly research and feed results into NotebookLM (best quality)
-    "notebooklm": true,
-    "web_search": true,          // Fallback if neither tavily nor notebooklm available
-    "fact_check": true
-  },
-
-  // AI image generation (requires Replicate account)
-  "images": {
-    "enabled": false,
-    "provider": "replicate",
-    "model": "black-forest-labs/flux-dev"
-  },
-
-  // The actual course content
-  "units": [ ... ]          // See schema.md for unit format
-}
-```
+For full field definitions, defaults, and examples, see [`config/schema.md`](config/schema.md) and the worked examples under `config/`.
 
 ### Page type assignment modes
 
@@ -408,8 +402,17 @@ Only after unit 1 passes, generate remaining units using the same templates.
 ### 3. Content-specific visuals
 - Story page emojis: each of the 6 pages shows a DIFFERENT emoji matching its vocabulary word
 - Sticker page: uses themed concrete objects (animals, food, etc.), not abstract shapes
-- Emoji colors match the text: if the label says "blue bird", the emoji must naturally render as blue. See [IMAGE_GENERATION.md](IMAGE_GENERATION.md) for emoji color reference
+- Emoji colors match the text: if the label says "blue bird", the emoji must naturally render as blue. See [`templates/images/README.md`](templates/images/README.md) for emoji color reference tables (circles, squares, hearts, color-accurate animals, common pitfalls)
 - Song page: embeds a real YouTube children's song (verify video ID is valid)
+
+#### Image prompt conventions
+
+When generating course images (coloring pages, story illustrations, game assets):
+- **Style prefix for coloring pages:** copy from `templates/images/prompt_style_prefix.txt` — enforces thick B&W outlines, no shading, white background. Edit in isolation without touching generator code.
+- **Ethnicity in prompt:** for Thai courses, include "Southeast Asian Thai ethnicity with warm brown skin, straight black hair" in the style prefix when generating images of people.
+- **Emoji color rule:** CSS `color` does NOT recolor emojis — they have built-in colors. Always choose a Unicode codepoint whose native rendering matches the intended color. Verify in a browser before bulk-generating.
+- **Path convention:** images go in `imgs/tefl/{course_slug}/` (sibling to `HTML/`, never inside it). HTML `src` uses relative depth-correct paths. The `imgs/` dir is gitignored — upload to S3 separately.
+- Full generate_images.py usage, aspect-ratio table, and Unicode color tables: [`templates/images/README.md`](templates/images/README.md).
 
 ### 4. JS quality checks
 

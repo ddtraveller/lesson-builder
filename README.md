@@ -251,12 +251,19 @@ The Unit 1 verification gate is the load-bearing rule that keeps generation reli
 lesson-builder/
 ├── SKILL.md                          # The skill itself (read by Claude Code)
 ├── README.md                         # This file
-├── NOTEBOOKLM.md                     # NotebookLM setup guide
-├── CHILDREN_PAGES.md                 # Children's page-type specifications
-├── IMAGE_GENERATION.md               # Replicate / FLUX Dev image generation
 ├── config/                           # Course config JSONs (12-week TEFL examples)
 ├── templates/
 │   ├── *.json                        # Course config templates (business, IT, starter)
+│   ├── children_pages/               # Children's page-type specs + examples (ages 4-12)
+│   │   ├── README.md                 # Page-type catalog + song video IDs
+│   │   ├── story_example.html        # Minimal story page (Dr. Seuss rhyming)
+│   │   ├── game_example.html         # Minimal game page (Match/Tap/Memory)
+│   │   └── coloring_example.html     # Minimal coloring page (two-canvas)
+│   ├── notebooklm/
+│   │   └── query_patterns.md         # Query phrasing tips + auth troubleshooting
+│   ├── images/
+│   │   ├── README.md                 # generate_images.py usage + emoji color tables
+│   │   └── prompt_style_prefix.txt   # Coloring page style prefix (copy-pasteable)
 │   └── buddy/                        # Buddy workflow artifact templates
 │       ├── spec.md                   # Phase 1 skeleton
 │       ├── plan.md                   # Phase 2 skeleton

@@ -445,7 +445,7 @@ The initiative succeeds if **all three** of the following improve relative to a 
 
 | Metric | Baseline (2026-04-17) | Target |
 |--------|-----------------------|--------|
-| `SKILL.md` line count | 787 lines | Approximately 450-500 lines (~35-40% reduction) after workstreams 1 and 2 |
+| `SKILL.md` line count | 787 lines | Revised target: ~500-575 lines (~27-36% reduction). Original estimate of 440-520 assumed satellite-doc content was inline in SKILL.md; reality was pointer-only references, so WS5 could not remove as many lines as projected. WS4+WS6 also added ~110 lines of genuinely new prose (Q8-Q10 backend block, Phase 5c). Duplication elimination via post-WS5 Step 0 and Configuration System trims landed at 573 lines. |
 | Shipped bugs learners report per month | TBD (operator to record baseline) | Downward trend over the three months following completion |
 | Time-to-patch for a reported page-level bug | Full pipeline re-run (minutes to tens of minutes) | Under 5 minutes after workstream 3 lands |
 

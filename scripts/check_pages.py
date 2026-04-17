@@ -37,23 +37,25 @@ import tempfile
 from pathlib import Path
 from typing import NamedTuple
 
+# Shared backend probe for node detection — avoids duplicating the logic.
+# backend_probes.py lives in the same directory; resolve relative to this file.
+import importlib.util as _ilu
+_bp_path = Path(__file__).parent / "backend_probes.py"
+_bp_spec = _ilu.spec_from_file_location("backend_probes", _bp_path)
+_bp_mod = _ilu.module_from_spec(_bp_spec)  # type: ignore[arg-type]
+_bp_spec.loader.exec_module(_bp_mod)  # type: ignore[union-attr]
+_probe_node = _bp_mod.probe_node
+
 
 # ---------------------------------------------------------------------------
 # JS parse mode detection (per-invocation, no caching)
+# Uses shared probe_node() from backend_probes.py
 # ---------------------------------------------------------------------------
 
 def _detect_node() -> bool:
-    """Return True if node is on PATH and responds to --version."""
-    if shutil.which("node") is None:
-        return False
-    try:
-        result = subprocess.run(
-            ["node", "--version"],
-            capture_output=True, text=True, timeout=5,
-        )
-        return result.returncode == 0
-    except Exception:  # noqa: BLE001
-        return False
+    """Return True if node is on PATH (delegates to backend_probes.probe_node)."""
+    available, _reason = _probe_node()
+    return available
 
 
 NODE_AVAILABLE: bool = _detect_node()

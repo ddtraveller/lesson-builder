@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<!--
+  COLORING PAGE TEMPLATE — ages 4-7
+  ============================================================
+  AI-generated black-and-white line art with interactive
+  canvas paint-over. Each vocab word gets a dedicated
+  coloring outline image.
+
+  IMAGE GENERATION:
+  - Use generate_images.py with style prefix enforcing B&W
+    line art (see templates/images/prompt_style_prefix.txt)
+  - Aspect ratio: 1:1
+  - Save to: imgs/coloring/{topic}_{word}.png
+  - Fallback: gray placeholder with "(image pending)" message
+
+  TWO-CANVAS ARCHITECTURE (per card):
+  - Draw canvas (hidden, z-index 2) — captures paint strokes
+    at 300x300px resolution
+  - Display canvas (visible, z-index 1) — composites:
+      white bg → user drawing → line art on top via
+      globalCompositeOperation='multiply'
+  - This keeps black outlines always visible over colors
+  - touch-action: none for mobile finger painting
+
+  UI CONTROLS:
+  - Color palette — 10 circles + eraser
+  - Brush size slider — 4-40px with live preview dot
+  - Clear All, Print Blank, Print Colored buttons
+  - Word labels tap → TTS pronunciation
+
+  PRINT CSS (@media print):
+  - Hides header, palette, brush slider, toolbar, nav-footer
+  - Cards print in 3-column grid
+  - Print Blank: temporarily clears draw canvases before print
+  - Print Colored: prints as-is with user artwork
+
+  EMOJI COLOR RULE (for word labels):
+  CSS 'color' does NOT recolor emojis. Use Unicode codepoints
+  whose natural color matches the vocabulary word.
+  See templates/images/README.md for color reference tables.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unit 1 Coloring — Animals</title>
+  <style>
+    body { font-family:'Sarabun','Nunito',sans-serif; background:#f9f9f9; margin:0; padding:0; }
+    header { background:#FF9800; color:#fff; padding:14px 20px; text-align:center; font-size:1.3em; }
+
+    .toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:10px;
+               padding:12px 20px; background:#fff; border-bottom:1px solid #eee; }
+    .palette { display:flex; gap:6px; flex-wrap:wrap; }
+    .color-dot { width:28px; height:28px; border-radius:50%; cursor:pointer;
+                 border:2px solid transparent; transition:border-color 0.2s; }
+    .color-dot.active { border-color:#333; }
+    .eraser-btn { padding:6px 14px; border:1px solid #aaa; border-radius:6px;
+                  background:#fff; cursor:pointer; }
+    .brush-row  { display:flex; align-items:center; gap:8px; }
+    .brush-preview { border-radius:50%; background:#333; }
+    .action-btn { padding:8px 14px; border:none; border-radius:6px;
+                  background:#eee; cursor:pointer; }
+
+    .card-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px;
+                 padding:20px; max-width:900px; margin:0 auto; }
+    .color-card { text-align:center; }
+    .canvas-wrap { position:relative; width:280px; height:280px; margin:0 auto; }
+    .display-canvas, .draw-canvas {
+        position:absolute; top:0; left:0; width:280px; height:280px;
+        border-radius:8px; border:1px solid #ddd;
+    }
+    .draw-canvas { z-index:2; opacity:0; cursor:crosshair; touch-action:none; }
+    .word-label { margin-top:8px; font-size:1.1em; cursor:pointer; }
+
+    @media print {
+      header, .toolbar, .word-label, nav { display:none !important; }
+      .card-grid { grid-template-columns:repeat(3,1fr); padding:0; gap:10px; }
+      .canvas-wrap { border:1px solid #ccc; }
+    }
+  </style>
+</head>
+<body>
+<header>Unit 1 — Animals Coloring</header>
+
+<div class="toolbar">
+  <div class="palette" id="palette"></div>
+  <div class="brush-row">
+    <label>Size</label>
+    <input type="range" id="brush-size" min="4" max="40" value="16"
+           oninput="updateBrush()">
+    <span id="brush-preview" class="brush-preview" style="width:16px;height:16px;"></span>
+  </div>
+  <button class="eraser-btn" onclick="selectEraser()">Eraser</button>
+  <button class="action-btn" onclick="clearAll()">Clear All</button>
+  <button class="action-btn" onclick="printBlank()">Print Blank</button>
+  <button class="action-btn" onclick="window.print()">Print Colored</button>
+</div>
+
+<div class="card-grid" id="card-grid"></div>
+
+<script>
+// Vocab data — replace with unit-specific content from config
+var vocab = [
+    { en:'cat',   th:'แมว',  img:'imgs/coloring/animals_cat.png'  },
+    { en:'dog',   th:'หมา',  img:'imgs/coloring/animals_dog.png'  },
+    { en:'bird',  th:'นก',   img:'imgs/coloring/animals_bird.png' },
+    { en:'fish',  th:'ปลา',  img:'imgs/coloring/animals_fish.png' },
+    { en:'frog',  th:'กบ',   img:'imgs/coloring/animals_frog.png' },
+    { en:'bear',  th:'หมี',  img:'imgs/coloring/animals_bear.png' }
+];
+
+var COLORS = ['#e53935','#FF9800','#FDD835','#43A047','#1E88E5','#8E24AA',
+              '#795548','#000000','#ffffff','#f48fb1'];
+var currentColor = COLORS[0];
+var currentSize  = 16;
+var isEraser     = false;
+
+// Build palette
+(function() {
+    var pal = document.getElementById('palette');
+    COLORS.forEach(function(c, i) {
+        var d = document.createElement('div');
+        d.className = 'color-dot' + (i === 0 ? ' active' : '');
+        d.style.background = c;
+        d.style.outline = (c === '#ffffff') ? '1px solid #ccc' : 'none';
+        d.onclick = function() {
+            document.querySelectorAll('.color-dot').forEach(function(x) {
+                x.classList.remove('active');
+            });
+            d.classList.add('active');
+            currentColor = c;
+            isEraser = false;
+        };
+        pal.appendChild(d);
+    });
+})();
+
+function updateBrush() {
+    currentSize = parseInt(document.getElementById('brush-size').value);
+    var p = document.getElementById('brush-preview');
+    p.style.width = currentSize + 'px';
+    p.style.height = currentSize + 'px';
+}
+
+function selectEraser() { isEraser = true; }
+
+// Build cards
+var cards = {}; // key: word.en → {drawCtx, dispCtx, lineImg}
+vocab.forEach(function(v) {
+    var card = document.createElement('div');
+    card.className = 'color-card';
+
+    var wrap = document.createElement('div');
+    wrap.className = 'canvas-wrap';
+
+    var disp  = document.createElement('canvas');
+    disp.className = 'display-canvas';
+    disp.width = 300; disp.height = 300;
+
+    var draw  = document.createElement('canvas');
+    draw.className = 'draw-canvas';
+    draw.width = 300; draw.height = 300;
+
+    wrap.appendChild(disp);
+    wrap.appendChild(draw);
+
+    var label = document.createElement('div');
+    label.className = 'word-label';
+    label.textContent = v.en + ' / ' + v.th;
+    label.onclick = function() { speak(v.en); };
+
+    card.appendChild(wrap);
+    card.appendChild(label);
+    document.getElementById('card-grid').appendChild(card);
+
+    var drawCtx = draw.getContext('2d');
+    var dispCtx = disp.getContext('2d');
+    var lineImg = new Image();
+    lineImg.onload = function() { composite(drawCtx, dispCtx, lineImg); };
+    lineImg.onerror = function() { showPlaceholder(dispCtx, v.en); };
+    lineImg.src = v.img;
+
+    cards[v.en] = { drawCtx:drawCtx, dispCtx:dispCtx, lineImg:lineImg };
+
+    // Drawing events
+    var painting = false;
+    draw.addEventListener('pointerdown', function(e) {
+        painting = true;
+        drawCtx.beginPath();
+        drawCtx.moveTo(e.offsetX * (300/draw.offsetWidth),
+                       e.offsetY * (300/draw.offsetHeight));
+    });
+    draw.addEventListener('pointermove', function(e) {
+        if (!painting) return;
+        drawCtx.globalCompositeOperation = isEraser ? 'destination-out' : 'source-over';
+        drawCtx.strokeStyle = currentColor;
+        drawCtx.lineWidth   = currentSize;
+        drawCtx.lineCap     = 'round';
+        drawCtx.lineJoin    = 'round';
+        drawCtx.lineTo(e.offsetX * (300/draw.offsetWidth),
+                       e.offsetY * (300/draw.offsetHeight));
+        drawCtx.stroke();
+        composite(drawCtx, dispCtx, lineImg);
+    });
+    draw.addEventListener('pointerup',   function() { painting = false; });
+    draw.addEventListener('pointerleave',function() { painting = false; });
+});
+
+function composite(drawCtx, dispCtx, lineImg) {
+    dispCtx.clearRect(0,0,300,300);
+    dispCtx.fillStyle = '#ffffff';
+    dispCtx.fillRect(0,0,300,300);
+    dispCtx.drawImage(drawCtx.canvas,0,0);
+    if (lineImg.complete && lineImg.naturalWidth) {
+        dispCtx.globalCompositeOperation = 'multiply';
+        dispCtx.drawImage(lineImg,0,0,300,300);
+        dispCtx.globalCompositeOperation = 'source-over';
+    }
+}
+
+function showPlaceholder(ctx, word) {
+    ctx.fillStyle = '#e0e0e0';
+    ctx.fillRect(0,0,300,300);
+    ctx.fillStyle = '#888';
+    ctx.font = '18px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(word, 150, 140);
+    ctx.fillText('(image pending)', 150, 165);
+}
+
+function clearAll() {
+    Object.values(cards).forEach(function(c) {
+        c.drawCtx.clearRect(0,0,300,300);
+        composite(c.drawCtx, c.dispCtx, c.lineImg);
+    });
+}
+
+function printBlank() {
+    Object.values(cards).forEach(function(c) {
+        c.drawCtx.clearRect(0,0,300,300);
+        composite(c.drawCtx, c.dispCtx, c.lineImg);
+    });
+    setTimeout(function() { window.print(); }, 100);
+}
+
+function speak(text) {
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.rate = 0.9; u.lang = 'en-US';
+    window.speechSynthesis.speak(u);
+}
+</script>
+</body>
+</html>

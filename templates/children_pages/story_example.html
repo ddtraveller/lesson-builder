@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<!--
+  STORY PAGE TEMPLATE — ages 4-7
+  ============================================================
+  ILLUSTRATION RULE: each page gets a DIFFERENT emoji that
+  matches its vocabulary word (e.g., cat → 🐱, dog → 🐶).
+  Never reuse the same emoji across all pages.
+
+  DR. SEUSS-STYLE RHYMING RULES:
+  - AABB rhyming couplets — pairs of lines that rhyme
+  - Each page introduces ONE vocab word woven into 2-4 lines
+  - Narrative arc: character doing something → silly conclusion
+  - Cumulative/building structure where possible
+  - Absurd humor (dog in a log, robot with wobbly eyes)
+  - Sound effects: CRASH! SPLAT! ZOOM! POP!
+  - Repetition and refrains ("Oh me! Oh my!")
+
+  STORY CONCEPT PATTERNS (pick one per unit):
+  Cumulative  — each page adds to a growing scene
+  Chain       — characters/items line up one by one
+  Building    — something constructed piece by piece
+  Journey     — character moves discovering things
+  Feast       — character tries everything
+  Chaos       — situation gets sillier each page
+  Introduction— meet characters with funny habits
+  Discovery   — character finds things one by one
+
+  THAI TRANSLATIONS: natural and conversational — do NOT force rhyme.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unit 1 Story — Colors</title>
+  <style>
+    body { font-family: 'Sarabun','Nunito',sans-serif; background:#fff8f0; margin:0; padding:0; }
+    .story-container { max-width:600px; margin:0 auto; padding:20px; }
+    .story-page { display:none; text-align:center; }
+    .story-page.active { display:block; }
+    .story-emoji { font-size:5em; margin:20px 0; }
+    .story-text  { font-size:1.3em; line-height:1.7; cursor:pointer; color:#333; }
+    .story-text b { color:#e65100; }
+    .story-thai  { font-size:1.1em; color:#555; margin-top:8px; }
+    .speak-btn   { background:#FF9800; color:#fff; border:none; border-radius:8px;
+                   padding:10px 24px; font-size:1em; cursor:pointer; margin-top:12px; }
+    .nav-row     { display:flex; justify-content:space-between; margin-top:24px; }
+    .nav-btn     { background:#eee; border:none; border-radius:8px;
+                   padding:10px 20px; font-size:1.2em; cursor:pointer; }
+    .page-dots   { text-align:center; margin:12px 0; }
+    .dot         { display:inline-block; width:10px; height:10px; border-radius:50%;
+                   background:#ccc; margin:0 4px; }
+    .dot.active  { background:#FF9800; }
+  </style>
+</head>
+<body>
+<div class="story-container">
+  <div id="page-1" class="story-page active">
+    <div class="story-emoji">🔴</div>
+    <div class="story-text" onclick="speak('red')">
+      The apple is <b>red</b>, oh what do you see?<br>
+      A red, red apple is winking at me!
+    </div>
+    <div class="story-thai">แอปเปิ้ลสีแดง มันกำลังกะพริบตาให้เราเห็นเลย!</div>
+    <button class="speak-btn" onclick="speak('red')">&#128266; red</button>
+  </div>
+
+  <div id="page-2" class="story-page">
+    <div class="story-emoji">💛</div>
+    <div class="story-text" onclick="speak('yellow')">
+      Oh me! Oh my! A banana so <b>yellow</b>!<br>
+      It danced with a spoon and a jolly old fellow!
+    </div>
+    <div class="story-thai">โอ้โห! กล้วยสีเหลืองกำลังเต้นกับช้อนอยู่เลย!</div>
+    <button class="speak-btn" onclick="speak('yellow')">&#128266; yellow</button>
+  </div>
+
+  <!-- Add pages 3-6 following same pattern, one vocab word each -->
+
+  <div class="page-dots" id="dots"></div>
+  <div class="nav-row">
+    <button class="nav-btn" onclick="changePage(-1)">&#8592;</button>
+    <button class="nav-btn" onclick="changePage(1)">&#8594;</button>
+  </div>
+</div>
+
+<script>
+var currentPage = 1;
+var totalPages  = 2; // set to 6 for a full unit
+
+function speak(text) {
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.rate = 0.9; u.lang = 'en-US';
+    window.speechSynthesis.speak(u);
+}
+
+function changePage(delta) {
+    var next = currentPage + delta;
+    if (next < 1 || next > totalPages) return;
+    document.getElementById('page-' + currentPage).classList.remove('active');
+    currentPage = next;
+    document.getElementById('page-' + currentPage).classList.add('active');
+    updateDots();
+}
+
+function updateDots() {
+    var container = document.getElementById('dots');
+    container.innerHTML = '';
+    for (var i = 1; i <= totalPages; i++) {
+        var d = document.createElement('span');
+        d.className = 'dot' + (i === currentPage ? ' active' : '');
+        container.appendChild(d);
+    }
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight') changePage(1);
+    if (e.key === 'ArrowLeft')  changePage(-1);
+});
+
+updateDots();
+</script>
+</body>
+</html>
