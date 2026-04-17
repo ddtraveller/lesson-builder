@@ -1,6 +1,6 @@
 # Tasks: Lesson-Builder Hardening Initiative
 
-**Status:** Draft
+**Status:** In Progress (WS0+WS1 complete, gate T012 passed, awaiting WS2 kickoff)
 **Branch decision (T002):** Continuing on `feature/buddy-workflow-integration`. Hardening initiative commits start at the commit AFTER snapshot `8943a16` (chore(phase-5): snapshot in-flight work). No branch rename, no force-push.
 **Date:** 2026-04-17
 **Initiative ID:** lesson-builder-hardening
@@ -40,19 +40,19 @@ Goal: replace ~150 lines of inline Phases 1-4 with delegation stubs + capped app
 
 ### Implementation
 
-- [ ] **T003 (S1):** Add buddy-availability detection block to `SKILL.md`. ~6 lines at the top of the (current) Phase 1 section, documenting: the assistant checks its own available-skills list for `buddy:spec`, `buddy:plan`, `buddy:tasks`, `buddy:implement`; sets a session-scoped `BUDDY_AVAILABLE` flag; no shell `which`, no frontmatter metadata, no external probe file. Write the block verbatim as described in plan §3.1.
-- [ ] **T004 (S1):** Rewrite `SKILL.md` Phase 1 (Specification) body as a ~15-line delegation stub invoking `buddy:spec` with TEFL-specific overlays. Keep: topic/L1/L2/weeks/age-group/page-types/research/backends list; vocabulary density target; bilingual markup rules; page-type catalog; theme palette. Spec lands at `specs/{YYYYMMDD}-{course_id}/spec.md`. Add "Fallback (buddy:spec not available): see §Appendix".
-- [ ] **T005 (S1):** Rewrite `SKILL.md` Phase 2 (Research + Plan) body as a delegation stub invoking `buddy:plan`. Preserve the TEFL-specific research step (NotebookLM corpus load; Tavily fallback). Same fallback pointer.
-- [ ] **T006 (S1):** Rewrite `SKILL.md` Phase 3 (Tasks) body as a delegation stub invoking `buddy:tasks`. Preserve TEFL-specific task-shape expectations (per-unit generator parts, Unit-1 gate, Phase-5 checker invocations).
-- [ ] **T007 (S1):** Rewrite `SKILL.md` Phase 4 (Implement) body as a delegation stub invoking `buddy:implement`. Preserve the "pause at Unit 1" gate behavior.
-- [ ] **T008 (S1):** Append new `## Appendix: Minimal Inline Fallback (no buddy:* installed)` section at tail of `SKILL.md`. **Hard cap: ≤40 content lines.** Content: (1) in-file bold warning "This is a safety net, not a second canonical path. Do not grow it. If buddy:* becomes unavailable for a real user, fix the harness, don't extend this fallback." (2) 4-step barest pipeline: create folder at `specs/{date}-{course_id}/`; copy `templates/buddy/{spec,plan,tasks,research}.md` in; fill in obvious fields; stop.
+- [X] **T003 (S1):** Add buddy-availability detection block to `SKILL.md`. ~6 lines at the top of the (current) Phase 1 section, documenting: the assistant checks its own available-skills list for `buddy:spec`, `buddy:plan`, `buddy:tasks`, `buddy:implement`; sets a session-scoped `BUDDY_AVAILABLE` flag; no shell `which`, no frontmatter metadata, no external probe file. Write the block verbatim as described in plan §3.1.
+- [X] **T004 (S1):** Rewrite `SKILL.md` Phase 1 (Specification) body as a ~15-line delegation stub invoking `buddy:spec` with TEFL-specific overlays. Keep: topic/L1/L2/weeks/age-group/page-types/research/backends list; vocabulary density target; bilingual markup rules; page-type catalog; theme palette. Spec lands at `specs/{YYYYMMDD}-{course_id}/spec.md`. Add "Fallback (buddy:spec not available): see §Appendix".
+- [X] **T005 (S1):** Rewrite `SKILL.md` Phase 2 (Research + Plan) body as a delegation stub invoking `buddy:plan`. Preserve the TEFL-specific research step (NotebookLM corpus load; Tavily fallback). Same fallback pointer.
+- [X] **T006 (S1):** Rewrite `SKILL.md` Phase 3 (Tasks) body as a delegation stub invoking `buddy:tasks`. Preserve TEFL-specific task-shape expectations (per-unit generator parts, Unit-1 gate, Phase-5 checker invocations).
+- [X] **T007 (S1):** Rewrite `SKILL.md` Phase 4 (Implement) body as a delegation stub invoking `buddy:implement`. Preserve the "pause at Unit 1" gate behavior.
+- [X] **T008 (S1):** Append new `## Appendix: Minimal Inline Fallback (no buddy:* installed)` section at tail of `SKILL.md`. **Hard cap: ≤40 content lines.** Content: (1) in-file bold warning "This is a safety net, not a second canonical path. Do not grow it. If buddy:* becomes unavailable for a real user, fix the harness, don't extend this fallback." (2) 4-step barest pipeline: create folder at `specs/{date}-{course_id}/`; copy `templates/buddy/{spec,plan,tasks,research}.md` in; fill in obvious fields; stop.
 
 ### Self-Verification
 
-- [ ] **T009 (S1):** Run `wc -l SKILL.md` — confirm line count has dropped from 787 into the low-600s after WS1 alone. Anything ≥700 means delegation stubs are not lean enough; iterate on T004-T007.
-- [ ] **T010 (S1):** Run `awk '/^## Appendix: Minimal Inline Fallback/,/^## /' SKILL.md | wc -l` — confirm < 45. If higher, trim.
-- [ ] **T011 (S1):** Run `grep -q "safety net, not a second canonical path" SKILL.md && echo OK` — must print OK.
-- [ ] **T012 (S1) [GATE]:** End-to-end buddy-delegation verification — run the skill (interactive or dry-run) in a context where `buddy:*` IS available. Confirm Phase 1 invokes `buddy:spec`, artifacts land at `specs/{date}-{course_id}/spec.md` with the TEFL overlays. Then simulate `buddy:*` unavailability (e.g., a vanilla harness session) — confirm the appendix fallback produces the same three-file artifact layout. **This is the gate before any WS2 prose deletions land.** If either mode is broken, loop back to T003-T008 before proceeding.
+- [X] **T009 (S1):** Run `wc -l SKILL.md` — confirm line count has dropped from 787 into the low-600s after WS1 alone. Anything ≥700 means delegation stubs are not lean enough; iterate on T004-T007.
+- [X] **T010 (S1):** Run `awk '/^## Appendix: Minimal Inline Fallback/,/^## /' SKILL.md | wc -l` — confirm < 45. If higher, trim.
+- [X] **T011 (S1):** Run `grep -q "safety net, not a second canonical path" SKILL.md && echo OK` — must print OK.
+- [X] **T012 (S1) [GATE]:** End-to-end buddy-delegation verification — run the skill (interactive or dry-run) in a context where `buddy:*` IS available. Confirm Phase 1 invokes `buddy:spec`, artifacts land at `specs/{date}-{course_id}/spec.md` with the TEFL overlays. Then simulate `buddy:*` unavailability (e.g., a vanilla harness session) — confirm the appendix fallback produces the same three-file artifact layout. **This is the gate before any WS2 prose deletions land.** If either mode is broken, loop back to T003-T008 before proceeding.
 
 ### Documentation
 

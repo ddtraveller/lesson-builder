@@ -132,159 +132,45 @@ Then proceed to interactive mode.
 
 ## How it works — Buddy Workflow Integration
 
-The lesson builder uses a structured spec → plan → tasks → implement pipeline adapted from the buddy workflow. This ensures each course is well-designed before code generation begins.
+The lesson builder uses a structured spec → plan → tasks → implement pipeline, delegated to the `buddy:*` skill suite when available. This ensures each course is well-designed before code generation begins.
 
 **Templates and worked example:**
 - `templates/buddy/{spec,plan,tasks,research}.md` — placeholder skeletons to copy for a new course
 - `specs/EXAMPLE-tefl_children_10_12/` — complete worked example (Thai children ages 10-12, 12 units, 84 files) showing what each artifact looks like filled in. Read this before starting a new course to understand the proven shape and detail level.
 
-### Phase 1: Specification (`/buddy:spec` pattern)
+### Buddy-availability detection (runs once at Phase 1 start)
 
-After gathering requirements interactively (or loading a config), create a course specification:
+Before delegating, check whether `buddy:spec`, `buddy:plan`, `buddy:tasks`, and `buddy:implement` appear in the current session's available skills list (the same list visible in the system-reminder). This is a self-awareness check — the assistant scans its own skill list. No shell `which` call; `buddy:*` are harness-registered skills, not PATH binaries. If all four are present, set `BUDDY_AVAILABLE=1` and use the delegation path below. If any are absent, set `BUDDY_AVAILABLE=0` and use the fallback at `§Appendix: Minimal Inline Fallback`.
 
-1. Create folder: `specs/{YYYYMMDD}-{course_id}/`
-2. Write `specs/{YYYYMMDD}-{course_id}/spec.md` containing:
-   - Course identity (title, languages, level, schedule)
-   - Target audience and age group
-   - Unit breakdown with topics, vocabulary themes, and grammar points
-   - Page types per unit (with assignment modes)
-   - Research method and available services (from Step 0)
-   - Image generation availability
-   - Theme and output configuration
-   - Acceptance criteria (what "done" looks like for this course)
-3. Mark unclear aspects with `[NEEDS CLARIFICATION: ...]`
-4. Present clarification questions to the user
-5. Update spec with answers, set status to "Ready for Review"
+### Phase 1: Specification
 
-### Phase 2: Research & Planning (`/buddy:plan` pattern)
+**Delegate to `buddy:spec` with TEFL-specific overlays.**
 
-Once the spec is confirmed, research content and create an implementation plan:
+Pass inputs from Step 0 + interactive Q&A (topic, L1/L2, weeks, age group, page types, research method, backend choices). TEFL overlays to include: vocabulary density target (10-12 words/unit adults; 6-8 children); bilingual markup rules (§Bilingual Content Rules); page-type catalog for chosen age group (§Adult Page Type Specifications or `templates/children_pages/`); theme palette. Spec lands at `specs/{YYYYMMDD}-{course_id}/spec.md`. Reference: `specs/EXAMPLE-tefl_children_10_12/spec.md`.
 
-1. **Research** using the method determined in Step 0:
+**Fallback (buddy:spec not available):** see §Appendix: Minimal Inline Fallback.
 
-   **Tavily → NotebookLM bridge** (best quality — both ready):
-   - Run `tvly research` for 2–3 queries covering curriculum, L1 interference, and (optionally) niche vocab. Use `--model pro` for the comprehensive multi-angle pass and `--json` so we get structured sources to feed NotebookLM. **Always set `PYTHONIOENCODING=utf-8`** — the CLI crashes on Windows cp1252 when the API returns Unicode whitespace characters:
-     ```bash
-     mkdir -p specs/{YYYYMMDD}-{course_id}/tavily
-     PYTHONIOENCODING=utf-8 tvly research "{topic} curriculum CEFR {level} for {audience}" \
-       --model pro --json \
-       -o specs/{YYYYMMDD}-{course_id}/tavily/curriculum.json
-     PYTHONIOENCODING=utf-8 tvly research "teaching {L2} to {L1} speakers {level} common errors pronunciation" \
-       --model pro --json \
-       -o specs/{YYYYMMDD}-{course_id}/tavily/l1_interference.json
-     # Optional 3rd query for niche vocab topics
-     PYTHONIOENCODING=utf-8 tvly research "{topic} essential vocabulary {level} authoritative wordlists" \
-       --model pro --json \
-       -o specs/{YYYYMMDD}-{course_id}/tavily/vocab.json
-     ```
-   - **Bridge into NotebookLM** — for each Tavily report, create the notebook (once), then ingest the markdown report (`content` field) as a text source AND ingest each source URL (`sources[*].url`) as a URL source. Verified JSON shape (as of `tavily-cli 0.1.0`): `{"content": "<markdown>", "sources": [{"url": "...", "title": "...", "favicon": "..."}], "status", "created_at", "response_time", "request_id"}`. Cap source ingestion to stay under NotebookLM's 50-source free-tier ceiling:
-     ```bash
-     NB_ID=$(PYTHONIOENCODING=utf-8 python -m notebooklm create "Course: {topic}" --json \
-              | python -c "import sys,json;print(json.load(sys.stdin)['id'])")
+### Phase 2: Research & Planning
 
-     for FILE in specs/{YYYYMMDD}-{course_id}/tavily/*.json; do
-       # 1. Extract markdown report (content field) and ingest as text source
-       python -c "import json; print(json.load(open(r'$FILE', encoding='utf-8'))['content'])" \
-         > "${FILE%.json}.md"
-       PYTHONIOENCODING=utf-8 python -m notebooklm source add "$NB_ID" --file "${FILE%.json}.md"
+**Delegate to `buddy:plan` with TEFL-specific research step.**
 
-       # 2. Extract source URLs (sources[*].url) and ingest each (cap at 10 per query)
-       python -c "
-import json
-d = json.load(open(r'$FILE', encoding='utf-8'))
-for s in d.get('sources', [])[:10]:
-    if s.get('url'): print(s['url'])
-" | while read URL; do
-         PYTHONIOENCODING=utf-8 python -m notebooklm source add "$NB_ID" --url "$URL"
-       done
+Run the TEFL-specific corpus loading first (buddy can't do this): use the research method from Step 0 (Tavily→NotebookLM bridge, NotebookLM only, Tavily standalone, or web search). Save findings to `specs/{YYYYMMDD}-{course_id}/research.md`. Then invoke buddy:plan with the research.md content as context. Windows note: always prefix notebooklm/tvly commands with `PYTHONIOENCODING=utf-8`. Plan lands at `specs/{YYYYMMDD}-{course_id}/plan.md`.
 
-       PYTHONIOENCODING=utf-8 python -m notebooklm source wait "$NB_ID"
-     done
-     ```
-   - Run the existing `notebooklm ask` loop against the enriched corpus to get per-unit content.
-   - Save Q&A answers + Tavily report file paths to `specs/{YYYYMMDD}-{course_id}/research.md` for traceability.
+**Fallback (buddy:plan not available):** see §Appendix: Minimal Inline Fallback.
 
-   > **Tip:** Tavily's `mini` model returns ~7 sources, `pro` returns more. Spot-check the top URLs before bulk ingestion — Tavily can surface low-quality results for niche queries. If the JSON shape ever changes in a future `tavily-cli` release, run `PYTHONIOENCODING=utf-8 tvly research "test" --model mini --json -o /tmp/t.json` and inspect `t.json` to update the key paths above.
+### Phase 3: Task Breakdown
 
-   **NotebookLM only** (NotebookLM ready, Tavily not):
-   - Create a research notebook:
-     ```bash
-     PYTHONIOENCODING=utf-8 python -m notebooklm create "Course: {topic}" --json
-     ```
-   - Add research sources (2-3 queries covering curriculum, grammar, and L1 interference):
-     ```bash
-     PYTHONIOENCODING=utf-8 python -m notebooklm source add-research "{topic} curriculum CEFR {level}"
-     PYTHONIOENCODING=utf-8 python -m notebooklm source add-research "teaching English {L1} speakers {level} common errors"
-     ```
-   - Query for content per topic area:
-     ```bash
-     PYTHONIOENCODING=utf-8 python -m notebooklm ask "What are the key grammar topics for {level}?" --json
-     PYTHONIOENCODING=utf-8 python -m notebooklm ask "What vocabulary is essential for {topic area}?" --json
-     ```
-   - Save research findings to `specs/{YYYYMMDD}-{course_id}/research.md`
+**Delegate to `buddy:tasks`.** Pass spec + plan as context. TEFL constraints: include a Unit 1 gate task; include `check_links.py`, `check_exams.py`, `check_pages.py` invocations in Phase 5 tasks; keep tasks terse. Tasks land at `specs/{YYYYMMDD}-{course_id}/tasks.md`.
 
-   **Tavily Research standalone** (Tavily ready, NotebookLM not):
-   - Run the same 2–3 `tvly research --model pro` queries from the bridge block above, but write directly to markdown instead of JSON (always with `PYTHONIOENCODING=utf-8`):
-     ```bash
-     PYTHONIOENCODING=utf-8 tvly research "{topic} curriculum CEFR {level}" --model pro \
-       -o specs/{YYYYMMDD}-{course_id}/research_curriculum.md
-     PYTHONIOENCODING=utf-8 tvly research "teaching {L2} to {L1} speakers common errors" --model pro \
-       -o specs/{YYYYMMDD}-{course_id}/research_l1.md
-     ```
-   - Concatenate or summarize these reports into the final `specs/{YYYYMMDD}-{course_id}/research.md`
-   - No Q&A grounding layer; tell the user this is degraded mode
+**Fallback (buddy:tasks not available):** see §Appendix: Minimal Inline Fallback.
 
-   **Web Search** (fallback — neither ready):
-   - Search for curriculum references, grammar examples, and vocabulary verification from 2+ authoritative sources
-   - Verify vocabulary definitions and L1 translations
-   - Save source citations to `specs/{YYYYMMDD}-{course_id}/research.md`
+### Phase 4: Implementation
 
-   **Training data only** (if user chose speed):
-   - Inform: *"Generating from training data. For higher accuracy, re-run with Tavily Research or NotebookLM."*
+**Delegate to `buddy:implement`.** Pass the full `specs/{YYYYMMDD}-{course_id}/` directory as context.
 
-2. **Fact-Check** using the `fact-checker` skill (if available) to verify grammar rules, vocabulary, quiz answers, and real-world examples.
+TEFL-specific constraint: **pause at Unit 1 gate.** buddy:implement must stop after generating Unit 1, report that Unit 1 is ready for browser verification, and wait for operator confirmation before proceeding to bulk generation. This is the single most important structural rule — do not let buddy:implement auto-proceed past Unit 1.
 
-3. Write `specs/{YYYYMMDD}-{course_id}/plan.md` containing:
-   - Research summary and sources used
-   - Generation strategy (which units first, page type order)
-   - Python generator script architecture (functions, modules, line count estimates)
-   - Unit content outlines (vocabulary lists, grammar topics, activity ideas per unit — informed by research)
-   - Image generation plan (if Replicate available)
-   - Video plan (if applicable)
-   - Risk assessment (large script splitting, encoding issues, etc.)
-4. Mark unclear aspects, get clarifications, set status to "Ready for Review"
-
-### Phase 3: Task Breakdown (`/buddy:tasks` pattern)
-
-Convert the plan into executable tasks. Start from `templates/buddy/tasks.md` — it already encodes the proven shape from `specs/EXAMPLE-tefl_children_10_12/tasks.md`:
-
-1. Write `specs/{YYYYMMDD}-{course_id}/tasks.md` with ordered tasks. The load-bearing structure is:
-   - **Setup** (T001): create output directory
-   - **Generator script** (T002–T004): write the script. Collapse to a single task for small courses (<2000 lines); split into Part 1 / Part 2 / COURSE_DATA for larger ones
-   - **Unit 1 gate** (T005–T006): generate Unit 1 only, browser-verify it. **Do not proceed past this gate until Unit 1 is clean.**
-   - **Bulk generation** (T007): all remaining units
-   - **Polish** (T008–T009): cross-file consistency check, syllabus
-   - **Optional extras** (T0XX): image generation if Replicate available, video if requested
-
-2. Keep tasks terse. Per-task file paths, acceptance criteria, and `[P]` parallel flags are not required — for single-script generator courses they add ceremony without payoff. The Unit 1 gate is the only structural rule that has to hold.
-3. Set status to "Ready for Review".
-
-### Phase 4: Implementation (`/buddy:implement` pattern)
-
-Execute the tasks in order:
-
-1. Read all docs in `specs/{YYYYMMDD}-{course_id}/` (spec, plan, tasks, research)
-2. Execute phase-by-phase:
-   - **Setup first** — directories, config, script skeleton
-   - **Unit 1 first** — generate only unit 1 as a test
-   - **Verify Unit 1** — check in browser before proceeding
-   - **Remaining units** — generate after Unit 1 passes
-   - **Images** — if Replicate available
-   - **Video** — if user wants it
-   - **Polish** — consistency checks, final testing
-3. Update `tasks.md` after each task: `- [ ]` → `- [X]`
-4. Report progress after each completed task
-5. On completion, update tasks.md status to "Completed"
+**Fallback (buddy:implement not available):** see §Appendix: Minimal Inline Fallback.
 
 ### Phase 5: Post-Generation Verification (REQUIRED)
 
@@ -785,3 +671,28 @@ To add a new page type:
 2. Add its structure options to `page_structure`
 3. Write a `generate_{type}(unit, config)` function in the generator script
 4. Document it in this skill file
+
+## Appendix: Minimal Inline Fallback (no buddy:* installed)
+
+**WARNING — This is a safety net, not a second canonical path. Do not grow it. If `buddy:*` becomes unavailable for a real user, fix the harness installation, not this fallback. Never add workflow logic here that duplicates or competes with what `buddy:spec / buddy:plan / buddy:tasks / buddy:implement` do.**
+
+Use this fallback only when `BUDDY_AVAILABLE=0` (buddy:* skills not in the available-skills list).
+
+**4-step barest pipeline:**
+
+1. **Create the course folder:**
+   ```bash
+   mkdir -p specs/{YYYYMMDD}-{course_id}/
+   ```
+
+2. **Copy templates in:**
+   ```bash
+   cp templates/buddy/spec.md     specs/{YYYYMMDD}-{course_id}/spec.md
+   cp templates/buddy/plan.md     specs/{YYYYMMDD}-{course_id}/plan.md
+   cp templates/buddy/tasks.md    specs/{YYYYMMDD}-{course_id}/tasks.md
+   cp templates/buddy/research.md specs/{YYYYMMDD}-{course_id}/research.md
+   ```
+
+3. **Fill in the obvious fields** in each template (course_id, topic, L1/L2, weeks, age group, page types, output_dir, theme). Use `specs/EXAMPLE-tefl_children_10_12/` as the reference shape for content and detail level.
+
+4. **Stop and hand off to the operator** — present the filled-in spec.md for review before proceeding to any generation. The operator must confirm the spec before the course is built. This fallback does not implement the full buddy workflow; it only produces the file scaffold.
