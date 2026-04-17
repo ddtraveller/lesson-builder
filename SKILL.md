@@ -3,6 +3,7 @@ name: lesson-builder
 description: "Generates bilingual TEFL/ESL courses with lessons, exams, flashcards, conversations, pronunciation drills, worksheets, and syllabi for any language pair."
 ---
 <!-- Changelog (most recent first)
+  WS5 complete (2026-04-17): CHILDREN_PAGES.md, NOTEBOOKLM.md, IMAGE_GENERATION.md deleted outright (no redirect stubs). Content migrated to templates/children_pages/{README.md,story_example.html,game_example.html,coloring_example.html}, templates/notebooklm/query_patterns.md, templates/images/{README.md,prompt_style_prefix.txt}. SKILL.md gained §Querying the corpus (Phase 2 anchor) and §Image prompt conventions (Quality Checklist §3 anchor). All SKILL.md references to deleted files updated to template locations. README.md repo tree updated. NOTE: SKILL.md line count 681 — above [440,520] target (see T095 gate note; user review needed).
   WS4+WS6 complete (2026-04-17): scripts/backend_probes.py (shared probe module, 8 backends); scripts/check_content.py (Phase 5c content-truth validator, off/tavily/notebooklm backends, 20%/10%/100% sampling, seeded per course_id); Interactive Mode Q8-Q10 backend choices block added; §Course-creation backend choices availability-check table added; §Phase 5c shipping gate added; config/schema.md updated with unified backend choices group; all example configs updated with content_truth/images.backend/video fields; check_pages.py refactored to import probe_node() from backend_probes.py.
   WS3 complete (2026-04-17): scripts/regenerate.py added — page-level and question-level patch paths; config/children_10_12.json added; §Operational: Patching a Single Page or Question anchor added to SKILL.md; templates/buddy/tasks.md patch-path note added. Architecture note: children_10_12 quiz pages use inline HTML question blocks (not questionBank JS object); determinism check correctly flags generator's random distractor shuffle.
   WS2 complete (2026-04-17): check_pages.py (rules 2.1-2.7) added; §Common JS bugs 4a-4e, §Relative path depth tutorial, §Filename convention coordination, §Path-bug detection script deleted; Unit 1 gate trimmed. SKILL.md now 569 lines.
@@ -33,7 +34,7 @@ PYTHONIOENCODING=utf-8 python -m notebooklm auth check --test --json
 **If `checks.token_fetch` is `true`:** NotebookLM is ready. Tell the user:
 > "NotebookLM: authenticated and ready for AI-powered research."
 
-**If auth fails or package not installed:** Guide the user through login per [NOTEBOOKLM.md](NOTEBOOKLM.md). If they decline or login fails after troubleshooting, set research fallback to **web search** and tell the user:
+**If auth fails or package not installed:** Guide the user through login per [templates/notebooklm/query_patterns.md](templates/notebooklm/query_patterns.md) (Auth Troubleshooting section). If they decline or login fails after troubleshooting, set research fallback to **web search** and tell the user:
 > "NotebookLM: not available. Will use web search for content research instead."
 
 ### 0b. Check Tavily Research (`tvly` CLI)
@@ -122,7 +123,7 @@ Then proceed to interactive mode.
    **Adult page types:**
    - Lesson, Activities, Exam, Flashcards, Conversation, Pronunciation, Worksheet, Syllabus
 
-   **Children's page types:** See [CHILDREN_PAGES.md](CHILDREN_PAGES.md) for full list and specifications (Story, Game, Song, Coloring, Stickers, Flashcards, Reward, Avatar Video for ages 4-7; Comic, Quiz Show, Word Puzzle, Adventure, Journal, Video Lesson, Board Game, Reading for ages 8-12)
+   **Children's page types:** See [templates/children_pages/README.md](templates/children_pages/README.md) for full list and specifications (Story, Game, Song, Coloring, Stickers, Flashcards, Reward, Avatar Video for ages 4-7; Comic, Quiz Show, Word Puzzle, Adventure, Journal, Video Lesson, Board Game, Reading for ages 8-12)
 
 6. **Output location** — "Where should files go?" (default: `HTML/courses/{topic_slug}/`)
 7. **Color theme** — "Any color preference?" (or auto-pick)
@@ -212,6 +213,10 @@ Pass inputs from Step 0 + interactive Q&A (topic, L1/L2, weeks, age group, page 
 **Delegate to `buddy:plan` with TEFL-specific research step.**
 
 Run the TEFL-specific corpus loading first (buddy can't do this): use the research method from Step 0 (Tavily→NotebookLM bridge, NotebookLM only, Tavily standalone, or web search). Save findings to `specs/{YYYYMMDD}-{course_id}/research.md`. Then invoke buddy:plan with the research.md content as context. Windows note: always prefix notebooklm/tvly commands with `PYTHONIOENCODING=utf-8`. Plan lands at `specs/{YYYYMMDD}-{course_id}/plan.md`.
+
+#### Querying the corpus
+
+Phrase NotebookLM queries as **"What does [source] say about X?"** — the source-attributed form forces the model to draw from uploaded material rather than general knowledge. Example: "What does the Tavily TEFL report say about vocabulary density for A1 learners?" Always prefix with `PYTHONIOENCODING=utf-8` on Windows to avoid cp1252 crashes. For more query patterns and auth troubleshooting, see [`templates/notebooklm/query_patterns.md`](templates/notebooklm/query_patterns.md).
 
 **Fallback (buddy:plan not available):** see §Appendix: Minimal Inline Fallback.
 
@@ -506,8 +511,17 @@ Only after unit 1 passes, generate remaining units using the same templates.
 ### 3. Content-specific visuals
 - Story page emojis: each of the 6 pages shows a DIFFERENT emoji matching its vocabulary word
 - Sticker page: uses themed concrete objects (animals, food, etc.), not abstract shapes
-- Emoji colors match the text: if the label says "blue bird", the emoji must naturally render as blue. See [IMAGE_GENERATION.md](IMAGE_GENERATION.md) for emoji color reference
+- Emoji colors match the text: if the label says "blue bird", the emoji must naturally render as blue. See [`templates/images/README.md`](templates/images/README.md) for emoji color reference tables (circles, squares, hearts, color-accurate animals, common pitfalls)
 - Song page: embeds a real YouTube children's song (verify video ID is valid)
+
+#### Image prompt conventions
+
+When generating course images (coloring pages, story illustrations, game assets):
+- **Style prefix for coloring pages:** copy from `templates/images/prompt_style_prefix.txt` — enforces thick B&W outlines, no shading, white background. Edit in isolation without touching generator code.
+- **Ethnicity in prompt:** for Thai courses, include "Southeast Asian Thai ethnicity with warm brown skin, straight black hair" in the style prefix when generating images of people.
+- **Emoji color rule:** CSS `color` does NOT recolor emojis — they have built-in colors. Always choose a Unicode codepoint whose native rendering matches the intended color. Verify in a browser before bulk-generating.
+- **Path convention:** images go in `imgs/tefl/{course_slug}/` (sibling to `HTML/`, never inside it). HTML `src` uses relative depth-correct paths. The `imgs/` dir is gitignored — upload to S3 separately.
+- Full generate_images.py usage, aspect-ratio table, and Unicode color tables: [`templates/images/README.md`](templates/images/README.md).
 
 ### 4. JS quality checks
 

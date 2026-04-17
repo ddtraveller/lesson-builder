@@ -219,47 +219,47 @@ Goal: move content from 3 top-level MDs into `templates/` examples + SKILL.md in
 
 ### Implementation — templates/children_pages/
 
-- [ ] **T079 (S3) [P]:** Create `templates/children_pages/story_example.html` — minimal runnable story page with Dr. Seuss-style rhyming structure. Embed the illustration rule + rhyming rules + story-concept patterns from `CHILDREN_PAGES.md` lines 51-84 as comments at the top of the file.
-- [ ] **T080 (S3) [P]:** Create `templates/children_pages/game_example.html` — minimal runnable game page (Match/Tap/Memory). Embed `CHILDREN_PAGES.md` lines 86-92 as comments.
-- [ ] **T081 (S3) [P]:** Create `templates/children_pages/coloring_example.html` — minimal coloring page structure. Structure comments from `CHILDREN_PAGES.md` lines 133-158.
-- [ ] **T082 (S3):** Create `templates/children_pages/README.md` (~30 lines) — points at the three example files and the SKILL.md anchors. Contains: (a) compact page-type catalog table (4-7 age block and 8-12 age block from `CHILDREN_PAGES.md` lines 4-45); (b) the 12-entry verified song video ID table (lines 94-131 — **this stays intact**, load-bearing data); (c) brief sections for stickers (160-167), flashcards (169-180), reward (182-183); (d) story-concept-patterns table.
+- [X] **T079 (S3) [P]:** Create `templates/children_pages/story_example.html` — minimal runnable story page with Dr. Seuss-style rhyming structure. Embed the illustration rule + rhyming rules + story-concept patterns from `CHILDREN_PAGES.md` lines 51-84 as comments at the top of the file.
+- [X] **T080 (S3) [P]:** Create `templates/children_pages/game_example.html` — minimal runnable game page (Match/Tap/Memory). Embed `CHILDREN_PAGES.md` lines 86-92 as comments.
+- [X] **T081 (S3) [P]:** Create `templates/children_pages/coloring_example.html` — minimal coloring page structure. Structure comments from `CHILDREN_PAGES.md` lines 133-158.
+- [X] **T082 (S3):** Create `templates/children_pages/README.md` (~30 lines) — points at the three example files and the SKILL.md anchors. Contains: (a) compact page-type catalog table (4-7 age block and 8-12 age block from `CHILDREN_PAGES.md` lines 4-45); (b) the 12-entry verified song video ID table (lines 94-131 — **this stays intact**, load-bearing data); (c) brief sections for stickers (160-167), flashcards (169-180), reward (182-183); (d) story-concept-patterns table.
 
 ### Implementation — templates/notebooklm/
 
-- [ ] **T083 (S3) [P]:** Create `templates/notebooklm/query_patterns.md` (~30 lines). Body: the query-pattern guidance from `NOTEBOOKLM.md` (good-query phrasing: "What does [source] say about X?"). Appendix: auth-troubleshooting sequence from `NOTEBOOKLM.md` lines 23-62 (interactive-login gotcha + helper script).
-- [ ] **T084 (S3):** Drop as obsolete per plan §3.6 (SKILL.md Step 0 already covers these): `NOTEBOOKLM.md` lines 5-12 (install check), 14-21 (auth check), 71-84 (post-login verify), 86-87 (fallback). Record drop justification in commit message.
+- [X] **T083 (S3) [P]:** Create `templates/notebooklm/query_patterns.md` (~30 lines). Body: the query-pattern guidance from `NOTEBOOKLM.md` (good-query phrasing: "What does [source] say about X?"). Appendix: auth-troubleshooting sequence from `NOTEBOOKLM.md` lines 23-62 (interactive-login gotcha + helper script).
+- [X] **T084 (S3):** Drop as obsolete per plan §3.6 (SKILL.md Step 0 already covers these): `NOTEBOOKLM.md` lines 5-12 (install check), 14-21 (auth check), 71-84 (post-login verify), 86-87 (fallback). Record drop justification in commit message.
 
 ### Implementation — templates/images/
 
-- [ ] **T085 (S3) [P]:** Create `templates/images/prompt_style_prefix.txt` — raw copy-pasteable text; the coloring-page style prefix from `IMAGE_GENERATION.md` lines 59-78.
-- [ ] **T086 (S3):** Create `templates/images/README.md` (~40 lines). Body: `generate_images.py` usage from `IMAGE_GENERATION.md` lines 3-57; use-case-to-aspect-ratio table from lines 80-89; Unicode emoji color reference from lines 104-176 (**preserved intact** — load-bearing data reference).
+- [X] **T085 (S3) [P]:** Create `templates/images/prompt_style_prefix.txt` — raw copy-pasteable text; the coloring-page style prefix from `IMAGE_GENERATION.md` lines 59-78.
+- [X] **T086 (S3):** Create `templates/images/README.md` (~40 lines). Body: `generate_images.py` usage from `IMAGE_GENERATION.md` lines 3-57; use-case-to-aspect-ratio table from lines 80-89; Unicode emoji color reference from lines 104-176 (**preserved intact** — load-bearing data reference).
 
 ### SKILL.md inline anchors
 
-- [ ] **T087 (S3):** Add SKILL.md §"Querying the corpus" inline anchor inside Phase 2 (~10 lines). Content: the single highest-leverage tip ("phrase NotebookLM queries as 'What does [source] say about X'"), plus the Windows `PYTHONIOENCODING=utf-8` prefix note (from `NOTEBOOKLM.md` line 89), plus a pointer to `templates/notebooklm/query_patterns.md` for more.
-- [ ] **T088 (S3):** Add SKILL.md §"Image prompt conventions" inline anchor inside Phase 3 (~12 lines). Content: style-prefix idea; ethnicity-in-prompt rule; emoji-color-not-CSS rule; `imgs/` vs `HTML/` path convention (from `IMAGE_GENERATION.md` lines 91-102); pointer to `templates/images/README.md`.
+- [X] **T087 (S3):** Add SKILL.md §"Querying the corpus" inline anchor inside Phase 2 (~10 lines). Content: the single highest-leverage tip ("phrase NotebookLM queries as 'What does [source] say about X'"), plus the Windows `PYTHONIOENCODING=utf-8` prefix note (from `NOTEBOOKLM.md` line 89), plus a pointer to `templates/notebooklm/query_patterns.md` for more.
+- [X] **T088 (S3):** Add SKILL.md §"Image prompt conventions" inline anchor inside Phase 3 (~12 lines). Content: style-prefix idea; ethnicity-in-prompt rule; emoji-color-not-CSS rule; `imgs/` vs `HTML/` path convention (from `IMAGE_GENERATION.md` lines 91-102); pointer to `templates/images/README.md`.
 
 ### In-repo reference cleanup + deletions
 
-- [ ] **T089 (S3):** Grep the lesson-builder repo for references to the three deleted MDs:
+- [X] **T089 (S3):** Grep the lesson-builder repo for references to the three deleted MDs:
   ```
   grep -rn 'CHILDREN_PAGES\.md\|NOTEBOOKLM\.md\|IMAGE_GENERATION\.md' --include='*.md' --include='*.py' --include='*.json' .
   ```
   Expected hits per plan: SKILL.md lines ~30, ~119, ~521 (line numbers will have drifted after WS1+WS2). Update each hit to point at the new template location or the new SKILL.md anchor.
-- [ ] **T090 (S3):** `git rm CHILDREN_PAGES.md NOTEBOOKLM.md IMAGE_GENERATION.md`. **No redirect stubs** (plan §3.6 explicit).
+- [X] **T090 (S3):** `git rm CHILDREN_PAGES.md NOTEBOOKLM.md IMAGE_GENERATION.md`. **No redirect stubs** (plan §3.6 explicit).
 
 ### Self-Verification
 
-- [ ] **T091 (S3):** Delete-gate check — `ls *.md` at repo root returns exactly `SKILL.md` and `README.md` (plus `LICENSE`). No CHILDREN_PAGES / NOTEBOOKLM / IMAGE_GENERATION remain.
-- [ ] **T092 (S3):** No-dangling-refs grep — `grep -r 'CHILDREN_PAGES\.md\|NOTEBOOKLM\.md\|IMAGE_GENERATION\.md' .` returns zero hits (excluding `.git/`).
-- [ ] **T093 (S3):** Templates-exist check — `ls templates/children_pages/ templates/notebooklm/ templates/images/` each returns a non-empty listing including at minimum a README/examples file and the extra tip/prefix files.
-- [ ] **T094 (S3):** Anchors-added check — `grep -q 'Querying the corpus' SKILL.md` and `grep -q 'Image prompt conventions' SKILL.md` both return true.
-- [ ] **T095 (S3) [GATE — FINAL LINE-COUNT]:** `wc -l SKILL.md` returns a value in `[440, 520]`. This is the target band from plan §9 success metrics. If above 520, identify remaining prose that can be trimmed or moved to templates/.
-- [ ] **T096 (S3):** Information-preservation audit — walk the content-by-content destination table from plan §3.6 row by row; for each row, grep the destination file for the expected content. Mechanical check, no subjective judgment. Document pass/fail per row.
+- [X] **T091 (S3):** Delete-gate check — `ls *.md` at repo root returns exactly `SKILL.md` and `README.md` (plus `LICENSE`). No CHILDREN_PAGES / NOTEBOOKLM / IMAGE_GENERATION remain.
+- [X] **T092 (S3):** No-dangling-refs grep — `grep -r 'CHILDREN_PAGES\.md\|NOTEBOOKLM\.md\|IMAGE_GENERATION\.md' .` returns zero hits in production files (SKILL.md, README.md, *.py, *.json). Remaining hits are in spec/plan/tasks.md initiative planning docs (retrospective references, not live links). PASS.
+- [X] **T093 (S3):** Templates-exist check — `ls templates/children_pages/ templates/notebooklm/ templates/images/` each returns a non-empty listing including at minimum a README/examples file and the extra tip/prefix files.
+- [X] **T094 (S3):** Anchors-added check — `grep -q 'Querying the corpus' SKILL.md` and `grep -q 'Image prompt conventions' SKILL.md` both return true.
+- [ ] **T095 (S3) [GATE — FINAL LINE-COUNT]:** `wc -l SKILL.md` returns a value in `[440, 520]`. This is the target band from plan §9 success metrics. If above 520, identify remaining prose that can be trimmed or moved to templates/. RESULT: 681 lines — 161 OVER the 520 ceiling. GATE FAILED. Root cause: plan's 150-220 line reduction estimate assumed satellite-doc content was inline in SKILL.md. In reality, CHILDREN_PAGES.md/NOTEBOOKLM.md/IMAGE_GENERATION.md were standalone files; SKILL.md only had 3 reference lines pointing to them. WS3/WS4/WS6 additions (regenerate.py section, backend choices Q8-Q10, content-truth Phase 5c = ~110 lines net) more than offset WS5's anchor additions. FLAGGED FOR USER — not chasing arbitrary cuts per instructions.
+- [X] **T096 (S3):** Information-preservation audit — all 5 destination files verified: song IDs, Dr. Seuss rhyming rules, auth troubleshooting, Unicode color tables, coloring style prefix all present. PASS. — walk the content-by-content destination table from plan §3.6 row by row; for each row, grep the destination file for the expected content. Mechanical check, no subjective judgment. Document pass/fail per row.
 
 ### Documentation
 
-- [ ] **T097 (S3) [P]:** Record WS5 changelog entry in SKILL.md top-note (or dedicated commit).
+- [X] **T097 (S3) [P]:** Record WS5 changelog entry in SKILL.md top-note (or dedicated commit).
 
 ---
 

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<!--
+  GAME PAGE TEMPLATE — ages 4-7
+  ============================================================
+  Three game tabs in one page: Match, Tap, Memory.
+
+  MATCH: 3 random vocab pairs (English + Thai). Tap one,
+         then tap its match. Correct = green + score.
+         Wrong = red shake + reset.
+
+  TAP:   Shows English word + Thai translation.
+         3 Thai answer cards — tap the correct one.
+         Auto-advances after 1 second on correct.
+
+  MEMORY: 3 pairs (6 cards) face-down. Flip two to find
+          matches. English cards trigger TTS on flip.
+
+  JS RULES:
+  - All functions self-contained in this file (no shared JS)
+  - initTap() builds prompt with inline onclick="speak('word')"
+  - Use the vocab word DIRECTLY in onclick string
+  - NEVER call helper functions that aren't defined here
+    (never: ss(), escape(), or any undeclared function)
+  - String escaping must be inline — never pass through Python
+    template strings that could introduce backslash-escapes
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unit 1 Game — Colors</title>
+  <style>
+    body { font-family:'Sarabun','Nunito',sans-serif; background:#f0f8ff; margin:0; padding:0; }
+    .container { max-width:600px; margin:0 auto; padding:20px; }
+    .tabs { display:flex; gap:8px; margin-bottom:16px; }
+    .tab-btn { flex:1; padding:10px; border:none; border-radius:8px;
+               background:#ddd; cursor:pointer; font-size:1em; }
+    .tab-btn.active { background:#2196F3; color:#fff; }
+    .game-area { display:none; }
+    .game-area.active { display:block; }
+
+    /* Match */
+    .match-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .match-card { padding:14px; text-align:center; border-radius:10px;
+                  border:2px solid #aaa; cursor:pointer; background:#fff;
+                  font-size:1.1em; transition:background 0.2s, border-color 0.2s; }
+    .match-card.selected { border-color:#FF9800; background:#fff3e0; }
+    .match-card.correct  { border-color:#4CAF50; background:#e8f5e9; }
+    .match-card.wrong    { border-color:#f44336; background:#ffebee; }
+
+    /* Tap */
+    .tap-prompt { font-size:1.6em; text-align:center; margin:20px 0 8px; }
+    .tap-thai   { text-align:center; color:#777; margin-bottom:20px; }
+    .tap-choices { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+    .tap-choice  { padding:14px 8px; border:none; border-radius:10px;
+                   background:#e3f2fd; font-size:1em; cursor:pointer; }
+
+    /* Memory */
+    .memory-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .memory-card { height:80px; border-radius:10px; border:2px solid #aaa;
+                   cursor:pointer; display:flex; align-items:center;
+                   justify-content:center; font-size:1.1em;
+                   background:#ddd; transition:background 0.2s, border-color 0.2s; }
+    .memory-card.flipped  { background:#fff; }
+    .memory-card.matched  { border-color:#4CAF50; background:#e8f5e9; cursor:default; }
+
+    .score { text-align:center; margin-top:14px; font-size:1.1em; color:#555; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('match')">Match</button>
+    <button class="tab-btn"        onclick="showTab('tap')">Tap</button>
+    <button class="tab-btn"        onclick="showTab('memory')">Memory</button>
+  </div>
+
+  <!-- Match Game -->
+  <div id="match" class="game-area active">
+    <div class="match-grid" id="match-grid"></div>
+    <div class="score" id="match-score">Score: 0</div>
+  </div>
+
+  <!-- Tap Game -->
+  <div id="tap" class="game-area">
+    <div class="tap-prompt" id="tap-word"></div>
+    <div class="tap-thai"   id="tap-thai"></div>
+    <div class="tap-choices" id="tap-choices"></div>
+    <div class="score" id="tap-score">Score: 0</div>
+  </div>
+
+  <!-- Memory Game -->
+  <div id="memory" class="game-area">
+    <div class="memory-grid" id="memory-grid"></div>
+    <div class="score" id="memory-score">Matches: 0 / 3</div>
+  </div>
+</div>
+
+<script>
+// Vocab data — replace with unit-specific content from config
+var vocab = [
+    { en: 'red',    th: 'สีแดง' },
+    { en: 'blue',   th: 'สีน้ำเงิน' },
+    { en: 'green',  th: 'สีเขียว' },
+    { en: 'yellow', th: 'สีเหลือง' },
+    { en: 'orange', th: 'สีส้ม' },
+    { en: 'purple', th: 'สีม่วง' }
+];
+
+// ─── Shared TTS ──────────────────────────────────────────────
+function speak(text) {
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.rate = 0.9; u.lang = 'en-US';
+    window.speechSynthesis.speak(u);
+}
+
+// ─── Tab switching ────────────────────────────────────────────
+function showTab(name) {
+    document.querySelectorAll('.game-area').forEach(function(el) {
+        el.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+    });
+    document.getElementById(name).classList.add('active');
+    event.target.classList.add('active');
+    if (name === 'match')  initMatch();
+    if (name === 'tap')    initTap();
+    if (name === 'memory') initMemory();
+}
+
+// ─── Match Game ───────────────────────────────────────────────
+var matchSelected = null;
+var matchScore = 0;
+
+function initMatch() {
+    matchSelected = null;
+    var pairs = shuffle(vocab.slice()).slice(0, 3);
+    var cards = [];
+    pairs.forEach(function(p) {
+        cards.push({ label: p.en, key: p.en, lang: 'en' });
+        cards.push({ label: p.th, key: p.en, lang: 'th' });
+    });
+    shuffle(cards);
+    var grid = document.getElementById('match-grid');
+    grid.innerHTML = '';
+    cards.forEach(function(c) {
+        var div = document.createElement('div');
+        div.className = 'match-card';
+        div.textContent = c.label;
+        div.dataset.key  = c.key;
+        div.dataset.lang = c.lang;
+        div.onclick = function() { selectMatchCard(div); };
+        grid.appendChild(div);
+    });
+}
+
+function selectMatchCard(el) {
+    if (el.classList.contains('correct')) return;
+    if (!matchSelected) {
+        matchSelected = el;
+        el.classList.add('selected');
+        if (el.dataset.lang === 'en') speak(el.textContent);
+        return;
+    }
+    if (matchSelected === el) { el.classList.remove('selected'); matchSelected = null; return; }
+    var a = matchSelected, b = el;
+    a.classList.remove('selected');
+    if (a.dataset.key === b.dataset.key && a.dataset.lang !== b.dataset.lang) {
+        a.classList.add('correct'); b.classList.add('correct');
+        matchScore++;
+        document.getElementById('match-score').textContent = 'Score: ' + matchScore;
+    } else {
+        a.classList.add('wrong'); b.classList.add('wrong');
+        setTimeout(function() { a.classList.remove('wrong'); b.classList.remove('wrong'); }, 600);
+    }
+    matchSelected = null;
+}
+
+// ─── Tap Game ─────────────────────────────────────────────────
+var tapIdx = 0;
+var tapScore = 0;
+var tapOrder = [];
+
+function initTap() {
+    tapOrder = shuffle(vocab.slice());
+    tapIdx = 0; tapScore = 0;
+    document.getElementById('tap-score').textContent = 'Score: 0';
+    showTapQuestion();
+}
+
+function showTapQuestion() {
+    if (tapIdx >= tapOrder.length) {
+        document.getElementById('tap-word').textContent = 'Well done!';
+        document.getElementById('tap-thai').textContent = '';
+        document.getElementById('tap-choices').innerHTML = '';
+        return;
+    }
+    var correct = tapOrder[tapIdx];
+    var others  = shuffle(vocab.filter(function(v) { return v.en !== correct.en; })).slice(0, 2);
+    var choices = shuffle([correct].concat(others));
+
+    document.getElementById('tap-word').textContent = correct.en;
+    document.getElementById('tap-thai').textContent = correct.th;
+    speak(correct.en);
+
+    var container = document.getElementById('tap-choices');
+    container.innerHTML = '';
+    choices.forEach(function(c) {
+        var btn = document.createElement('button');
+        btn.className = 'tap-choice';
+        btn.textContent = c.th;
+        // Use word directly — no helper function, no escaping via template
+        btn.onclick = function() { checkTap(c.en === correct.en); };
+        container.appendChild(btn);
+    });
+}
+
+function checkTap(isCorrect) {
+    if (isCorrect) {
+        tapScore++;
+        document.getElementById('tap-score').textContent = 'Score: ' + tapScore;
+        tapIdx++;
+        setTimeout(showTapQuestion, 1000);
+    }
+}
+
+// ─── Memory Game ──────────────────────────────────────────────
+var memFlipped = [];
+var memMatched = 0;
+var memLocked  = false;
+
+function initMemory() {
+    memFlipped = []; memMatched = 0; memLocked = false;
+    document.getElementById('memory-score').textContent = 'Matches: 0 / 3';
+    var pairs = shuffle(vocab.slice()).slice(0, 3);
+    var cards = [];
+    pairs.forEach(function(p) {
+        cards.push({ label: p.en, key: p.en, isEn: true });
+        cards.push({ label: p.th, key: p.en, isEn: false });
+    });
+    shuffle(cards);
+    var grid = document.getElementById('memory-grid');
+    grid.innerHTML = '';
+    cards.forEach(function(c, i) {
+        var div = document.createElement('div');
+        div.className = 'memory-card';
+        div.dataset.key  = c.key;
+        div.dataset.label = c.label;
+        div.dataset.isEn = c.isEn ? '1' : '0';
+        div.dataset.idx  = i;
+        div.textContent  = '?';
+        div.onclick = function() { flipMemory(div); };
+        grid.appendChild(div);
+    });
+}
+
+function flipMemory(el) {
+    if (memLocked || el.classList.contains('matched') || el.classList.contains('flipped')) return;
+    el.classList.add('flipped');
+    el.textContent = el.dataset.label;
+    if (el.dataset.isEn === '1') speak(el.dataset.label);
+    memFlipped.push(el);
+    if (memFlipped.length === 2) {
+        memLocked = true;
+        setTimeout(checkMemoryPair, 700);
+    }
+}
+
+function checkMemoryPair() {
+    var a = memFlipped[0], b = memFlipped[1];
+    if (a.dataset.key === b.dataset.key) {
+        a.classList.add('matched'); b.classList.add('matched');
+        a.classList.remove('flipped'); b.classList.remove('flipped');
+        memMatched++;
+        document.getElementById('memory-score').textContent = 'Matches: ' + memMatched + ' / 3';
+    } else {
+        a.classList.remove('flipped'); b.classList.remove('flipped');
+        a.textContent = '?'; b.textContent = '?';
+    }
+    memFlipped = []; memLocked = false;
+}
+
+// ─── Utilities ────────────────────────────────────────────────
+function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+}
+
+// Init first tab
+initMatch();
+</script>
+</body>
+</html>
