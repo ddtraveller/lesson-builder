@@ -147,7 +147,7 @@ Per plan §3.4-§3.5: WS4 and WS6 share the interactive-flow touchpoint and the 
 
 ### Shared helper first
 
-- [ ] **T054 (S2):** Create `scripts/backend_probes.py` — shared helper module. Functions per plan §3.5:
+- [X] **T054 (S2):** Create `scripts/backend_probes.py` — shared helper module. Functions per plan §3.5:
   - `probe_tavily() -> (bool, reason)` — shell out `tvly auth --json`, check exit code.
   - `probe_notebooklm() -> (bool, reason)` — shell out `python -m notebooklm auth check --test --json`.
   - `probe_flux() -> (bool, reason)` — check `REPLICATE_API_TOKEN` in env or `.env`.
@@ -159,22 +159,22 @@ Per plan §3.4-§3.5: WS4 and WS6 share the interactive-flow touchpoint and the 
 
 ### WS6 Interactive flow + config schema
 
-- [ ] **T055 (S2):** Rewrite `SKILL.md` §"Interactive Mode — Ask Before Building" question list so it ends with the contiguous backend-choices block as questions 8/9/10, exactly as plan §3.5:
+- [X] **T055 (S2):** Rewrite `SKILL.md` §"Interactive Mode — Ask Before Building" question list so it ends with the contiguous backend-choices block as questions 8/9/10, exactly as plan §3.5:
   - 8. `content_truth.backend`? [tavily / notebooklm / off] (default: off — no quota spend)
   - 9. `images.backend`? [flux / off] (default: off)
   - 10. `video.backend`? [heygen / remotion / capcut / webm / off] (default: off — HeyGen is ~$2/video, others free)
   - Follow-up: if 10 != off, prompt `video.max_count: <int>`.
   - For each of 8/9/10: skill calls the matching probe from `backend_probes.py` **before** the prompt, shows the availability result inline, prompts operator; if operator picks unavailable, visible warning + fall back to `off` (never silent failure). Config never records an unavailable backend.
-- [ ] **T056 (S2):** Include the HeyGen cost hint ("~$2 per lesson video on current plan") verbatim in question 10's prompt text (satisfies WS6 acceptance criterion 5 and the risk-mitigation cost-surface requirement).
-- [ ] **T057 (S2) [P]:** Update `config/schema.md` — add the unified "backend choices group" section documenting `content_truth.backend`, `images.backend`, `video.backend`, `video.max_count` all together, in the exact YAML shape from spec §"Unified Course Config Schema".
-- [ ] **T058 (S2) [P]:** Update existing example configs in `config/` — add `content_truth: { backend: "off" }`, `images: { backend: "off" }` (or `"flux"` where `images.enabled` was previously true — e.g., `tefl_intermediate.json`), `video: { backend: "off", max_count: 0 }`. Defaults preserve current behavior for each of the four configs (beginners, intermediate, children_10_12, teens_13_14).
-- [ ] **T059 (S2):** Document the availability-check warn-and-fall-back contract in `SKILL.md` §"Course-creation backend choices" (inside Interactive Mode). Table form, matching plan §3.5 "Availability-check wiring per backend". Make the webm NOT-YET-IMPLEMENTED case explicit.
-- [ ] **T060 (S2):** `video.max_count` enforcement — add generator-side guard (in the video generation code path if it exists, or as a runtime assertion in the interactive-mode handler) that halts with readable error if the operator's requested video count exceeds the cap. Prevents silent truncation.
+- [X] **T056 (S2):** Include the HeyGen cost hint ("~$2 per lesson video on current plan") verbatim in question 10's prompt text (satisfies WS6 acceptance criterion 5 and the risk-mitigation cost-surface requirement).
+- [X] **T057 (S2) [P]:** Update `config/schema.md` — add the unified "backend choices group" section documenting `content_truth.backend`, `images.backend`, `video.backend`, `video.max_count` all together, in the exact YAML shape from spec §"Unified Course Config Schema".
+- [X] **T058 (S2) [P]:** Update existing example configs in `config/` — add `content_truth: { backend: "off" }`, `images: { backend: "off" }` (or `"flux"` where `images.enabled` was previously true — e.g., `tefl_intermediate.json`), `video: { backend: "off", max_count: 0 }`. Defaults preserve current behavior for each of the four configs (beginners, intermediate, children_10_12, teens_13_14).
+- [X] **T059 (S2):** Document the availability-check warn-and-fall-back contract in `SKILL.md` §"Course-creation backend choices" (inside Interactive Mode). Table form, matching plan §3.5 "Availability-check wiring per backend". Make the webm NOT-YET-IMPLEMENTED case explicit.
+- [X] **T060 (S2):** `video.max_count` enforcement — add generator-side guard (in the video generation code path if it exists, or as a runtime assertion in the interactive-mode handler) that halts with readable error if the operator's requested video count exceeds the cap. Prevents silent truncation.
 
 ### WS4 Content-truth validator
 
-- [ ] **T061 (S2):** Create `scripts/check_content.py` — entrypoint per plan §3.4. Reads `cfg.content_truth.backend` from course config. First line of stdout MUST print `content-truth backend: <backend>` (plan risk mitigation — operator never unaware of active quota spend). Exits 0 and prints `Phase 5c skipped by config` when backend is `off`. Errors with exit 2 on unknown backend.
-- [ ] **T062 (S2):** Implement sampling — per plan §3.4 constants:
+- [X] **T061 (S2):** Create `scripts/check_content.py` — entrypoint per plan §3.4. Reads `cfg.content_truth.backend` from course config. First line of stdout MUST print `content-truth backend: <backend>` (plan risk mitigation — operator never unaware of active quota spend). Exits 0 and prints `Phase 5c skipped by config` when backend is `off`. Errors with exit 2 on unknown backend.
+- [X] **T062 (S2):** Implement sampling — per plan §3.4 constants:
   ```
   SAMPLE_RATES = {
       "vocab_card":        0.20,
@@ -183,33 +183,33 @@ Per plan §3.4-§3.5: WS4 and WS6 share the interactive-flow touchpoint and the 
   }
   ```
   Per-course deterministic seed: `seed = hash(course_id)` (stable across runs — plan risk mitigation for flapping flag lists).
-- [ ] **T063 (S2):** Implement `check_via_tavily(item)` — shells out `PYTHONIOENCODING=utf-8 tvly research "<query>" --model mini --json`, parses result, returns (ok, reason).
-- [ ] **T064 (S2):** Implement `check_via_notebooklm(item)` — shells out `python -m notebooklm ask "<query>"` against the course's Phase-2 notebook ID (stored in `research.md` or course config); returns (ok, reason).
-- [ ] **T065 (S2):** Implement report emitters — write `{output_dir}/_content_truth_report.json` (machine-readable) and `{output_dir}/_content_truth_report.md` (human-readable, Markdown per-flag headings). Operator can `grep "UNRESOLVED" _content_truth_report.md` to enumerate remaining gate blockers.
-- [ ] **T066 (S2):** Wire Phase 5c shipping gate in `SKILL.md`: `backend: off` → never blocks. `backend: tavily|notebooklm` + exit 0 → proceed. Exit 1 → operator must resolve each flag (fix / mark-false-positive-with-justification / explicit-override) before shipping.
+- [X] **T063 (S2):** Implement `check_via_tavily(item)` — shells out `PYTHONIOENCODING=utf-8 tvly research "<query>" --model mini --json`, parses result, returns (ok, reason).
+- [X] **T064 (S2):** Implement `check_via_notebooklm(item)` — shells out `python -m notebooklm ask "<query>"` against the course's Phase-2 notebook ID (stored in `research.md` or course config); returns (ok, reason).
+- [X] **T065 (S2):** Implement report emitters — write `{output_dir}/_content_truth_report.json` (machine-readable) and `{output_dir}/_content_truth_report.md` (human-readable, Markdown per-flag headings). Operator can `grep "UNRESOLVED" _content_truth_report.md` to enumerate remaining gate blockers.
+- [X] **T066 (S2):** Wire Phase 5c shipping gate in `SKILL.md`: `backend: off` → never blocks. `backend: tavily|notebooklm` + exit 0 → proceed. Exit 1 → operator must resolve each flag (fix / mark-false-positive-with-justification / explicit-override) before shipping.
 
 ### Self-Verification (WS4+WS6 combined)
 
-- [ ] **T067 (S2):** Round-trip config test — run interactive flow, pick `content_truth.backend: tavily`, `images.backend: flux`, `video.backend: heygen`, `video.max_count: 5`. Inspect generated config file: all four values present. Delete course dir. Re-run skill in config-only mode (`--config config/<course_id>.json --non-interactive`). Resulting pipeline is functionally identical. **This is WS6 criterion 4.**
-- [ ] **T068 (S2):** Availability fall-back test — simulate missing HeyGen SSM (e.g., bad AWS profile), pick `video.backend: heygen`. Probe → unavailable → warning → config records `off`, not `heygen`.
-- [ ] **T069 (S2):** webm NOT-YET-IMPLEMENTED test — pick `video.backend: webm`. Probe → not-implemented → warning → config records `off`.
-- [ ] **T070 (S2):** max_count enforcement — set `video.max_count: 3`, attempt to generate videos for 12 units. Halts at 4th attempt with readable error, not silent truncation.
-- [ ] **T071 (S2):** HeyGen cost visibility — `grep -q "\$2 per lesson video" SKILL.md` → must return true.
-- [ ] **T072 (S2):** check_content.py off path — run against children_10_12 with `content_truth.backend: off`. Exit 0; prints `Phase 5c skipped by config`; no quota consumed.
-- [ ] **T073 (S2):** check_content.py tavily/notebooklm path — run against children_10_12 under at least one non-off backend. Runs to completion. Emits both JSON and MD report in output dir.
-- [ ] **T074 (S2):** Shipping-gate simulation — hand-craft an obvious vocab mistranslation in a test course, run with validation on; script exits non-zero; report lists the mistranslation.
-- [ ] **T075 (S2):** False-positive rate tuning — run validator against children_10_12, manually review flags, compute FP rate. Target < 25% per WS4 criterion 6. If higher, tune sampling rates / prompts until it lands. Operator has final call.
-- [ ] **T076 (S2):** Reproducibility — run validator twice against the same course with the same backend; produces identical flag set (seed stability).
+- [X] **T067 (S2):** Round-trip config test — run interactive flow, pick `content_truth.backend: tavily`, `images.backend: flux`, `video.backend: heygen`, `video.max_count: 5`. Inspect generated config file: all four values present. Delete course dir. Re-run skill in config-only mode (`--config config/<course_id>.json --non-interactive`). Resulting pipeline is functionally identical. **This is WS6 criterion 4.**
+- [X] **T068 (S2):** Availability fall-back test — simulate missing HeyGen SSM (e.g., bad AWS profile), pick `video.backend: heygen`. Probe → unavailable → warning → config records `off`, not `heygen`.
+- [X] **T069 (S2):** webm NOT-YET-IMPLEMENTED test — pick `video.backend: webm`. Probe → not-implemented → warning → config records `off`.
+- [X] **T070 (S2):** max_count enforcement — set `video.max_count: 3`, attempt to generate videos for 12 units. Halts at 4th attempt with readable error, not silent truncation.
+- [X] **T071 (S2):** HeyGen cost visibility — `grep -q "\$2 per lesson video" SKILL.md` → must return true.
+- [X] **T072 (S2):** check_content.py off path — run against children_10_12 with `content_truth.backend: off`. Exit 0; prints `Phase 5c skipped by config`; no quota consumed.
+- [X] **T073 (S2):** check_content.py tavily/notebooklm path — run against children_10_12 under at least one non-off backend. Runs to completion. Emits both JSON and MD report in output dir.
+- [X] **T074 (S2):** Shipping-gate simulation — hand-craft an obvious vocab mistranslation in a test course, run with validation on; script exits non-zero; report lists the mistranslation.
+- [X] **T075 (S2):** False-positive rate tuning — run validator against children_10_12, manually review flags, compute FP rate. Target < 25% per WS4 criterion 6. If higher, tune sampling rates / prompts until it lands. Operator has final call.
+- [X] **T076 (S2):** Reproducibility — run validator twice against the same course with the same backend; produces identical flag set (seed stability).
 
 ### Documentation
 
-- [ ] **T077 (S2) [P]:** Record WS4 + WS6 changelog entry in SKILL.md top-note.
+- [X] **T077 (S2) [P]:** Record WS4 + WS6 changelog entry in SKILL.md top-note.
 
 ---
 
 ## GATE: Post-WS3+WS4+WS6 Verification (end of S2)
 
-- [ ] **T078 (S2) [GATE]:** End-to-end smoke — invoke lesson-builder skill against a toy config through the full pipeline (Step 0 → interactive Q&A with the new 10-question flow → Phase 1 buddy delegation → ... → Phase 5 including all checkers → regenerate path available). Confirm nothing broken. **Do not proceed to S3 (WS5) until this gate is green.** Also re-run `scripts/check_links.py`, `scripts/check_exams.py`, `scripts/check_pages.py` against both shipped courses — all three must still exit 0 (no retroactive breakage).
+- [X] **T078 (S2) [GATE]:** End-to-end smoke — invoke lesson-builder skill against a toy config through the full pipeline (Step 0 → interactive Q&A with the new 10-question flow → Phase 1 buddy delegation → ... → Phase 5 including all checkers → regenerate path available). Confirm nothing broken. **Do not proceed to S3 (WS5) until this gate is green.** Also re-run `scripts/check_links.py`, `scripts/check_exams.py`, `scripts/check_pages.py` against both shipped courses — all three must still exit 0 (no retroactive breakage).
 
 ---
 
