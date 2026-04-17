@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<!-- Rule 2.2 PASS: no Python backslash-quote leakage -->
+<html><head><title>Rule 2.2 pass</title></head>
+<body>
+<button onclick="speak(&quot;hello&quot;, &quot;en-US&quot;)">Speak</button>
+<script>
+function speak(text, lang) {
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = lang;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+}
+</script>
+</body></html>

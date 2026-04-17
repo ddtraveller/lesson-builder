@@ -16,6 +16,7 @@
 - [ ] T009: Generate syllabus page
 - [ ] T010: Run `python scripts/check_links.py {{output_dir}} --html-root HTML` — fix BROKEN and DEPTH findings in the generator, regenerate, re-run until exit 0
 - [ ] T011: Run `python scripts/check_exams.py {{output_dir}} --review-out {{output_dir}}/_exam_review.json` — fix structural issues, then read `_exam_review.json` and verify every question is answerable (complete question, exactly one correct option, plausible distractors). Skip if course has no exam pages.
+- [ ] T012: Run `python scripts/check_pages.py {{output_dir}}` — review findings (report-only until promoted to blocking after two clean runs on shipped courses). Fix any JS escape leakage, undefined function references, or missing media src findings in the generator, then regenerate.
 
 {{Optional additional tasks if applicable:}}
 - [ ] T0XX: Generate hero images via Replicate (if `images.enabled`)

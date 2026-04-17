@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<!-- Rule 2.4 BROKEN: speechSynthesis.speak() called without cancel guard -->
+<html><head><title>Rule 2.4 broken</title></head>
+<body>
+<button onclick="speak('hello')">Speak</button>
+<script>
+function speak(text) {
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    speechSynthesis.speak(u);
+}
+</script>
+</body></html>

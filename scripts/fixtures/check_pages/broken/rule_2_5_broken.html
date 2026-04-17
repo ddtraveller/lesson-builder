@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<!-- Rule 2.5 BROKEN: onclick arg has apostrophe inside single-quoted JS arg -->
+<html><head><title>Rule 2.5 broken</title></head>
+<body>
+<button onclick="speak('it's a test')">Speak</button>
+<script>
+function speak(t) { console.log(t); }
+</script>
+</body></html>

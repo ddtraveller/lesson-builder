@@ -1,0 +1,7 @@
+<!DOCTYPE html>
+<!-- Rule 2.6 BROKEN: img src references a local file that does not exist -->
+<html><head><title>Rule 2.6 broken</title></head>
+<body>
+<!-- This file does not exist on disk — should trigger rule 2.6 -->
+<img src="../../imgs/this_file_does_not_exist_abc123.png" alt="missing">
+</body></html>

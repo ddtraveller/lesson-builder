@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<!-- Rule 2.3 BROKEN: SVG attribute uses \' inside JS string literal -->
+<html><head><title>Rule 2.3 broken</title></head>
+<body>
+<script>
+// viewBox=\' will terminate the JS string prematurely
+var icon = '<svg viewBox=\'0 0 16 16\'><circle cx="8" cy="8" r="4"/></svg>';
+document.body.innerHTML = icon;
+</script>
+</body></html>

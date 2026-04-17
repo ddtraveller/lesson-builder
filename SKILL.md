@@ -2,6 +2,10 @@
 name: lesson-builder
 description: "Generates bilingual TEFL/ESL courses with lessons, exams, flashcards, conversations, pronunciation drills, worksheets, and syllabi for any language pair."
 ---
+<!-- Changelog (most recent first)
+  WS2 complete (2026-04-17): check_pages.py (rules 2.1-2.7) added; §Common JS bugs 4a-4e, §Relative path depth tutorial, §Filename convention coordination, §Path-bug detection script deleted; Unit 1 gate trimmed. SKILL.md now 569 lines.
+  WS1 complete (2026-04-17): Phases 1-4 delegated to buddy:*; minimal fallback at Appendix.
+-->
 
 ## When to use
 
@@ -407,48 +411,11 @@ Only after unit 1 passes, generate remaining units using the same templates.
 - Emoji colors match the text: if the label says "blue bird", the emoji must naturally render as blue. See [IMAGE_GENERATION.md](IMAGE_GENERATION.md) for emoji color reference
 - Song page: embeds a real YouTube children's song (verify video ID is valid)
 
-### 4. Common JS bugs to avoid (battle-tested from real builds)
+### 4. JS quality checks
 
-**These are bugs that have actually shipped to production and broken courses. Fix them at generation time, not after the user reports them.**
+Rules 2.1–2.5 and 2.7 are mechanically enforced by `scripts/check_pages.py` (run in Phase 5). One operational concern that remains:
 
-#### a. Never reference undefined functions
-Every function used in `onclick`, `innerHTML` strings, or event handlers must be defined in the same `<script>` block. Pages are standalone HTML with no shared JS files.
-
-#### b. Quote safety in inline handlers
-When building `onclick="speak('word')"` via string concatenation, the word itself must not contain single quotes. Use `html.escape(text, quote=True)` to convert any embedded `'` to `&#39;` before injecting into onclick.
-
-#### c. JS quote escaping in Python-emitted JS — THE MOST SUBTLE BUG
-**This is the bug we hit on the English Quest TEFL course quiz page that broke the entire `<script>` block with a SyntaxError.**
-
-When a Python generator emits JavaScript that itself constructs strings with embedded single quotes (e.g., language tags like `'en-US'`, key codes like `'Enter'`, scenario IDs), the Python source `\'` does NOT survive into the rendered JS as an escape — Python's `\'` in a single-quoted string is just a literal `'`.
-
-**Wrong (Python source):**
-```python
-html += '<button onclick="speak(' + JSON.stringify(q.word) + ',\'en-US\')">'
-```
-This Python source contains the literal string `<button onclick="speak(...),'en-US')">"`. When that runs as JS, the `'en-US'` prematurely terminates the surrounding JS string, JS sees `en-US` as an identifier (undefined), and the whole script fails to parse.
-
-**Right (Python source):**
-```python
-html += '<button onclick="speak(' + JSON.stringify(q.word) + ',\\'en-US\\')">'
-```
-The `\\'` in the Python source is a literal backslash followed by a quote. When written to the file it becomes `\'`, which IS the correct JS escape for a single quote inside a JS string literal. The rendered JS now contains `,\'en-US\')` which JS parses correctly.
-
-**Even better (avoids the entire problem):**
-```python
-html += '<button onclick="speak(' + JSON.stringify(q.word) + ',' + JSON.stringify('en-US') + ')">'
-```
-Use `JSON.stringify()` for ANY string value embedded in JS — it produces a properly-quoted, properly-escaped JS string literal at runtime regardless of what Python's escaping does.
-
-**Detection:** This bug is invisible to `python -c "import ast; ast.parse(...)"` because the Python file IS valid Python — only the rendered JS is broken. To catch it before users see it, **load every generated page in a browser with DevTools console open** and look for `SyntaxError` or `ReferenceError`. Alternatively, extract the `<script>` block from at least one page per page-type and run it through a JS parser (`node --check page.js` or similar).
-
-#### d. SVG / HTML attribute quoting inside JS string literals
-When embedding SVG or HTML fragments inside a single-quoted JS string (e.g., `html += '<button>...<svg viewBox=...>'`), use **double-quoted attributes** (`viewBox="0 0 16 16"`) not single-quoted ones (`viewBox='0 0 16 16'`). Single-quoted SVG attributes inside a single-quoted JS string will terminate the JS string mid-construction.
-
-#### e. Always cancel speechSynthesis
-Call `window.speechSynthesis.cancel()` before each `speak()` call to prevent utterance queue buildup if the user clicks rapidly.
-
-#### f. localStorage quota
+#### localStorage quota
 Each page-type's localStorage keys should have a per-key size budget. For a 12-unit course with chat history + quiz scores + project drafts + vocab tracking, total budget should stay under 1 MB. If quota is hit, fall back to clearing oldest entries first.
 
 ## Bilingual Content Rules
@@ -531,93 +498,22 @@ for unit in config['units']:
 - **Sequential generation only** — never launch multiple heavy agents in parallel (they exhaust token budget and all fail)
 - **One course at a time** — verify output before starting the next
 
-### Relative path depth — critical for nested HTML output dirs
+### Relative path depth
 
-**This is the bug we hit on the English Quest TEFL course where the deployed HeyGen video URL returned 404.**
+The number of `..` segments in a relative path must equal the page's depth from `HTML/` root — enforced by `scripts/check_links.py` (depth check) and `scripts/check_pages.py` (rule 2.6 src existence). Make `html_relative_path` configurable in the course config, not hardcoded in the generator.
 
-Pages deployed to S3 inherit a path based on their location under `HTML/`. The S3 bucket structure is:
-
-```
-s3://krueng.ai/
-  imgs/      ← all images at bucket root
-  video/     ← all videos at bucket root
-  audio/     ← all audio at bucket root
-  *.html     ← deployed from HTML/ root
-  tefl/teens_13_14/*.html  ← deployed from HTML/tefl/teens_13_14/
-```
-
-Pages at `HTML/page.html` deploy to `/page.html`. From there, `../imgs/foo.png` resolves to `/imgs/foo.png` ✓ (one `..` is correct).
-
-Pages at `HTML/tefl/teens_13_14/page.html` deploy to `/tefl/teens_13_14/page.html`. From there:
-- `../imgs/foo.png` → `/tefl/imgs/foo.png` ✗ **(WRONG — that path doesn't exist)**
-- `../../imgs/foo.png` → `/imgs/foo.png` ✓ **(correct — reaches bucket root)**
-
-**Rule:** the number of `..` segments in a relative path must equal the page's depth from `HTML/` root. A page at `HTML/<dir1>/<dir2>/page.html` is at depth 2 and needs `../../imgs/...`. A page at `HTML/<dir1>/page.html` is at depth 1 and needs `../imgs/...`. A page at `HTML/page.html` is at depth 0 and needs `imgs/...` (no `..` at all, or just `./imgs/`).
-
-**Implementation:** make the `html_relative_path` for `imgs/`, `video/`, and `audio/` configurable in the course config JSON, NOT hardcoded in the generator. Compute the correct depth at config time based on `output_dir`. Example for a course at `HTML/tefl/teens_13_14/`:
-
-```jsonc
-"ai_services": {
-  "heygen": { "html_relative_path": "../../video/<course_id>/" },
-  "flux":   { "html_relative_path": "../../imgs/<course_id>/" }
-}
-```
-
-**Detection:** before bulk generation, manually check ONE generated page's `<img>`/`<video>` `src` attributes against the actual S3 path the file lives at. Or: after deployment, `curl -I` one media URL to see if it 200s.
-
-### Filename convention coordination across generators
-
-**This is the bug we hit on English Quest where the HTML generator's vocab card filenames didn't match what the FLUX image generator produced — every vocab card image silently 404'd.**
-
-When a course uses two or more scripts that share data (e.g., `generate_<course>.py` for HTML and `generate_<course>_images.py` for FLUX images), they MUST agree on filename conventions. The two scripts are typically written by different agents in different tasks, and naming drift is common.
-
-**Failure mode:** HTML generator emits `<img src="../../imgs/.../slug_name.png">` while the image generator produces `quest_slug_vocab_name.png`. The pages render with broken images and no error — easy to miss in a quick spot check.
-
-**Fix:** define the filename pattern in **one** place. Two options:
-
-1. **Config-driven:** put the pattern in the course config JSON as a format string:
-   ```jsonc
-   "filename_patterns": {
-     "vocab_card":   "{prefix}_{slug}_vocab_{word_slug}.png",
-     "lesson_hero":  "{prefix}_{slug}_lesson_hero.png",
-     "project_hero": "{prefix}_{slug}_project_hero.png",
-     "reading_scene":"{prefix}_{slug}_reading.png"
-   }
-   ```
-   Both scripts read this from the config.
-
-2. **Shared helper:** put the pattern in a small Python module that both generators import. E.g., `quest_paths.py` with `vocab_card_filename(prefix, slug, word)` etc.
-
-**Detection:** after Phase F (image generation) and before declaring the course done, run:
-```bash
-# List all <img src=...> from generated HTML, list all .png files in imgs dir,
-# diff to find references that don't have a corresponding file
-grep -h 'src="\.\./' HTML/path/to/course/*.html | grep -oE '[^"]+\.png' | sort -u > /tmp/html_refs.txt
-ls imgs/path/to/course/*.png | xargs -n1 basename | sort -u > /tmp/actual_files.txt
-diff /tmp/html_refs.txt /tmp/actual_files.txt
-```
-Any line in `/tmp/html_refs.txt` not in `/tmp/actual_files.txt` is a broken reference.
 
 ### Unit 1 verification gate — what to actually verify
 
-**The Unit 1 gate (Phase C, T005-T006) is load-bearing, but a casual spot check is insufficient.** Real bugs can hide behind a "looks fine" surface. The English Quest build had three bugs that survived a spot check and surfaced only after deployment:
-
-1. The Quest Quiz JS had a `SyntaxError` that killed the entire script tag — every quiz button silently no-op'd
-2. Video paths used `../video/` instead of `../../video/` — every lesson video URL 404'd after deployment
-3. Image filenames didn't match the FLUX generator's output — every vocab card image 404'd after deployment
-
-**Mandatory checks at Unit 1 gate (T006), in order:**
+**The Unit 1 gate is load-bearing.** Run `scripts/check_pages.py`, `scripts/check_links.py`, and `scripts/check_exams.py` first; they catch mechanical issues automatically. Then do the human-only checks:
 
 1. **Open DevTools Console.** ANY red error or warning is a fail. Most subtle bugs surface here.
 2. **Click every interactive element on every page** — every vocab card flip, every quiz answer button, every chat scenario chip, every "Next" button, every "Save to Portfolio" button. Watch the console while doing it.
-3. **View source on at least one page per page-type.** Visually scan the inline `<script>` block for obvious quote conflicts, undefined function references, or Python escape patterns that didn't render correctly (e.g., `\'` where `\\'` was needed).
-4. **Test relative paths against the actual S3 layout.** Pick one image src from the HTML (e.g., `../../imgs/foo/bar.png`) and verify the file exists at the corresponding S3 key (`s3://bucket/imgs/foo/bar.png`). Same for videos.
-5. **Refresh the page** after entering quiz/project/chat data. Verify `localStorage` persistence — data should still be there.
-6. **Test mobile breakpoints** — DevTools responsive mode at 768px and 480px. Check for layout breakage, button overlap, text overflow.
-7. **Check at least one nav footer link works** — click from lesson to chat, chat to reading, etc. Verify they go to the correct file.
-8. **For chatbot pages: send a real test message and verify the response renders + speaks correctly.** This proves the Lambda endpoint is reachable.
+3. **Refresh the page** after entering quiz/project/chat data. Verify `localStorage` persistence — data should still be there.
+4. **Test mobile breakpoints** — DevTools responsive mode at 768px and 480px. Check for layout breakage, button overlap, text overflow.
+5. **For chatbot pages: send a real test message and verify the response renders + speaks correctly.** This proves the Lambda endpoint is reachable.
 
-If ANY of these checks fail, fix the generator (not the HTML — the HTML is a build output) and re-run T005 (regenerate Unit 1) before re-checking.
+If ANY of these checks fail, fix the generator (not the HTML — the HTML is a build output) and re-run generation before re-checking.
 
 ### FLUX safety filter false positives
 
@@ -633,30 +529,6 @@ If ANY of these checks fail, fix the generator (not the HTML — the HTML is a b
 
 The image generator script should support per-vocab prompt overrides via the config so the rare problematic items can be re-prompted without changing the global style prefix.
 
-### Path-bug detection script (run during Unit 1 gate)
-
-Add this one-liner to the Unit 1 verification step to catch path/filename mismatches before deployment:
-
-```bash
-# From repo root, verify every HTML <img src="../..."> resolves to a real local file
-python -c "
-import os, re, sys
-HTML_DIR = 'HTML/path/to/course'
-IMGS_DIR = 'imgs/path/to/course'  # local FLUX output
-broken = []
-for fn in os.listdir(HTML_DIR):
-    if not fn.endswith('.html'): continue
-    with open(os.path.join(HTML_DIR, fn), encoding='utf-8') as f:
-        for m in re.finditer(r'src=\"([^\"]+\.(?:png|jpg|mp4))\"', f.read()):
-            ref = m.group(1).split('/')[-1]
-            if not os.path.exists(os.path.join(IMGS_DIR, ref)):
-                broken.append((fn, ref))
-if broken:
-    for fn, ref in broken[:10]: print(f'{fn}: missing {ref}')
-    sys.exit(1)
-print('All image refs resolve OK')
-"
-```
 
 ## Example Configs
 
