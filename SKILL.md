@@ -286,6 +286,72 @@ Execute the tasks in order:
 4. Report progress after each completed task
 5. On completion, update tasks.md status to "Completed"
 
+### Phase 5: Post-Generation Verification (REQUIRED)
+
+Before declaring the course complete, run two automated checks and one semantic review. These catch the two classes of bugs that have shipped to users and been reported back as complaints: **broken links** and **unanswerable exam questions**.
+
+#### 5a. Link check (always run)
+
+```bash
+python scripts/check_links.py {output_dir} --html-root HTML
+```
+
+The script walks every `.html` file in the course directory and reports:
+- **BROKEN** — a `href` or `src` points at a local file that doesn't exist on disk
+- **DEPTH** — a media ref like `../imgs/foo.png` uses the wrong number of `..` for the page's depth (so it deploys correctly locally but 404s on S3 — this is the bug we hit on the English Quest teens_13_14 course)
+- **YouTube embeds** — list of video IDs for the user to spot-check
+- **External URLs** — list of external refs for the user to review (optional `--check-external` flag HEADs each one)
+
+Fix every BROKEN and DEPTH finding by editing the generator (not the HTML — the HTML is a build output), then regenerate the affected pages. Don't proceed until the script exits 0.
+
+#### 5b. Exam answerability check (if course has exam pages)
+
+Exam pages ship with embedded question banks. The common complaints from learners are:
+- "The question is incomplete" — e.g. the vocabulary word got stripped and the question reads `What is the meaning of ""?`
+- "None of the answers are right" — the distractors are fine but the correct option was swapped with a near-miss
+- "Two answers look correct" — the distractors aren't actually distinct from the correct answer
+
+Step 1 — run the structural check:
+
+```bash
+python scripts/check_exams.py {output_dir} --review-out {output_dir}/_exam_review.json
+```
+
+This catches: empty/placeholder question text, fewer than 2 real options, duplicate options, `correct` index out of range, explanation that quotes a string no option matches. Fix any structural issues in the generator and regenerate.
+
+Step 2 — **semantic review** (mandatory). The script writes `_exam_review.json` containing every question with its options, correct index, and explanation. You (the skill) MUST read this file and for each question verify:
+
+1. **Is the question complete?** A question like `What is the meaning of ""?` or `Choose the correct form of to` is incomplete — a word was stripped during generation.
+2. **Does `options[correct_index]` actually answer the question?** E.g. if the question is "What is the past tense of 'go'?" and `options[correct]` is `"going"`, that is wrong.
+3. **Are any *other* options also correct?** A question like "Which is a greeting?" with options `["hello", "hi", "bye", "goodbye"]` has two right answers — unanswerable as written.
+4. **Are the distractors plausible but clearly wrong?** If the distractors are nonsense strings or identical in meaning to the correct one, the question is either trivial or broken.
+
+Report findings back in this format:
+
+```
+Exam review: N questions across M exam files
+
+Issues:
+  begin_greetings_exam.html / vocabulary/easy #3
+    Q: "What is the meaning of \"\"?"
+    → question is truncated (empty quoted word)
+    → fix generator: vocab loop lost the word variable
+
+  begin_food_exam.html / grammar/medium #7
+    Q: "Which is the correct plural of 'fish'?"
+    Options: ["fish", "fishes", "fishies", "none of these"]
+    correct=0 ("fish")
+    → "fishes" is also accepted as plural in several contexts (different species);
+      rewrite the distractor or add specificity to the question
+```
+
+Then fix the generator and regenerate the affected exam pages. Re-run both checks until clean.
+
+#### 5c. When to skip
+
+- **Skip 5b if `page_structure.exam` is `"none"`** for this course.
+- **Never skip 5a.** Every course has links; every course needs the check.
+
 ### Stepping Through vs. Auto-Run
 
 By default, **pause after Phase 1 (spec)** to confirm with the user before proceeding. The user can say:
